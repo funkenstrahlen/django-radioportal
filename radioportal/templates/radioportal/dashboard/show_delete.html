@@ -1,0 +1,10 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}{{ block.super }} » {% trans "Delete Show" %}{% endblock %}
+{% block content %}
+<h2>{% trans "Delete Show" %}</h2>
+<form method="POST" action=".">
+{% csrf_token %}
+<p>{% trans "Should the object" %} "{{ object }}" {% trans "really be deleted" %}</p>
+<input type="submit" value="Löschen" />
+</form>
+{% endblock %}

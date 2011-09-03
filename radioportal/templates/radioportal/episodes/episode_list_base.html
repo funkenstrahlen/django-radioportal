@@ -1,0 +1,99 @@
+{% extends 'radioportal/base.html' %}{% load cache i18n shorturl hosts %}
+{% block title %} &middot; {{ show.name }}{% endblock %}
+{% block breadcrumb %}{{ block.super }} » <a href="{% url shows %}">{% trans "Shows" %}</a>{% if show %} » {{ show.name }}{% endif %}{% endblock %}
+{% block head_css %}
+	{{ block.super }}
+	{% include "radioportal/episodes/episode_streams_head_css.html" %}
+{% endblock %}
+{% block head_js %}
+	{{ block.super }}
+	{% include "radioportal/episodes/episode_streams_head_js.html" %}
+{% endblock %}
+{% block head %}
+
+<link href="{% host_url show-feed show_name=show.slugName on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+{% endblock %}
+{% block feed_footer %}
+
+<li><a href="{% host_url show-feed show_name=show.slugName on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+{% endblock %}
+{% block collapsed_shows %}un{% endblock %}
+{% block navi_shows %}
+<ul>
+{% for s in shows %}
+        <li{% ifequal s show %} class="active"{% endifequal %}>
+		<a class="{% ifequal s show %}un{% endifequal %}collapsed" href="{% url show show_name=s.slugName %}">{{ s.name }}</a>
+	{% ifequal s show %}
+                <ul>
+		{% if is_paginated and page_obj.has_previous %}
+			<li><a href="?page={{ page_obj.previous_page_number }}">...</a></li>
+		{% endif %}
+		{% for episode in object_list %}
+			<li><a href="{% url episode show_name=episode.show.slugName,episode_id=episode.shortName %}">
+				{{ episode.shortName|upper }}
+			</a></li>
+		{% endfor %}
+		{% if is_paginated and page_obj.has_next %}
+			<li><a href="?page={{ page_obj.next_page_number }}">...</a></li>
+		{% endif %}
+                </ul>
+	{% endifequal %}
+        </li>
+{% endfor %}
+</ul>
+{% endblock %}
+{% block content %}
+{% block list_head %}
+{% cache 900 episode_list_head show.slugName %}
+<div class="showheader">
+{% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" />{% endif %}
+<h1><a href="{% url show show_name=show.slugName %}">{{ show.name }}</a></h1>
+<small>{{ show.description }} (<a href="{{ show.url }}">{% trans "Homepage" %}</a>)</small>
+<p>{{ show.abstract }}</p>
+</div>
+{% endcache %}
+{% endblock %}
+{% if object_list %}
+{% for episode in object_list %}
+	{% ifchanged %}
+		<h2>
+		{% ifequal episode.status "RUNNING" %}
+			{% if show_name %}<a href="{% url live_show show_name=show.slugName %}">{% endif %}
+				{% trans "Running Episodes" %}
+			{% if show_name %}</a>{% endif %}
+		{% endifequal %}
+		{% ifequal episode.status "ARCHIVED" %}
+			{% trans "Archived Episodes" %}
+		{% endifequal %}
+		{% ifequal episode.status "PLANNED" %}
+			{% if show_name %}<a href="{% url planned_show show_name=show.slugName %}">{% endif %}
+				{% trans "Planned Episodes" %}
+			{% if show_name %}</a>{% endif %}
+		{% endifequal %}
+		</h2>
+	{% endifchanged %}
+	{% include "radioportal/episodes/episode_list_entry.html" %}
+{% endfor %}
+{% else %}
+{% block no_episodes %}<h2>{% trans "No episodes available." %}</h2>{% endblock %}
+{% endif %}
+{% if is_paginated %}
+<div class="pagination">
+<ul>
+	{% if page_obj.has_previous %}
+	{% ifnotequal page_obj.previous_page_number 1 %}
+	<li><a href="?page=1">{% trans "First" %}</a></li>
+	{% endifnotequal %}
+	<li><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+	{% endif %}
+	<li>{% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ paginator.num_pages }}</li>
+	{% if page_obj.has_next %}
+	<li><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+	{% ifnotequal page_obj.next_page_number paginator.num_pages %}
+	<li><a href="?page=last">{% trans "Last" %}</a></li>
+	{% endifnotequal %}
+	{% endif %}
+</ul>
+</div>
+{% endif %}
+{% endblock %}

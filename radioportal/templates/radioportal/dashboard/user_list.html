@@ -1,0 +1,26 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+{% trans "List of Users" %}
+{% endblock %}
+{% block content %}
+<h2>{% trans "User" %}</h2>
+<ul>
+	<li><a href="{% host_url admin-user-create on dashboard %}">{% trans "Create User" %}</a></li>
+{% for u in users %}
+	<li>
+		<a href="{% host_url admin-user-edit u.username on dashboard %}">{{ u.get_full_name }} ({{ u.username }})</a>
+	</li>
+{% endfor %}
+</ul>
+<h2>{% trans "Groups" %}</h2>
+<ul>
+	<li><a href="{% host_url admin-group-create on dashboard %}">{% trans "Create Group" %}</a></li>
+{% for g in groups %}
+	<li>
+		<a href="{% host_url admin-group-edit g.id on dashboard %}">{{ g.name }}</a>
+	</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

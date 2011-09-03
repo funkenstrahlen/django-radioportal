@@ -1,0 +1,56 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n guardian_tags hosts %}
+{% block content %}
+<h2>{% trans "Dashboard" %}</h2>
+<p>{% blocktrans %}Nachfolgend sind alle Ressourcen aufgeführt, die bearbeitbar sind.{% endblocktrans %}</p>
+
+{% if shows or perms.portal.add_show %}
+<h3>{% trans "Shows" %}</h3>
+<p class="explanation">
+{% blocktrans %}
+Sendungen fassen Folgen zusammen
+{% endblocktrans %}
+</p>
+<ul>
+{% for s in shows %}
+{% get_obj_perms request.user for s as "show_perms" %}
+	<li>
+{% if "change_show" in show_perms %}<a href="{% host_url admin-episode-list s.slugName on dashboard %}">{% endif %}
+{{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
+{% if "delete_show" in show_perms %}(<a href="{% host_url admin-show-delete s.slugName on dashboard %}">{% trans "delete" %}</a>){% endif %}
+</li>
+{% endfor %}
+{% if perms.portal.add_show %}
+	<li><a href="{% host_url admin-show-create on dashboard %}">{% trans "Create new Show" %}</a></li>
+{% endif %}	
+</ul>
+{% endif %}
+
+{% if server or perms.portal.add_streamsetup %}
+<h3>{% trans "Streams" %}</h3>
+<p class="explanation">
+{% blocktrans %}
+Ein StreamSetup fasst alle Streams einer Folge zusammen. Streams unterscheiden sich
+inFormat und Qualität.
+{% endblocktrans %}
+</p>
+<ul>
+{% for s in setups %}
+{% get_obj_perms request.user for s as "setup_perms" %}
+	<li>
+		<a href="{% host_url admin-streamsetup-edit s.id on dashboard %}">{{ s }}</a>
+		{% if "delete_streamsetup" in setup_perms %}(<a href="{% host_url admin-streamsetup-delete s.id on dashboard %}">{% trans "delete" %}</a>){% endif %}
+	</li>
+{% endfor %}
+{% if perms.portal.add_streamsetup %}
+	<li><a href="{% host_url admin-streamsetup-create on dashboard %}">{% trans "Create new StreamSetup" %}</a></li>
+{% endif %}
+</ul>
+{% endif %}
+<h3>{% trans "Account Settings" %}</h3>
+<ul>
+    <li><a href="{% host_url account-change-pass on dashboard %}">{% trans "Change Password" %}</a></li>
+{% if request.user.is_superuser %}
+    <li><a href="{% host_url admin-list-users on dashboard %}">{% trans "List of Users" %}</a></li>
+{% endif %}
+</ul>
+{% endblock %}

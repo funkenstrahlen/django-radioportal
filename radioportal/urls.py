@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+
+from django.conf.urls.defaults import patterns, url, include
+from django.views.decorators.cache import cache_page
+from django.views.generic import base
+from radioportal.views import stream, episodes
+
+
+urlpatterns = patterns('',
+
+    url(r'^robots.txt$',
+        cache_page(episodes.RobotsTxtView.as_view(), 60 * 60 * 3),
+        name="robots"),
+        
+    url(r'^dashboard/', include('radioportal.dashboard.urls')),
+    
+    # root
+    url(r'^home/$', base.RedirectView.as_view(url='/'), name="home"),
+    url(r'^$', episodes.LandingView.as_view(), name="root"),
+
+    #======================================================================
+    # # statistic, temp-hack
+    # url(r'^statistic/$', list_detail.object_list,
+    #    {
+    #        'queryset': StreamSetup.objects.select_related().all(),
+    #        'template_name': 'portal/statistic.html',
+    #    },
+    #    name="statistic"
+    # ),
+    # # Status
+    # url(
+    #   r'^status/$',
+    #   'django.views.generic.list_detail.object_list',
+    #   {
+    #       'queryset': Status.objects.all().order_by('category'),
+    #       'template_name': 'portal/status.html'
+    #   },
+    #   name="status"
+    # ),
+    #======================================================================
+
+    # archive
+    url(r'^shows/$', episodes.ShowList.as_view(), name="shows"),
+
+    # latest
+    url(r'^latest/$', episodes.ShowView.as_view(what='old'), name="latest"),
+    url(r'^latest/(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what='old'), name="latest_show"),
+
+    # planned
+    url(r'^planned/$', episodes.ShowView.as_view(what='future'),
+        name="planned"),
+    url(r'^planned/(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what='future'), name="planned_show"),
+
+    # running streams
+    url(r'^live/$', episodes.ShowView.as_view(what='now'), name="live"),
+    url(r'^live/(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what='now'), name="live_show"),
+
+    url(r'^(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what="all"), name="show"),
+
+    url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
+        episodes.EpisodeView.as_view(), name="episode"),
+
+    url(r'^(?P<slug>.*\..{3}).m3u$',
+        cache_page(stream.StreamTemplateView.as_view(), 60 * 60 * 3),
+        name="playlist"),
+    url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac))$',
+        stream.stream, name="mount"),
+)

@@ -1,0 +1,20 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url admin-list-users on dashboard %}">{% trans "User List" %}</a> »
+	{% if object %}{{ object.username }}{% else %}{% trans "Create User" %}{% endif %}
+{% endblock %}
+{% block content %}
+{% if object %}
+<h2>{% trans "Edit" %} {{ object|object_name }}</h2>
+{% else %}
+<h2>{% trans "Create User" %}</h2>
+{% endif %}
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+{{ form.as_table }}
+<tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
+</table>
+</form>
+{% endblock %}

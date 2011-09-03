@@ -1,0 +1,56 @@
+{% extends 'radioportal/base.html' %}{% load i18n cache %}
+{% block title %} &middot; {% trans "Archive" %}{% endblock %}
+{% block collapsed_shows %}un{% endblock %}
+{% block navi_shows %}{% comment %}
+{% cache 900 navi_show %}
+<!-- navi_show {% now "r" %} -->
+{% if object_list %}
+<ul>
+{% for show in object_list %}
+	<li><a class="collapsed" href="{% url show show_name=show.slugName %}">{{ show.name }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endcache %}{% endcomment %}
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} » {% trans "Shows" %}{% endblock %}
+{% block content %}
+<h2>{% trans "Archive" %}</h2>
+<p>{% blocktrans %}Here are informations about the shows available, which were distributed through this streaming system. This includes the graphical statistic about listener counts.{% endblocktrans %}</p>
+{# {% cache 900 show_list %} #}
+<!-- show_list {% now "r" %} -->
+{% if object_list %}
+{% for show in object_list %}
+	<div class="showslug {% if show.icon %}showicon{% endif %}">
+	{% if show.icon %}<img src="{{ show.icon.url }}" />{% endif %}
+	<h3><a href="{% url show show_name=show.slugName %}">{{ show.name }}</a></h3>
+	{% if show.description %}<small>{{ show.description }}</small>{% endif %}
+	<p>{{ show.abstract|truncatewords:50 }} <a href="{% url show show_name=show.slugName %}">{% trans "Read more" %} »</a></p>
+	<span style="clear: both;"></span>
+	</div>
+{% endfor %}
+{% else %}
+	<p>{% trans "No shows available." %}</p>
+{% endif %}
+{% if is_paginated %}
+<div class="pagination">
+<ul>
+	{% if page_obj.has_previous %}
+	{% ifnotequal page_obj.previous_page_number 1 %}
+	<li><a href="?page=1">{% trans "First" %}</a></li>
+	{% endifnotequal %}
+	<li><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+	{% endif %}
+	<li>{% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ paginator.num_pages }}</li>
+	{% if page_obj.has_next %}
+	<li><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+	{% ifnotequal page_obj.next_page_number paginator.num_pages %}
+	<li><a href="?page=last">{% trans "Last" %}</a></li>
+	{% endifnotequal %}
+	{% endif %}
+</ul>
+</div>
+{% endif %}
+
+{# {% endcache %} #}
+{% endblock %}

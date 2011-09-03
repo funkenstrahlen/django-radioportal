@@ -1,0 +1,66 @@
+{% extends 'radioportal/base.html' %}{% load cache i18n hosts %}
+{% block shorturl_header %}<link rev="canonical" href="http://xsn.io" />{% endblock %}
+{% block shorturl_footer %}<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block head_css %}
+	{{ block.super }}
+	{% include "radioportal/episodes/episode_streams_head_css.html" %}
+{% endblock %}
+{% block head_js %}
+	{{ block.super }}
+	{% include "radioportal/episodes/episode_streams_head_js.html" %}
+{% endblock %}
+
+{% block head %}
+<link href="{% host_url all-feed status='planned' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "planned episodes" %}" />
+<link href="{% host_url all-feed status='live' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "running episodes" %}" />
+<link href="{% host_url all-feed status='latest' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "archived episodes" %}" />
+<link href="{% host_url planned-all-ical on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
+{% endblock %}
+
+{% block content %}
+{% url all-feed status="planned",urlconf=radioportal.feeds.urls as planned_feed_url %}
+{% url all-feed status="live",urlconf=radioportal.feeds.urls as live_feed_url %}
+{% url all-feed status="latest",urlconf=radioportal.feeds.urls as latest_feed_url %}
+{% url planned-all-ical urlconf=radioportal.feeds.urls as ical_url %}
+{% if running %}
+<h2>{% trans "Running Episodes" %}&nbsp;<a href="{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
+{% for episode in running %}
+	{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
+{% else %}
+<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}</h2>
+{% endif %}
+
+{% if planned %}
+<h2>{% trans "Planned Episodes" %}&nbsp;<a href="{% host_url all-feed status='planned' on feeds %}" class="feed atom"></a><a href="{% host_url planned-all-ical on feeds %}" class="feed ical"></a></h2>
+{% for episode in planned %}
+	{% include "radioportal/episodes/episode_list_entry.html" %}
+{% endfor %}
+{% endif %}
+
+<h2>{% trans "Missed Episodes" %}&nbsp;<a href="{% host_url all-feed status='latest' on feeds %}" class="feed atom"></a></h2>
+{% for episode in archived %}
+	{% include "radioportal/episodes/episode_list_entry.html" %}
+{% empty %}
+<p>{% trans "No episodes available." %}</p>
+{% endfor %}
+{% endblock %}
+{% comment %}
+	{% ifchanged %}
+		<h2>
+		{% ifequal episode.status "RUNNING" %}
+			{% if show_name %}<a href="{% url live_show show_name=show.slugName %}">{% endif %}
+				{% trans "Running Episodes" %}
+			{% if show_name %}</a>{% endif %}
+		{% endifequal %}
+		{% ifequal episode.status "ARCHIVED" %}
+			{% trans "Archived Episodes" %}
+		{% endifequal %}
+		{% ifequal episode.status "PLANNED" %}
+			{% if show_name %}<a href="{% url planned_show show_name=show.slugName %}">{% endif %}
+				{% trans "Planned Episodes" %}
+			{% if show_name %}</a>{% endif %}
+		{% endifequal %}
+		</h2>
+	{% endifchanged %}
+{% endcomment %}

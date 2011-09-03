@@ -1,0 +1,59 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	{% if object %}{{ object }}{% else %}{% trans "Create new StreamSetup" %}{% endif %}
+{% endblock %}
+{% block head_js %}{{ block.super }}
+<script type="text/javascript">                                         
+   // we will add our javascript code here
+   function toggle(event) {
+   		//alert(event.type);
+   		//alert(event.data);
+   		var newstate = $(event.target).find('option:selected').attr('value');
+   		var number = event.data;
+   		var all = ['mount','status','user','password','format','bitrate','encoding','fallback'];
+   		var hidden = {};
+   		hidden['RECODE'] = [ all[2], all[3], all[7] ];
+   		hidden['SOURCE'] = [ all[4], all[5] ];
+   		for (var i = 0; i < all.length; i++) {
+   			$('#id_stream_set-' + number + '-' + all[i]).parent().parent().show()
+   		};
+   		for (var i = 0; i < hidden[newstate].length; i++) {
+   			$('#id_stream_set-' + number + '-' + hidden[newstate][i]).parent().parent().fadeOut('fast');
+   		};
+   }
+   
+   $(document).ready(function() {
+   		// do stuff when DOM is ready
+   		var num = $('#id_stream_set-TOTAL_FORMS').attr('value');
+   		for (var i = 0; i < num; i++) {
+   			$('#id_stream_set-' + i + '-status').bind('change', i, toggle);
+   			$('#id_stream_set-' + i + '-status').change();
+   		};
+   });                        
+ </script>
+{% endblock %}
+{% block content %}
+
+<h2>{% if object %}{% trans "Edit StreamSetup" %}{% else %}{% trans "Create new StreamSetup" %}{% endif %}</h2>
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+{{ form.forms.0.as_table }}
+
+<tr><td colspan="2"><h3>{% trans "Sourced Streams" %}</h3>{{ form.forms.1.management_form }}</td></tr>
+{% for f in form.forms.1 %}
+<tr><td colspan="2"><h4>{% trans "Stream" %} {{ f.instance.mount }}</h4></td></tr>
+{{ f.as_table }}
+{% endfor %}
+
+<tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3>{{ form.forms.2.management_form }}</td></tr>
+{% for f in form.forms.2 %}
+<tr><td colspan="2"><h4>{% trans "Stream" %} {{ f.instance.mount }}</h4></td></tr>
+{{ f.as_table }}
+{% endfor %}
+
+<tr><td colspan="2"><input type="submit" value="{% trans "Save StreamSetup" %}" /></td></tr>
+</table>
+</form>
+{% endblock %}

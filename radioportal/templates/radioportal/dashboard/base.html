@@ -1,0 +1,21 @@
+{% extends 'radioportal/base.html' %}
+{% load i18n hosts %}
+{% block shorturl_footer %}{% endblock %}
+{% block shorturl_head %}{% endblock %}
+{% block head %}
+	{% load adminmedia %}
+	<script type="text/javascript" src="{% url jsi18n %}"></script>
+	<script type="text/javascript" src="{% admin_media_prefix %}js/core.js"></script>
+	<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css"/>
+	<!--<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/base.css"/>-->
+	<!--<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/global.css"/>-->
+	<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/widgets.css"/>	
+	{{ form.media }}
+	<script type="text/javascript">
+	window.__admin_media_prefix__ = "{% filter escapejs %}{% admin_media_prefix %}{% endfilter %}";
+	</script>
+{% endblock %}
+{% block content_class %} class="accounts"{% endblock %}
+{% block navi_account %}
+{% endblock %}
+{% block breadcrumb %}<a href="{% host_url dashboard on dashboard %}">{% trans "Overview" %}</a>{% endblock %}

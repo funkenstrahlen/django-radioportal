@@ -1,0 +1,52 @@
+{% load cache i18n hosts %}
+{% ifequal episode.status "RUNNING" %}
+	{% cache 900 episode_stream episode.status episode.id %}
+	<div class="streams audio">
+	{% if episode.streamsetup %}
+            <h4>{% trans "Listen" %}: {{ episode.streamsetup.streamCurrentSong }}</h4>
+
+     
+		<ul>
+<li class="stream">
+            <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+            <div class="jp-audio">
+              <div class="jp-type-single">
+                <div id="jp_interface_{{ episode.streamsetup.id }}" class="jp-interface">
+                  <ul class="jp-controls">
+                    <li><a href="#" class="jp-play" tabindex="1">play</a></li>
+                    <li><a href="#" class="jp-pause" tabindex="1">pause</a></li>
+                    <li><a href="#" class="jp-stop" tabindex="1">stop</a></li>
+                    <li><a href="#" class="jp-mute" tabindex="1">mute</a></li>
+                    <li><a href="#" class="jp-unmute" tabindex="1">unmute</a></li>
+                  </ul>
+                  <div class="jp-volume-bar">
+                    <div class="jp-volume-bar-value"></div>
+                  </div>
+                  <div class="jp-current-time"></div>
+                </div>
+              </div>
+            </div>
+                <div class="jp-activate">
+                 <a href="#" class="jp-show-player">{% trans "show webplayer" %}</a> ({% trans "needs JavaScript" %})
+                </div>
+</li>
+		{% for stream in episode.streamsetup.stream_set.all %}
+		{% if stream.running %}{% spaceless %}
+		<li class="stream direct">
+			<span class="what">
+				{{ stream.format }}
+				{{ stream.bitrate|formataudio:stream.format }}:
+			</span>
+			<a href="http:{% host_url playlist slug=stream.mount on www %}">{% trans "External Player" %}</a>
+			(<a href="http:{% host_url mount stream=stream.mount on www %}" class="mount">{% trans "direct" %}</a>,
+			<a href="{% load shorturl %}{% shorturl stream %}">{% trans "Short URL" %}</a>)
+		</li>
+		{% endspaceless %}{% endif %}
+		{% endfor %}
+		</ul>
+	{% else %}
+		<p>{% trans "No streams available currently" %}</p>
+	{% endif %}
+	</div>
+	{% endcache %}
+{% endifequal %}
