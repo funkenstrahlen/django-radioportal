@@ -23,7 +23,7 @@ class Show(models.Model):
         verbose_name=_("Description"))
     abstract = models.TextField(blank=True, default='',
         verbose_name=_('Longer description of the show'))
-    shortName = models.SlugField(default='',
+    defaultShortName = models.SlugField(default='',
         help_text=_('Used to construct the episode' +
                     ' identifier.'),
         verbose_name=_("Abbreviation of the show"))
@@ -65,7 +65,7 @@ class Episode(models.Model):
     topic = models.CharField(max_length=200, blank=True, default='', verbose_name=_("Topic"))
     description = models.CharField(max_length=200, blank=True,
         default='', verbose_name=_("Description"))
-    shortName = models.SlugField(max_length=30, default='',
+    slug = models.SlugField(max_length=30, default='',
         verbose_name=_("Short Name"))
     url = models.URLField(blank=True, verify_exists=False,
         help_text=_('Page of the Episode'),
@@ -77,24 +77,24 @@ class Episode(models.Model):
 
     def __unicode__(self):
         if self.topic:
-            if self.shortName:
-                return u'%s: %s' % (self.shortName, self.topic)
+            if self.slug:
+                return u'%s: %s' % (self.slug, self.topic)
             else:
                 return u'%s' % self.topic
         else:
-            return u'%s' % self.shortName
+            return u'%s' % self.slug
 
     def save(self, force_insert=False, force_update=False):
         #if self.topic == '':
         #    self.topic = _("Episode %(number)s of %(show)s") % \
-        #                    {'number': self.shortName, 'show': self.show.name}
-        self.shortName = self.shortName.lower()
-        if self.shortName == re.sub("\W", "", self.topic):
+        #                    {'number': self.slug, 'show': self.show.name}
+        self.slug = self.slug.lower()
+        if self.slug == re.sub("\W", "", self.topic):
             self.topic = ""
         super(Episode, self).save(force_insert, force_update)
 
     class Meta:
-        unique_together = (('show', 'shortName'),)
+        unique_together = (('show', 'slug'),)
 
 
 class EpisodePart(models.Model):

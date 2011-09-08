@@ -24,8 +24,8 @@
 <ul>
 {% for episode in now %}
 	<li>
-		<a href="{% url episode show_name=episode.show.slug,episode_id=episode.shortName %}">
-			{{ episode.shortName|upper }}
+		<a href="{% url episode show_name=episode.show.slug,episode_id=episode.slug %}">
+			{{ episode.slug|upper }}
 		</a>
 	</li>
 {% endfor %}

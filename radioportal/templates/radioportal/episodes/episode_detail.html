@@ -28,8 +28,8 @@
 	<li><a class="collapsed" href="{% url show show_name=episode.show.slug %}">{{ episode.show.name }}</a>
 		<ul>
 			<li class="active">
-				<a href="{% url episode show_name=episode.show.slug,episode_id=episode.shortName %}">
-					{{ episode.shortName|upper }}
+				<a href="{% url episode show_name=episode.show.slug,episode_id=episode.slug %}">
+					{{ episode.slug|upper }}
 				</a>
 			</li>
 		</ul>
@@ -39,7 +39,7 @@
 {% endblock %}
 {% block content %}
 {% cache 300 episode_detail episode.id episode.status %}
-	<h2>{{ episode.shortName|upper }}: {{ episode.topic }}</h2>
+	<h2>{{ episode.slug|upper }}: {{ episode.topic }}</h2>
 	<small>
 		{{ episode.begin|date:"d. F Y H:i" }} bis {{ episode.end|date:"d. F Y H:i" }}
 		(<a href="{{ episode.url }}">Homepage zur Sendung</a>)

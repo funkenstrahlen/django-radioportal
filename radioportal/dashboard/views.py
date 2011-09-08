@@ -177,7 +177,7 @@ class EpisodeListView(ListView):
     def get_queryset(self):
         qs = super(EpisodeListView, self).get_queryset()
         qs = qs.filter(show__slug=self.kwargs['slug'])
-        qs = qs.order_by('-shortName')
+        qs = qs.order_by('-slug')
         return qs
     
     def get_context_data(self, **kwargs):
@@ -199,7 +199,7 @@ class EpisodeCreateView(CreateView):
         s = Show.objects.get(slug=self.kwargs['slug'])
         initial = super(EpisodeCreateView, self).get_initial()
         initial['show'] = s.id
-        initial['shortName'] = "%s%03i" % (s.shortName.lower(), s.nextEpisodeNumber)
+        initial['slug'] = "%s%03i" % (s.defaultShortName.lower(), s.nextEpisodeNumber)
         return initial
 
     def get_form_class(self):

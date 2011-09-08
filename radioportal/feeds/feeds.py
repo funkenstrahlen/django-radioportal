@@ -65,10 +65,10 @@ class ShowFeed(Feed):
         return eps.order_by('-end')[:30]
 
     def item_title(self, item):
-        return _("xsn archive entry %s: %s" % (item.shortName, item.topic))
+        return _("xsn archive entry %s: %s" % (item.slug, item.topic))
 
     def item_link(self, item):
-        kwargs = {'show_name': item.show.slug, 'slug': item.shortName}
+        kwargs = {'show_name': item.show.slug, 'slug': item.slug}
         url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
         return 'http:%s' % url
 
@@ -86,13 +86,13 @@ def ical_feed(request, show_name=None):
         ep = ep.filter(show__slug=show_name)
     for episode in ep.order_by('begin')[:30]:
         vevent = cal.add('vevent')
-        val = "%s: %s" % (episode.shortName, episode.topic)
+        val = "%s: %s" % (episode.slug, episode.topic)
         vevent.add('summary').value = val
         vevent.add('description').value = episode.description
         vevent.add('dtstart').value = episode.begin
         vevent.add('dtend').value = episode.end
         vevent.add('uid').value = '%s' % episode.pk
-        kwargs = {'show_name': episode.show.slug, 'slug': episode.shortName}
+        kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
         url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
         vevent.add('url').value = 'http:%s' % url 
     icalstream = cal.serialize()

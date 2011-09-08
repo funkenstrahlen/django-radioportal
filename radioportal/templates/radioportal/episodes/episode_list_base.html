@@ -29,8 +29,8 @@
 			<li><a href="?page={{ page_obj.previous_page_number }}">...</a></li>
 		{% endif %}
 		{% for episode in object_list %}
-			<li><a href="{% url episode show_name=episode.show.slug,episode_id=episode.shortName %}">
-				{{ episode.shortName|upper }}
+			<li><a href="{% url episode show_name=episode.show.slug,episode_id=episode.slug %}">
+				{{ episode.slug|upper }}
 			</a></li>
 		{% endfor %}
 		{% if is_paginated and page_obj.has_next %}

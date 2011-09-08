@@ -2,7 +2,7 @@
 {% block breadcrumb %}
 {{ block.super }} » 
 	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
-	{% if episode %}{{ episode.shortName }}: {{ episode.topic }}{% else %}{% trans "Create new episode" %}{% endif %}
+	{% if episode %}{{ episode.slug }}: {{ episode.topic }}{% else %}{% trans "Create new episode" %}{% endif %}
 {% endblock %}
 {% block content %}
 <h2>{% if episode %}{% trans "Edit episode" %}{% else %}{% trans "Create new episode" %}{% endif %}</h2>

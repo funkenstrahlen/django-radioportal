@@ -23,7 +23,7 @@ class RobotsTxtView(TemplateResponseMixin, View):
 
 class EpisodeView(DetailView):
     model = Episode
-    slug_field = 'shortName'
+    slug_field = 'slug'
     context_object_name = 'episode'
     template_name = 'radioportal/episodes/episode_detail.html'
     

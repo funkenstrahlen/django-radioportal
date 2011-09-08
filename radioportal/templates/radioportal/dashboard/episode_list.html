@@ -13,7 +13,7 @@
 {% get_obj_perms request.user for show as "show_perms" %}
 {% for o in object_list %}
 	<li>
-<a href="{% host_url admin-episode-edit o.pk on dashboard %}">{{ o.shortName }}: {{ o.topic }}</a>
+<a href="{% host_url admin-episode-edit o.pk on dashboard %}">{{ o.slug }}: {{ o.topic }}</a>
 {% if "change_episodes" in show_perms %}(<a href="{% host_url admin-episode-delete o.pk on dashboard %}">{% trans "delete" %}</a>){% endif %}
 </li>
 {% endfor %}
