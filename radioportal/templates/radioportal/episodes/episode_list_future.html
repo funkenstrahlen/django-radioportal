@@ -3,8 +3,8 @@
 {% block breadcrumb %}{{ block.super }} » {% trans "Planned Episodes" %}{% endblock %}
 {% block head %}
 {% if show %}
-	<link href="{% host_url show-feed status="planned" show_name=show.slugName on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
-	<link href="{% host_url planned-show-ical show_name=show.slugName on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
+	<link href="{% host_url show-feed status="planned" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="{% host_url planned-show-ical show_name=show.slug on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
 {% else %}
 	<link href="{% host_url all-feed status="planned" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 	<link href="{% host_url planned-all-ical on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
@@ -12,8 +12,8 @@
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url show-feed status="planned" show_name=show.slugName on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
-	<li><a href="{% host_url planned-show-ical show_name=show.slugName on feeds %}" class="feed ical">{% trans "ical" %}</a></li>
+	<li><a href="{% host_url show-feed status="planned" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url planned-show-ical show_name=show.slug on feeds %}" class="feed ical">{% trans "ical" %}</a></li>
 {% else %}
 	<li><a href="{% host_url all-feed status="planned" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 	<li><a href="{% host_url planned-all-ical on feeds %}" class="feed ical">{% trans "ical" %}</a></li>
@@ -27,7 +27,7 @@
 <ul>
 {% for episode in future %}
 	<li>
-		<a href="{% url episode show_name=episode.show.slugName,episode_id=episode.shortName %}">
+		<a href="{% url episode show_name=episode.show.slug,episode_id=episode.shortName %}">
 			{{ episode.shortName|upper }}
 		</a>
 	</li>

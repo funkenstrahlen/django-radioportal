@@ -1,7 +1,7 @@
 {% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
 {% block breadcrumb %}
 {{ block.super }} » 
-	<a href="{% host_url admin-episode-list show.slugName on dashboard %}">{{ show }}</a> »
+	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
 	{% if episode %}{{ episode.shortName }}: {{ episode.topic }}{% else %}{% trans "Create new episode" %}{% endif %}
 {% endblock %}
 {% block content %}

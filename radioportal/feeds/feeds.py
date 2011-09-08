@@ -45,7 +45,7 @@ class ShowFeed(Feed):
                 obj.name = _("Archived episodes")
                 obj.abstract = _("Recently aired episodes")
             return (obj, status)
-        return (get_object_or_404(Show, slugName=show_name), status)
+        return (get_object_or_404(Show, slug=show_name), status)
 
     def title(self, obj):
         return _("xsn Archive for %s" % obj[0].name)
@@ -68,7 +68,7 @@ class ShowFeed(Feed):
         return _("xsn archive entry %s: %s" % (item.shortName, item.topic))
 
     def item_link(self, item):
-        kwargs = {'show_name': item.show.slugName, 'slug': item.shortName}
+        kwargs = {'show_name': item.show.slug, 'slug': item.shortName}
         url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
         return 'http:%s' % url
 
@@ -78,12 +78,12 @@ def ical_feed(request, show_name=None):
     cal.add('method').value = 'PUBLISH'  # IE/Outlook needs this
     str = ""
     if show_name:
-        str= " for %s" % Show.objects.get(slugName=show_name).name
+        str= " for %s" % Show.objects.get(slug=show_name).name
     cal.add('X-WR-CALNAME').value = "Upcoming episodes%s on xsn" % str
     cal.add('X-WR-TIMEZONE').value = settings.TIME_ZONE
     ep = Episode.objects.filter(status='PLANNED')
     if show_name:
-        ep = ep.filter(show__slugName=show_name)
+        ep = ep.filter(show__slug=show_name)
     for episode in ep.order_by('begin')[:30]:
         vevent = cal.add('vevent')
         val = "%s: %s" % (episode.shortName, episode.topic)
@@ -92,7 +92,7 @@ def ical_feed(request, show_name=None):
         vevent.add('dtstart').value = episode.begin
         vevent.add('dtend').value = episode.end
         vevent.add('uid').value = '%s' % episode.pk
-        kwargs = {'show_name': episode.show.slugName, 'slug': episode.shortName}
+        kwargs = {'show_name': episode.show.slug, 'slug': episode.shortName}
         url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
         vevent.add('url').value = 'http:%s' % url 
     icalstream = cal.serialize()

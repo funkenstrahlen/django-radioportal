@@ -14,9 +14,9 @@ Sendungen fassen Folgen zusammen
 {% for s in shows %}
 {% get_obj_perms request.user for s as "show_perms" %}
 	<li>
-{% if "change_show" in show_perms %}<a href="{% host_url admin-episode-list s.slugName on dashboard %}">{% endif %}
+{% if "change_show" in show_perms %}<a href="{% host_url admin-episode-list s.slug on dashboard %}">{% endif %}
 {{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
-{% if "delete_show" in show_perms %}(<a href="{% host_url admin-show-delete s.slugName on dashboard %}">{% trans "delete" %}</a>){% endif %}
+{% if "delete_show" in show_perms %}(<a href="{% host_url admin-show-delete s.slug on dashboard %}">{% trans "delete" %}</a>){% endif %}
 </li>
 {% endfor %}
 {% if perms.portal.add_show %}

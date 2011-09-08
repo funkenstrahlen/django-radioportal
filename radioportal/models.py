@@ -14,7 +14,7 @@ class Show(models.Model):
     name = models.CharField(max_length=50, unique=True,
         verbose_name=_('Name of the show'),
     )
-    slugName = AutoSlugField(populate_from='name', always_update=True)
+    slug = AutoSlugField(populate_from='name', always_update=True)
     url = models.URLField(verify_exists=False, blank=True, default='',
         verbose_name=_('Homepage of the Show'))
     twitter = models.CharField(max_length=100, blank=True, default='')

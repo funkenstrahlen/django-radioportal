@@ -3,9 +3,9 @@
 {% block content %}
 <h2>{{ show }}</h2>
 <ul>
-	<li><a href="{% host_url admin-show-edit show.slugName on dashboard %}">{% trans "Edit show properties" %}</a></li>
-	<li><a href="{% host_url admin-show-feed show.slugName on dashboard %}">{% trans "Configure update from podcast feed" %}</a></li>
-	<li><a href="{% host_url admin-episode-create show.slugName on dashboard %}">{% trans "Create new episode" %}</a></li>
+	<li><a href="{% host_url admin-show-edit show.slug on dashboard %}">{% trans "Edit show properties" %}</a></li>
+	<li><a href="{% host_url admin-show-feed show.slug on dashboard %}">{% trans "Configure update from podcast feed" %}</a></li>
+	<li><a href="{% host_url admin-episode-create show.slug on dashboard %}">{% trans "Create new episode" %}</a></li>
 </ul>
 {% if object_list %}
 <h3>{% trans "Episodes" %}</h3>

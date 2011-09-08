@@ -28,7 +28,7 @@ class EpisodeView(DetailView):
     template_name = 'radioportal/episodes/episode_detail.html'
     
     def get_queryset(self):
-        return Episode.objects.filter(show__slugName=self.kwargs.get('show_name', None))
+        return Episode.objects.filter(show__slug=self.kwargs.get('show_name', None))
     
 class ShowView(ListView):
     template_base_name = 'radioportal/episodes/episode_list%s.html'
@@ -39,7 +39,7 @@ class ShowView(ListView):
     def get_queryset(self):
         qs = Episode.objects.all().order_by('-begin')
         if 'show_name' in self.kwargs:
-            qs = qs.filter(show__slugName=self.kwargs['show_name'])
+            qs = qs.filter(show__slug=self.kwargs['show_name'])
         if hasattr(self, 'what'):
             if self.what in ('old'):
                 qs = qs.filter(status=Episode.STATUS[0][0])
@@ -53,7 +53,7 @@ class ShowView(ListView):
         context = super(ShowView, self).get_context_data(**kwargs)
         if 'show_name' in self.kwargs:
             context['show_name'] = self.kwargs['show_name']
-            context['show'] = Show.objects.get(slugName=self.kwargs['show_name'])
+            context['show'] = Show.objects.get(slug=self.kwargs['show_name'])
         else:
             context['show_name'] = False
         return context

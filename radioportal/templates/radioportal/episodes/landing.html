@@ -49,7 +49,7 @@
 	{% ifchanged %}
 		<h2>
 		{% ifequal episode.status "RUNNING" %}
-			{% if show_name %}<a href="{% url live_show show_name=show.slugName %}">{% endif %}
+			{% if show_name %}<a href="{% url live_show show_name=show.slug %}">{% endif %}
 				{% trans "Running Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
@@ -57,7 +57,7 @@
 			{% trans "Archived Episodes" %}
 		{% endifequal %}
 		{% ifequal episode.status "PLANNED" %}
-			{% if show_name %}<a href="{% url planned_show show_name=show.slugName %}">{% endif %}
+			{% if show_name %}<a href="{% url planned_show show_name=show.slug %}">{% endif %}
 				{% trans "Planned Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}

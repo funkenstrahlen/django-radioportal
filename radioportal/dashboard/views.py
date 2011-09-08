@@ -90,7 +90,7 @@ class LandingView(TemplateResponseMixin, View):
 
 class ShowCreateView(CreateView):
     template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/dashboard/show/%(slugName)s/'
+    success_url = '/dashboard/show/%(slug)s/'
     form_class = forms.ShowForm
     model = Show
 
@@ -101,29 +101,29 @@ class ShowCreateView(CreateView):
 
 class ShowEditView(UpdateView):
     template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/dashboard/show/%(slugName)s/'
+    success_url = '/dashboard/show/%(slug)s/'
     #form_class = forms.ShowCompoundForm
-    slug_field = 'slugName'
+    slug_field = 'slug'
     model = Show
 
-    @method_decorator(permission_required('change_show', (Show, 'slugName', 'slug')))
+    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowEditView, self).dispatch(*args, **kwargs)
 
 class ShowDeleteView(DeleteView):
     template_name = "radioportal/dashboard/show_delete.html"
     success_url = "/dashboard/"
-    slug_field = 'slugName'
+    slug_field = 'slug'
     model = Show
 
-    @method_decorator(permission_required('delete_show', (Show, 'slugName', 'slug')))
+    @method_decorator(permission_required('delete_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowDeleteView, self).dispatch(*args, **kwargs)
 
 class ShowFeedEditView(UpdateView):
     template_name = "radioportal/dashboard/showfeed_edit.html"
-    success_url = '/dashboard/show/%(slugName)s/'
-    slug_field = 'show__slugName'
+    success_url = '/dashboard/show/%(slug)s/'
+    slug_field = 'show__slug'
     model = ShowFeed
     form_class = forms.ShowFeedForm
     
@@ -159,13 +159,13 @@ class ShowFeedEditView(UpdateView):
         try:
             obj = queryset.get()
         except ObjectDoesNotExist:
-            obj = ShowFeed(show=Show.objects.get(slugName=slug))
+            obj = ShowFeed(show=Show.objects.get(slug=slug))
         return obj
     
     def get_success_url(self):
         return self.success_url % self.object.show.__dict__
     
-    @method_decorator(permission_required('change_show', (Show, 'slugName', 'slug')))
+    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowFeedEditView, self).dispatch(*args, **kwargs)
     
@@ -176,16 +176,16 @@ class EpisodeListView(ListView):
     
     def get_queryset(self):
         qs = super(EpisodeListView, self).get_queryset()
-        qs = qs.filter(show__slugName=self.kwargs['slug'])
+        qs = qs.filter(show__slug=self.kwargs['slug'])
         qs = qs.order_by('-shortName')
         return qs
     
     def get_context_data(self, **kwargs):
         ctx = super(EpisodeListView, self).get_context_data(**kwargs)
-        ctx['show'] = Show.objects.get(slugName=self.kwargs['slug'])
+        ctx['show'] = Show.objects.get(slug=self.kwargs['slug'])
         return ctx
     
-    @method_decorator(permission_required('change_show', (Show, 'slugName', 'slug')))
+    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeListView, self).dispatch(*args, **kwargs)
 
@@ -196,7 +196,7 @@ class EpisodeCreateView(CreateView):
     model = Episode
 
     def get_initial(self):
-        s = Show.objects.get(slugName=self.kwargs['slug'])
+        s = Show.objects.get(slug=self.kwargs['slug'])
         initial = super(EpisodeCreateView, self).get_initial()
         initial['show'] = s.id
         initial['shortName'] = "%s%03i" % (s.shortName.lower(), s.nextEpisodeNumber)
@@ -210,16 +210,16 @@ class EpisodeCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(EpisodeCreateView, self).get_context_data(**kwargs)
-        ctx['show'] = Show.objects.get(slugName=self.kwargs['slug'])
+        ctx['show'] = Show.objects.get(slug=self.kwargs['slug'])
         return ctx
 
     def form_valid(self, form):
-        s = Show.objects.get(slugName=self.kwargs['slug'])
+        s = Show.objects.get(slug=self.kwargs['slug'])
         s.nextEpisodeNumber+=1
         s.save()
         return super(EpisodeCreateView, self).form_valid(form)
 
-    @method_decorator(permission_required('change_episodes', (Show, 'slugName', 'slug')))
+    @method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeCreateView, self).dispatch(*args, **kwargs)
 
@@ -236,7 +236,7 @@ class EpisodeEditView(UpdateView):
         return ctx
 
     #FIXME
-    #@method_decorator(permission_required('change_episodes', (Show, 'slugName', 'slug')))
+    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeEditView, self).dispatch(*args, **kwargs)
 
@@ -252,7 +252,7 @@ class EpisodeDeleteView(DeleteView):
         return super(EpisodeDeleteView, self).delete(request, *args, **kwargs)
 
     #FIXME
-    #@method_decorator(permission_required('change_episodes', (Show, 'slugName', 'slug')))
+    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeDeleteView, self).dispatch(*args, **kwargs)
 
