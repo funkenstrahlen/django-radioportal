@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^show/(?P<slug>[\w-]+)/$', views.EpisodeListView.as_view(), name="admin-episode-list"),
     url(r'^show/(?P<slug>[\w-]+)/edit/$', views.ShowEditView.as_view(), name="admin-show-edit"),
     url(r'^show/(?P<slug>[\w-]+)/delete/$', views.ShowDeleteView.as_view(), name="admin-show-delete"),
+    url(r'^show/(?P<slug>[\w-]+)/feed/$', views.ShowFeedEditView.as_view(), name="admin-show-feed"),
     url(r'^show/(?P<slug>[\w-]+)/create-episode/$', views.EpisodeCreateView.as_view(), name="admin-episode-create"),
 
     url(r'^episode/(?P<pk>[\w-]+)/$', views.EpisodeEditView.as_view(), name="admin-episode-edit"),

@@ -145,6 +145,14 @@ class ShowForm(forms.ModelForm):
     class Meta:
         model = models.Show
 
+class ShowFeedForm(forms.ModelForm):
+    class Meta:
+        model = models.ShowFeed
+        widgets = {
+            'show': HiddenInput(),
+        }
+     
+
 FeedFormSet = inlineformset_factory(models.Show, models.ShowFeed)
 
 StreamFormSet = inlineformset_factory(StreamSetup, Stream, form=StreamForm)

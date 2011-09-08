@@ -9,11 +9,12 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, StreamSetup, Episode
+from radioportal.models import Show, StreamSetup, Episode, ShowFeed
 from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 
 class UserGroupListView(ListView):
     template_name = "radioportal/dashboard/user_list.html"
@@ -101,7 +102,7 @@ class ShowCreateView(CreateView):
 class ShowEditView(UpdateView):
     template_name = "radioportal/dashboard/show_edit.html"
     success_url = '/dashboard/show/%(slugName)s/'
-    form_class = forms.ShowCompoundForm
+    #form_class = forms.ShowCompoundForm
     slug_field = 'slugName'
     model = Show
 
@@ -118,6 +119,56 @@ class ShowDeleteView(DeleteView):
     @method_decorator(permission_required('delete_show', (Show, 'slugName', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowDeleteView, self).dispatch(*args, **kwargs)
+
+class ShowFeedEditView(UpdateView):
+    template_name = "radioportal/dashboard/showfeed_edit.html"
+    success_url = '/dashboard/show/%(slugName)s/'
+    slug_field = 'show__slugName'
+    model = ShowFeed
+    form_class = forms.ShowFeedForm
+    
+    def get_object(self, queryset=None):
+        """
+        Returns the object the view is displaying.
+
+        By default this requires `self.queryset` and a `pk` or `slug` argument
+        in the URLconf, but subclasses can override this to return any object.
+        """
+        # Use a custom queryset if provided; this is required for subclasses
+        # like DateDetailView
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        # Next, try looking up by primary key.
+        pk = self.kwargs.get('pk', None)
+        slug = self.kwargs.get('slug', None)
+        if pk is not None:
+            queryset = queryset.filter(pk=pk)
+
+        # Next, try looking up by slug.
+        elif slug is not None:
+            slug_field = self.get_slug_field()
+            queryset = queryset.filter(**{slug_field: slug})
+
+        # If none of those are defined, it's an error.
+        else:
+            raise AttributeError(u"Generic detail view %s must be called with "
+                                 u"either an object pk or a slug."
+                                 % self.__class__.__name__)
+
+        try:
+            obj = queryset.get()
+        except ObjectDoesNotExist:
+            obj = ShowFeed(show=Show.objects.get(slugName=slug))
+        return obj
+    
+    def get_success_url(self):
+        return self.success_url % self.object.show.__dict__
+    
+    @method_decorator(permission_required('change_show', (Show, 'slugName', 'slug')))
+    def dispatch(self, *args, **kwargs):
+        return super(ShowFeedEditView, self).dispatch(*args, **kwargs)
+    
 
 class EpisodeListView(ListView):
     template_name = "radioportal/dashboard/episode_list.html"

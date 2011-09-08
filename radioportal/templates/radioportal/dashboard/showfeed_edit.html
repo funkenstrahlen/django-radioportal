@@ -2,7 +2,7 @@
 {% block breadcrumb %}
 {{ block.super }} » 
 	{% if object %}
-	<a href="{% host_url admin-episode-list object.slugName on dashboard %}">{{ object.name }}</a> »
+	<a href="{% host_url admin-episode-list object.show.slugName on dashboard %}">{{ object.show.name }}</a> »
 	{% trans "Edit Show" %}
 	{% else %}{% trans "Create Show" %}{% endif %}
 {% endblock %}
@@ -11,13 +11,6 @@
 {% if object %}{% trans "Edit" %} {{ object|object_name }}
 {% else %}{% trans "Create Show" %}{% endif %}
 </h2>
-{% if object.showfeed.enabled %}
-{% blocktrans %}
-The properties of this show are currently updated from the configured podcast feed. If you want to change
-properties of the show either update the podcast feed or disable the automatic update via the feed
-{% endblocktrans %}
-<a href="{% host_url admin-show-feed object.slugName on dashboard %}">{% trans "here" %}</a> 
-{% else %}
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <table>
@@ -25,5 +18,4 @@ properties of the show either update the podcast feed or disable the automatic u
 <tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
 </table>
 </form>
-{% endif %}
 {% endblock %}

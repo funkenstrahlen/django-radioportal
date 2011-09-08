@@ -14,6 +14,8 @@ urlpatterns = patterns('',
         
     url(r'^dashboard/', include('radioportal.dashboard.urls')),
     
+    url(r'^feeds/', include('radioportal.feeds.urls')),
+    
     # root
     url(r'^home/$', base.RedirectView.as_view(url='/'), name="home"),
     url(r'^$', episodes.LandingView.as_view(), name="root"),

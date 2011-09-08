@@ -66,11 +66,11 @@ post_save.connect(object_changed, StreamSetup, dispatch_uid="my_dispatch_uid")
 post_save.connect(object_changed, ShowFeed, dispatch_uid="my_dispatch_uid")
 post_save.connect(object_changed, UserProfile, dispatch_uid="my_dispatch_uid")
 
-post_delete.connect(object_changed, RecodedStream, dispatch_uid="my_dispatch_uid")
-post_delete.connect(object_changed, SourcedStream, dispatch_uid="my_dispatch_uid")
-post_delete.connect(object_changed, StreamSetup, dispatch_uid="my_dispatch_uid")
-post_delete.connect(object_changed, ShowFeed, dispatch_uid="my_dispatch_uid")
-post_delete.connect(object_changed, UserProfile, dispatch_uid="my_dispatch_uid")
+post_delete.connect(object_deleted, RecodedStream, dispatch_uid="my_dispatch_uid")
+post_delete.connect(object_deleted, SourcedStream, dispatch_uid="my_dispatch_uid")
+post_delete.connect(object_deleted, StreamSetup, dispatch_uid="my_dispatch_uid")
+post_delete.connect(object_deleted, ShowFeed, dispatch_uid="my_dispatch_uid")
+post_delete.connect(object_deleted, UserProfile, dispatch_uid="my_dispatch_uid")
 
 
 

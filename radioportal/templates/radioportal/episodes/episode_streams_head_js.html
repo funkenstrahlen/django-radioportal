@@ -1,6 +1,7 @@
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}slimbox/js/slimbox2.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}jplayer/jquery.jplayer.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}slimbox2/js/slimbox2.js"></script>
+        <script type='text/javascript' src='{{ STATIC_URL }}mediaplayer-5.7/jwplayer.js'></script>
+        <script type='text/javascript' src='{{ STATIC_URL }}mediaplayer-5.7/jquery.jwplayer.js'></script>
   <script type="text/javascript">
     if(typeof(String.prototype.trim) === "undefined") {
         String.prototype.trim = function() {
@@ -9,32 +10,39 @@
     }
 
     function showplayer(index, element) {
-      $(element).find(".jp-show-player").bind('click', false);
-      $(element).find(".jp-show-player").bind('click', function() {
-          $(element).find(".jp-activate").css('display','none');
-          $(element).find(".jp-interface").css('display','block');
-          media = {}
-          $(element).find("ul > li.stream.direct").each(function () {
-              var format=$(this).find(".what").text().trim().replace(/\s+/g, ' ').split(" ")[0];
-              if (format == "ogg") { format = "oga"; }
+      $(element).bind('click', false);
+      $(element).click(function() {
+      		el=$(this).parent();
+			$(el).find('.player').show();
+   		    $(el).find('.play').hide();
+            media = {}
+            $(el).parent().find("li.stream.direct").each(function () {
               var mount = $(this).find("a.mount").attr("href");
-              var url = window.location.protocol + "//" + window.location.host + mount;
-              media[format] = url;
-          });
-          var id = $(element).find(".jp-interface").attr("id");
-          id = '#' + id
-          $(element).find(".jp-jplayer").jPlayer({
-            ready: function () {
-              $(this).jPlayer("setMedia", media );
-            },
-            swfPath: "{{ MEDIA_URL }}css/jplayer/",
-            preload: "none",
-            cssSelectorAncestor: id,
-          });
-      })
+              var format = mount.substr(mount.length-3)
+              if (format == "ogg") { format = "oga"; }
+              media[format] = mount;
+            });
+
+   		    $(el).find('.player').jwplayer({
+   		        'modes': [
+       				{type: 'flash', src: '{{ STATIC_URL }}/mediaplayer-5.7/player.swf'},
+      				{type: 'html5'},       				
+   				],
+			    'id': 'playerID',
+//			    'file': 'http://rbb.ic.llnwd.net/stream/rbb_fritz_mp3_m_a',
+  			    'file': media['mp3'],
+			    'type': 'sound',
+			    'height': '20',
+			    'width': '163',
+			    'backcolor': 'eeeeee',
+			    'screencolor': 'eeeeee',
+			    'controlbar': 'bottom',
+			    'skin': '{{ STATIC_URL }}/mediaplayer-5.7/skin/xsn.xml',
+ 				});
+    	});
     }
 
     $(document).ready(function() {
-      $(".streams").each(showplayer);
+      $(".play").each(showplayer);
     });
   </script>

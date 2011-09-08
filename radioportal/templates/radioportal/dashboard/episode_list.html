@@ -4,6 +4,7 @@
 <h2>{{ show }}</h2>
 <ul>
 	<li><a href="{% host_url admin-show-edit show.slugName on dashboard %}">{% trans "Edit show properties" %}</a></li>
+	<li><a href="{% host_url admin-show-feed show.slugName on dashboard %}">{% trans "Configure update from podcast feed" %}</a></li>
 	<li><a href="{% host_url admin-episode-create show.slugName on dashboard %}">{% trans "Create new episode" %}</a></li>
 </ul>
 {% if object_list %}

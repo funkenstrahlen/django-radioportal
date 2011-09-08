@@ -5,7 +5,10 @@ from django.utils.translation import ugettext as _
 
 
 import vobject
+from django_hosts.reverse import reverse_crossdomain
+
 from radioportal.models import Show, Episode
+from django.conf import settings
 
 _mapping = {'live': 'RUNNING', 'planned': 'PLANNED', 'latest': 'ARCHIVED'}
 
@@ -64,13 +67,23 @@ class ShowFeed(Feed):
     def item_title(self, item):
         return _("xsn archive entry %s: %s" % (item.shortName, item.topic))
 
+    def item_link(self, item):
+        kwargs = {'show_name': item.show.slugName, 'slug': item.shortName}
+        url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
+        return 'http:%s' % url
+
 
 def ical_feed(request, show_name=None):
     cal = vobject.iCalendar()
     cal.add('method').value = 'PUBLISH'  # IE/Outlook needs this
+    str = ""
+    if show_name:
+        str= " for %s" % Show.objects.get(slugName=show_name).name
+    cal.add('X-WR-CALNAME').value = "Upcoming episodes%s on xsn" % str
+    cal.add('X-WR-TIMEZONE').value = settings.TIME_ZONE
     ep = Episode.objects.filter(status='PLANNED')
     if show_name:
-        ep.filter(show__slugName=show_name)
+        ep = ep.filter(show__slugName=show_name)
     for episode in ep.order_by('begin')[:30]:
         vevent = cal.add('vevent')
         val = "%s: %s" % (episode.shortName, episode.topic)
@@ -78,6 +91,10 @@ def ical_feed(request, show_name=None):
         vevent.add('description').value = episode.description
         vevent.add('dtstart').value = episode.begin
         vevent.add('dtend').value = episode.end
+        vevent.add('uid').value = '%s' % episode.pk
+        kwargs = {'show_name': episode.show.slugName, 'slug': episode.shortName}
+        url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
+        vevent.add('url').value = 'http:%s' % url 
     icalstream = cal.serialize()
     response = HttpResponse(icalstream, mimetype='text/calendar')
     #response['Filename'] = 'filename.ics'  # IE needs this

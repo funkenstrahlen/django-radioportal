@@ -31,8 +31,6 @@ class Show(models.Model):
         help_text=_('The number of the next episode to be aired. Used to construct the episode identifier'),
         verbose_name=_("Number of the next episode"))
 
-    publicRecording = models.BooleanField()
-
     icon = models.ImageField(upload_to="show-icons/", blank=True)
 
     def __unicode__(self):
@@ -45,6 +43,7 @@ class Show(models.Model):
 
 class ShowFeed(models.Model):
     show = models.OneToOneField(Show)
+    enabled = models.BooleanField()
     feed = models.URLField(max_length=240, blank=True,
         verbose_name=_("Feed of the podcast"),)
     titlePattern = models.CharField(max_length=240, blank=True,
@@ -158,6 +157,9 @@ class StreamSetup(models.Model):
     graphic_differ_by = models.CharField(max_length=255, blank=True)
 
     graphic_title = models.CharField(max_length=255, blank=True)
+
+    def running_streams(self):
+        return self.stream_set.filter(running=True)
 
     def updateRunning(self):
         self.running = False
