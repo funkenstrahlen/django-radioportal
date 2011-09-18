@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^episode/(?P<pk>[\w-]+)/$', views.EpisodeEditView.as_view(), name="admin-episode-edit"),
     url(r'^episode/(?P<pk>[\w-]+)/delete/$', views.EpisodeDeleteView.as_view(), name="admin-episode-delete"),
 
+    url(r'^episodepart/(?P<pk>[\w-]+)/$', views.EpisodePartEditView.as_view(), name="admin-episodepart-edit"),
+
     url(r'^streamsetup/create/$', views.StreamSetupCreateView.as_view(), name="admin-streamsetup-create"),
     url(r'^streamsetup/(?P<pk>[\w-]+)/$', views.StreamSetupEditView.as_view(), name="admin-streamsetup-edit"),
     url(r'^streamsetup/(?P<pk>[\w-]+)/delete/$', views.StreamSetupDeleteView.as_view(), name="admin-streamsetup-delete"),

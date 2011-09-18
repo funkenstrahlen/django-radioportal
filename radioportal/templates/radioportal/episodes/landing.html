@@ -1,6 +1,6 @@
 {% extends 'radioportal/base.html' %}{% load cache i18n hosts %}
 {% block shorturl_header %}<link rev="canonical" href="http://xsn.io" />{% endblock %}
-{% block shorturl_footer %}<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>{% endblock %}
+{% block shorturl_footer %}http://xsn.io<!--<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>-->{% endblock %}
 {% block breadcrumb %}{% endblock %}
 {% block head_css %}
 	{{ block.super }}
@@ -12,17 +12,17 @@
 {% endblock %}
 
 {% block head %}
-<link href="{% host_url all-feed status='planned' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "planned episodes" %}" />
+<link href="{% host_url all-feed status='upcoming' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "upcoming episodes" %}" />
 <link href="{% host_url all-feed status='live' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "running episodes" %}" />
-<link href="{% host_url all-feed status='latest' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "archived episodes" %}" />
-<link href="{% host_url planned-all-ical on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
+<link href="{% host_url all-feed status='recent' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "archived episodes" %}" />
+<link href="{% host_url upcoming-all-ical on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
 {% endblock %}
 
 {% block content %}
-{% url all-feed status="planned",urlconf=radioportal.feeds.urls as planned_feed_url %}
+{% url all-feed status="upcoming",urlconf=radioportal.feeds.urls as upcoming_feed_url %}
 {% url all-feed status="live",urlconf=radioportal.feeds.urls as live_feed_url %}
-{% url all-feed status="latest",urlconf=radioportal.feeds.urls as latest_feed_url %}
-{% url planned-all-ical urlconf=radioportal.feeds.urls as ical_url %}
+{% url all-feed status="recent",urlconf=radioportal.feeds.urls as recent_feed_url %}
+{% url upcoming-all-ical urlconf=radioportal.feeds.urls as ical_url %}
 {% if running %}
 <h2>{% trans "Running Episodes" %}&nbsp;<a href="{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
 {% for episode in running %}
@@ -31,14 +31,14 @@
 <h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}</h2>
 {% endif %}
 
-{% if planned %}
-<h2>{% trans "Planned Episodes" %}&nbsp;<a href="{% host_url all-feed status='planned' on feeds %}" class="feed atom"></a><a href="{% host_url planned-all-ical on feeds %}" class="feed ical"></a></h2>
-{% for episode in planned %}
+{% if upcoming %}
+<h2>{% trans "Upcoming Episodes" %}&nbsp;<a href="{% host_url all-feed status='upcoming' on feeds %}" class="feed atom"></a><a href="{% host_url upcoming-all-ical on feeds %}" class="feed ical"></a></h2>
+{% for episode in upcoming %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}
 {% endfor %}
 {% endif %}
 
-<h2>{% trans "Missed Episodes" %}&nbsp;<a href="{% host_url all-feed status='latest' on feeds %}" class="feed atom"></a></h2>
+<h2>{% trans "Recent Episodes" %}&nbsp;<a href="{% host_url all-feed status='recent' on feeds %}" class="feed atom"></a></h2>
 {% for episode in archived %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}
 {% empty %}
@@ -56,9 +56,9 @@
 		{% ifequal episode.status "ARCHIVED" %}
 			{% trans "Archived Episodes" %}
 		{% endifequal %}
-		{% ifequal episode.status "PLANNED" %}
-			{% if show_name %}<a href="{% url planned_show show_name=show.slug %}">{% endif %}
-				{% trans "Planned Episodes" %}
+		{% ifequal episode.status "UPCOMING" %}
+			{% if show_name %}<a href="{% url upcoming_show show_name=show.slug %}">{% endif %}
+				{% trans "Upcoming Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
 		</h2>

@@ -9,12 +9,14 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, StreamSetup, Episode, ShowFeed
+from radioportal.models import Show, StreamSetup, Episode, ShowFeed, EpisodePart
 from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+
+from radioportal.dashboard import forms as dforms
 
 class UserGroupListView(ListView):
     template_name = "radioportal/dashboard/user_list.html"
@@ -91,7 +93,7 @@ class LandingView(TemplateResponseMixin, View):
 class ShowCreateView(CreateView):
     template_name = "radioportal/dashboard/show_edit.html"
     success_url = '/dashboard/show/%(slug)s/'
-    form_class = forms.ShowForm
+    form_class = dforms.ShowForm
     model = Show
 
     @method_decorator(permission_required('add_show'))
@@ -102,7 +104,7 @@ class ShowCreateView(CreateView):
 class ShowEditView(UpdateView):
     template_name = "radioportal/dashboard/show_edit.html"
     success_url = '/dashboard/show/%(slug)s/'
-    #form_class = forms.ShowCompoundForm
+    form_class = dforms.ShowForm
     slug_field = 'slug'
     model = Show
 
@@ -125,7 +127,7 @@ class ShowFeedEditView(UpdateView):
     success_url = '/dashboard/show/%(slug)s/'
     slug_field = 'show__slug'
     model = ShowFeed
-    form_class = forms.ShowFeedForm
+    form_class = dforms.ShowFeedForm
     
     def get_object(self, queryset=None):
         """
@@ -190,9 +192,9 @@ class EpisodeListView(ListView):
         return super(EpisodeListView, self).dispatch(*args, **kwargs)
 
 class EpisodeCreateView(CreateView):
-    template_name = "radioportal/dashboard/episode_edit.html"
+    template_name = "radioportal/dashboard/episode_create.html"
     success_url = '/dashboard/episode/%(id)s/'
-    form_class = forms.CreateEpisodeForm
+    form_class = dforms.CreateEpisodeForm
     model = Episode
 
     def get_initial(self):
@@ -204,8 +206,8 @@ class EpisodeCreateView(CreateView):
 
     def get_form_class(self):
         form_class = super(EpisodeCreateView, self).get_form_class()
-        qs = get_objects_for_user(self.request.user, "change_episodes", Show)
-        form_class.base_fields['show'].queryset = qs
+#        qs = get_objects_for_user(self.request.user, "change_episodes", Show)
+#        form_class.base_fields['show'].queryset = qs
         return form_class
 
     def get_context_data(self, **kwargs):
@@ -217,6 +219,10 @@ class EpisodeCreateView(CreateView):
         s = Show.objects.get(slug=self.kwargs['slug'])
         s.nextEpisodeNumber+=1
         s.save()
+        if form.instance.episode_id is None:
+            e = Episode(slug=form.cleaned_data['slug'], show=s)
+            e.save()
+            form.instance.episode = e
         return super(EpisodeCreateView, self).form_valid(form)
 
     @method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
@@ -227,7 +233,7 @@ class EpisodeCreateView(CreateView):
 class EpisodeEditView(UpdateView):
     template_name = "radioportal/dashboard/episode_edit.html"
     success_url = '/dashboard/episode/%(id)s/'
-    form_class = forms.EpisodeCompoundForm
+    form_class = dforms.EpisodeForm
     model = Episode
 
     def get_context_data(self, **kwargs):
@@ -257,10 +263,27 @@ class EpisodeDeleteView(DeleteView):
         return super(EpisodeDeleteView, self).dispatch(*args, **kwargs)
 
 
+class EpisodePartEditView(UpdateView):
+    template_name = "radioportal/dashboard/episodepart_edit.html"
+    success_url = '/dashboard/episodepart/%(id)s/'
+    form_class = dforms.EpisodePartForm
+    model = EpisodePart
+
+    def get_context_data(self, **kwargs):
+        ctx = super(EpisodePartEditView, self).get_context_data(**kwargs)
+        ctx['show'] = self.object.episode.show
+        return ctx
+
+    #FIXME
+    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
+    def dispatch(self, *args, **kwargs):
+        return super(EpisodePartEditView, self).dispatch(*args, **kwargs)
+
+
 class StreamSetupCreateView(CreateView):
     template_name = "radioportal/dashboard/streamsetup_edit.html"
     success_url = '/dashboard/streamsetup/%(id)s/'
-    form_class = forms.StreamSetupPlainCompoundForm
+    form_class = dforms.StreamSetupPlainCompoundForm
     model = StreamSetup
 
     def get_form_class(self):
@@ -277,7 +300,7 @@ class StreamSetupCreateView(CreateView):
 class StreamSetupEditView(UpdateView):
     template_name = "radioportal/dashboard/streamsetup_edit.html"
     success_url = '/dashboard/streamsetup/%(id)s/'
-    form_class = forms.StreamSetupCompoundForm
+    form_class = dforms.StreamSetupCompoundForm
     model = StreamSetup
 
     def get_form_class(self):

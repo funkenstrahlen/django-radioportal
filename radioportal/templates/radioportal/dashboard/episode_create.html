@@ -1,0 +1,72 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
+	{% if episode %}{{ episode.slug }}: {{ episode.title }}{% else %}{% trans "Create new episode" %}{% endif %}
+{% endblock %}
+{% block content %}
+<h2>{% trans "Create Episode" %}</h2>
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+{% if form.forms %}
+{{ form.forms.0.as_table }}
+
+{{ form.forms.1.management_form }}
+{% if form.forms.1|length > 0 %}
+<tr>
+<td colspan="2">
+<h3>{% trans "Associated Graphics" %}</h3>
+
+</td>
+</tr>
+{% for f in form.forms.1 %}
+<tr><td colspan="2"><h4>{% trans "Graphic" %}</h4></td></tr>
+<tr>
+	<td><label>{% trans "File" %}</label></td>
+	<td><a href="{{ f.instance.file.url }}">{{ f.instance.file }}</a></td>
+</tr>
+{{ f.as_table }}
+{% endfor %}
+{% endif %}{# end of graphics #}
+
+{{ form.forms.2.management_form }}
+{% if form.forms.2|length > 0 %}
+<tr>
+<td colspan="2">
+<h3>{% trans "Associated Recordings" %}</h3>
+
+</td>
+</tr>
+{% for f in form.forms.2 %}
+<tr><td colspan="2"><h4>{% trans "Recording" %} {{ f.instance.format }} {% trans "with" %} {{ f.instance.bitrate }}</h4></td></tr>
+<tr>
+	<td><label>{% trans "Path" %}</label></td>
+	<td><a href="http://archiv.streams.xenim.de/recordings{{ f.instance.path }}">{{ f.instance.path }}</a></td>
+</tr>
+{% if f.instance.size %}
+<tr>
+	<td><label>{% trans "Size" %}</label></td>
+	<td>{{ f.instance.size }}</td>
+</tr>
+{% endif %}
+{% if f.instance.publicURL %}
+<tr>
+	<td><label>{% trans "Public URL" %}</label></td>
+	<td><a href="{{ f.instance.publicURL }}">{{ f.instance.publicURL }}</a></td>
+</tr>
+{% endif %}
+
+{{ f.as_table }}
+{% endfor %}
+{% endif %}{# end of recordings #}
+
+
+{% else %}
+{{ form.as_table }}
+{% endif %}
+
+</table>
+<input type="submit" value="{% trans "Apply" %}" />
+</form>
+{% endblock %}

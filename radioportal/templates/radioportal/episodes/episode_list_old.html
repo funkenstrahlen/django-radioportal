@@ -1,26 +1,26 @@
 {% extends 'radioportal/episodes/episode_list_base.html' %}{% load i18n hosts%}
 {% block title %} &middot; {{ object_list.0.show.name }} {% endblock %}
-{% block breadcrumb %}{{ block.super }} » {% trans "Latest episodes" %}{% endblock %}
+{% block breadcrumb %}{{ block.super }} » {% trans "Recent episodes" %}{% endblock %}
 
 {% block head %}
 {% if show %}
-	<link href="{% host_url show-feed status="latest" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="{% host_url show-feed status="recent" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% else %}
-	<link href="{% host_url all-feed status="latest" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="{% host_url all-feed status="recent" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% endif %}
 
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url show-feed status="latest" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url show-feed status="recent" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 {% else %}
-	<li><a href="{% host_url all-feed status="latest" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url all-feed status="recent" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 {% endif %}
 
 {% endblock %}
 {% block collapsed_shows %}{% endblock %}
-{% block collapsed_planned %}un{% endblock %}
-{% block navi_planned %}
+{% block collapsed_upcoming %}un{% endblock %}
+{% block navi_upcoming %}
 {% if future %}
 <ul>
 {% for episode in future %}
@@ -38,5 +38,5 @@
 {# <h1>Liste der geplanten Sendungen</h1> #}
 {% endblock %}
 {% block no_episodes %}
-<h2>{% trans "There are no episodes planned currently" %}</h2>
+<h2>{% trans "There are no episodes upcoming currently" %}</h2>
 {% endblock %}
