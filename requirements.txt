@@ -10,7 +10,7 @@ django-hosts
 django-readonlywidget
 django-shorturls
 -e git+ssh://git@git.xenim.de:2066/devel/extshorturls.git#egg=django-shorturls-external
-python-dateutil
+python-dateutil==1.5
 simplejson
 translitcodec
 vobject

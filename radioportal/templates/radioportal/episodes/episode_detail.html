@@ -39,8 +39,8 @@
 {% endcomment %}
 {% endblock %}
 {% block content %}
-{% for part in episode.parts.all.reverse %}
-	<h2>{{ episode.slug|upper }}: {{ part.title }}</h2>
+{% for part in episode.parts.all %}
+	<h2>{{ episode.slug|upper }}{% if part.title %}: {{ part.title }}{% endif %}</h2>
 	<small>
 		{% if part.end %}{% trans "From" %}{% else %}{% trans "Since" %}{% endif %}
 		{{ part.begin|date:"d. F Y H:i" }}{% if part.end %}

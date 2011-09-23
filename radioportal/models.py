@@ -143,7 +143,7 @@ class EpisodePart(models.Model):
         return u'%s%s%s' % (self.episode.slug, " " if self.title else"", self.title, )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
 class Graphic(models.Model):
     file = models.ImageField(upload_to='archiv', blank=True)
@@ -169,8 +169,10 @@ class Recording(models.Model):
 
 class StreamSetup(models.Model):
     # Status
-    running = models.BooleanField(default=False,
-        help_text=_("A Stream of this setup is running"))
+    #running = models.BooleanField(default=False,
+    #    help_text=_("A Stream of this setup is running"))
+    def running(self):
+        return self.stream_set.filter(running=True).count() > 0
 
     # Meta data from stream
     cluster = models.CharField(max_length=40, unique=True,
@@ -224,10 +226,10 @@ class Stream(models.Model):
     running = models.BooleanField(default=False)
 
     FORMATS = (
-        ('MP3', _('MP3')),
-        ('AAC', _('AAC')),
-        ('OGG', _('Ogg/Vorbis')),
-        ('OGM', _('Ogg/Theora')),
+        ('mp3', _('MP3')),
+        ('aac', _('AAC')),
+        ('ogg', _('Ogg/Vorbis')),
+        ('ogm', _('Ogg/Theora')),
     )
 
     format = models.CharField(max_length=100,
@@ -309,7 +311,7 @@ class Status(models.Model):
 
 from django.db.models.signals import post_save
 def saved(sender, instance, created, **kwargs):
-    print sender, repr(instance)
+    print "Saved (models.py:314): ", sender, repr(instance)
 
 
 post_save.connect(saved, Show)

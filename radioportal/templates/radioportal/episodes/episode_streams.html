@@ -18,10 +18,7 @@ Here should appear the Webplayer
 		{% for stream in episode.streamsetup.running_streams %}
 		{% spaceless %}
 		<li class="stream direct">
-			<a href="http:{% host_url playlist slug=stream.mount on www %}">
-				{{ stream.format }}
-				{{ stream.bitrate|formataudio:stream.format }}
-			</a>
+			<a href="http:{% host_url playlist slug=stream.mount on www %}">{{ stream.format }} {{ stream.bitrate|formataudio:stream.format }}</a>
 			(<a href="http:{% host_url mount stream=stream.mount on www %}" class="mount">{% trans "direct" %}</a>,
 			<a href="{% load shorturl %}{% shorturl stream %}">{% trans "Short URL" %}</a>)
 		</li>

@@ -21,7 +21,7 @@ class EpisodeForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
         model = models.Episode
-        fields = ('slug', )
+        fields = ('slug', 'status')
 
 class EpisodePartForm(forms.ModelForm):
     required_css_class = "required"
