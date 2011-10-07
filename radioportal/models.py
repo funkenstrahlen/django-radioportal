@@ -8,7 +8,6 @@ from django.db.models import Min, Max
 
 from autoslug import AutoSlugField
 
-import re
 import hashlib
 
 class Show(models.Model):
@@ -81,36 +80,35 @@ class Episode(models.Model):
         verbose_name=_("Short Name"))
     
     def begin(self):
-        return self.episodepart_set.aggregate(Min('begin'))['begin__min']
+        return self.parts.aggregate(Min('begin'))['begin__min']
     
     def end(self):
-        return self.episodepart_set.aggregate(Max('end'))['end__max']
+        return self.parts.aggregate(Max('end'))['end__max']
     
     def title(self):
-        if len(self.episodepart_set.all()) > 0:
-            return self.episodepart_set.all()[0].title
+        if len(self.parts.all()) > 0:
+            return self.parts.all()[0].title
         return None
     
     def description(self):
-        if len(self.episodepart_set.all()) > 0:
-            return self.episodepart_set.all()[0].description
+        if len(self.parts.all()) > 0:
+            return self.parts.all()[0].description
         return None        
     
     def url(self):
-        if len(self.episodepart_set.all()) > 0:
-            return self.episodepart_set.all()[0].url
+        if len(self.parts.all()) > 0:
+            return self.parts.all()[0].url
         return None        
     
     status = models.CharField(max_length=10,
         choices=STATUS, default=STATUS[2][0])
 
+    current_part = models.ForeignKey('EpisodePart', blank=True, null=True, related_name="current_episode")
+
     def __unicode__(self):
-#        if self.title:
-#            if self.slug:
-#                return u'%s: %s' % (self.slug, self.title)
-#            else:
-#                return u'%s' % self.title
-#        else:
+        if len(self.parts.all()) > 0:
+            return self.parts.all()[0].__unicode__()
+        else:
             return u'%s' % self.slug
 
 #    def save(self, force_insert=False, force_update=False):
@@ -131,7 +129,7 @@ class EpisodePart(models.Model):
     a part of an episode, i.e 'intro' or 'interview with first caller'
     should be used for timelines
     """
-    episode = models.ForeignKey(Episode)
+    episode = models.ForeignKey(Episode, related_name='parts')
     title = models.CharField(max_length=200, blank=True, default='', verbose_name=_("Topic"))
     description = models.CharField(max_length=200, blank=True,
         default='', verbose_name=_("Description"))    
@@ -141,18 +139,23 @@ class EpisodePart(models.Model):
         help_text=_('Page of the Episode'),
         verbose_name=_("URL"))
 
+    def __unicode__(self):
+        return u'%s%s%s' % (self.episode.slug, " " if self.title else"", self.title, )
+
+    class Meta:
+        ordering = ['-id']
 
 class Graphic(models.Model):
     file = models.ImageField(upload_to='archiv', blank=True)
-    episode = models.ForeignKey('Episode', related_name='graphics')
+    episode = models.ForeignKey('EpisodePart', related_name='graphics')
 
     def __unicode__(self):
         return self.file.name + unicode(": ") + unicode(self.episode)
 
 
 class Recording(models.Model):
-    episode = models.ForeignKey('Episode', related_name='recordings')
-    path = models.CharField(max_length=250)
+    episode = models.ForeignKey('EpisodePart', related_name='recordings')
+    path = models.CharField(max_length=250, unique=True)
 
     format = models.CharField(max_length=50)
     bitrate = models.CharField(max_length=50)
@@ -160,12 +163,16 @@ class Recording(models.Model):
     publicURL = models.URLField(verify_exists=False, default='')
     isPublic = models.BooleanField()
     size = models.PositiveIntegerField()
+    
+    running = models.BooleanField()
 
 
 class StreamSetup(models.Model):
     # Status
-    running = models.BooleanField(default=False,
-        help_text=_("A Stream of this setup is running"))
+    #running = models.BooleanField(default=False,
+    #    help_text=_("A Stream of this setup is running"))
+    def running(self):
+        return self.stream_set.filter(running=True).count() > 0
 
     # Meta data from stream
     cluster = models.CharField(max_length=40, unique=True,
@@ -206,6 +213,11 @@ class StreamSetup(models.Model):
     def __unicode__(self):
         return _("Setup for %(cluster)s" % {'cluster': self.cluster})
 
+    class Meta:
+        permissions = (
+            ('change_stream', 'Change Stream'),
+        )
+
 
 class Stream(models.Model):
     """
@@ -219,10 +231,10 @@ class Stream(models.Model):
     running = models.BooleanField(default=False)
 
     FORMATS = (
-        ('MP3', _('MP3')),
-        ('AAC', _('AAC')),
-        ('OGG', _('Ogg/Vorbis')),
-        ('OGM', _('Ogg/Theora')),
+        ('mp3', _('MP3')),
+        ('aac', _('AAC')),
+        ('ogg', _('Ogg/Vorbis')),
+        ('ogm', _('Ogg/Theora')),
     )
 
     format = models.CharField(max_length=100,
@@ -304,7 +316,7 @@ class Status(models.Model):
 
 from django.db.models.signals import post_save
 def saved(sender, instance, created, **kwargs):
-    print sender, repr(instance)
+    print "Saved (models.py:314): ", sender, repr(instance)
 
 
 post_save.connect(saved, Show)

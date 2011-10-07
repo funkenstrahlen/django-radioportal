@@ -1,0 +1,38 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
+	<a href="{% host_url admin-episode-edit form.instance.episode.id %}">{{ form.instance.episode.slug }}</a> »
+	{{ form.instance.title }}
+{% endblock %}
+{% block content %}
+<h2>{% trans "Edit Part of Episode" %}</h2>
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+{{ form.as_table }}
+</table>
+<input type="submit" value="{% trans "Apply" %}" />
+</form>
+
+{% if form.instance.graphics.all %}
+<h3>{% trans "Associated Graphics" %}</h3>
+<ul>
+{% for g in form.instance.graphics.all %}
+	<li><a href="{{ g.file.url }}">{{ g.file }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if form.instance.recordings.all %}
+<h3>{% trans "Associated Recordings" %}</h3>
+<ul>
+{% for r in form.instance.recordings.all %}
+	<li><a href="http://archiv.streams.xenim.de/recordings{{ r.path }}">
+	{% trans "Recording" %} {{ r.format }}, {{ r.bitrate }}KBit/s, {{ r.size }}B <span style="display:inline-block; min-width: 1em; background-color: {% if r.running %}green{% else %}red{% endif %};">&nbsp;</span>
+	</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

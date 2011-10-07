@@ -1,6 +1,6 @@
 {% extends 'radioportal/base.html' %}{% load cache i18n hosts %}
 {% block shorturl_header %}<link rev="canonical" href="http://xsn.io" />{% endblock %}
-{% block shorturl_footer %}<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>{% endblock %}
+{% block shorturl_footer %}http://xsn.io<!--<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>-->{% endblock %}
 {% block breadcrumb %}{% endblock %}
 {% block head_css %}
 	{{ block.super }}

@@ -34,8 +34,8 @@ class InlineRecording(admin.TabularInline):
 class EpisodeAdmin(admin.ModelAdmin):
     inlines = [
         InlineEpisodePart,
-        InlineGraphic,
-        InlineRecording,
+#        InlineGraphic,
+#        InlineRecording,
     ]
 
 class ShowAdmin(GuardedModelAdmin):

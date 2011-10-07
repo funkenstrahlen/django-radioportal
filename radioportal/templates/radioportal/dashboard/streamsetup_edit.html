@@ -47,7 +47,9 @@
 {{ f.as_table }}
 {% endfor %}
 
+{% if form.forms.2 %}
 <tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3>{{ form.forms.2.management_form }}</td></tr>
+{% endif %}
 {% for f in form.forms.2 %}
 <tr><td colspan="2"><h4>{% trans "Stream" %} {{ f.instance.mount }}</h4></td></tr>
 {{ f.as_table }}

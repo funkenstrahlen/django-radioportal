@@ -7,6 +7,8 @@ import django.contrib.auth.views
 urlpatterns = patterns('',
     url(r'^$', views.LandingView.as_view(), name="dashboard"),
 
+    url(r'^perm/(?P<user_id>[\w]+)/(?P<post_slug>[\w]+)/$', views.my_view, name="admin-perm"),
+
     url(r'^user/$', views.UserGroupListView.as_view(), name="admin-list-users"),
     url(r'^user/create/$', views.UserCreateView.as_view() , name="admin-user-create"),
     url(r'^user/(?P<slug>[\w-]+)/$', views.UserEditView.as_view(), name="admin-user-edit"),
@@ -23,6 +25,8 @@ urlpatterns = patterns('',
 
     url(r'^episode/(?P<pk>[\w-]+)/$', views.EpisodeEditView.as_view(), name="admin-episode-edit"),
     url(r'^episode/(?P<pk>[\w-]+)/delete/$', views.EpisodeDeleteView.as_view(), name="admin-episode-delete"),
+
+    url(r'^episodepart/(?P<pk>[\w-]+)/$', views.EpisodePartEditView.as_view(), name="admin-episodepart-edit"),
 
     url(r'^streamsetup/create/$', views.StreamSetupCreateView.as_view(), name="admin-streamsetup-create"),
     url(r'^streamsetup/(?P<pk>[\w-]+)/$', views.StreamSetupEditView.as_view(), name="admin-streamsetup-edit"),

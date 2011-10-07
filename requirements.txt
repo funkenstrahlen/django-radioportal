@@ -1,0 +1,16 @@
+Django==1.3
+Pillow
+amqplib
+anyjson
+carrot
+distribute
+django-autoslug
+django-guardian
+django-hosts
+django-readonlywidget
+django-shorturls
+-e git+ssh://git@git.xenim.de:2066/devel/extshorturls.git#egg=django-shorturls-external
+python-dateutil==1.5
+simplejson
+translitcodec
+vobject

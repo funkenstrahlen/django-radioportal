@@ -12,6 +12,6 @@ urlpatterns = patterns('',
     url(r'^upcoming/ical/$', ical_feed, name="upcoming-all-ical"),
     url(r'^(?P<status>(recent|live|upcoming))/feed/$', ShowFeed(), name="all-feed"),
     url(r'^upcoming/(?P<show_name>[\w-]+)/ical/$', ical_feed, name="upcoming-show-ical"),
-    url(r'^(?P<status>(recent|live|upcoming))/(?P<show_name>[\w-]+)/feed/$', ShowFeed(), name="show-feed"),
+    url(r'^(?P<status>(recent|live|upcoming))/(?P<show_name>[\w-]+)/feed/$', ShowFeed(), name="shows-feed"),
     url(r'^(?P<show_name>[\w-]+)/feed/$', ShowFeed(), name="show-feed"),
 )
