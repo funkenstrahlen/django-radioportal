@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateResponseMixin, View
 from radioportal.models import Show, Stream, Episode
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.db.models.aggregates import Max, Sum
+from django.db.models.aggregates import Max, Sum, Min
 
 class RobotsTxtView(TemplateResponseMixin, View):
     
@@ -37,7 +37,7 @@ class ShowView(ListView):
     what = "all"
 
     def get_queryset(self):
-        qs = Episode.objects.all().order_by('-begin')
+        qs = Episode.objects.all().annotate(begin=Min('episodepart__begin')).order_by('-begin')
         if 'show_name' in self.kwargs:
             qs = qs.filter(show__slug=self.kwargs['show_name'])
         if hasattr(self, 'what'):
@@ -46,7 +46,7 @@ class ShowView(ListView):
             if self.what in ('now'):
                 qs = qs.filter(status=Episode.STATUS[1][0])
             if self.what in ('future'):
-                qs = qs.filter(status=Episode.STATUS[2][0]).order_by('begin')
+                qs = qs.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('episodepart__begin')).order_by('begin')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -73,17 +73,17 @@ class ShowList(ListView):
         #queryset = Show.objects.all() #annotate(newest=Max('episode__end')).order_by('-newest'),
         qs = Show.objects.all()
         qs = qs.annotate(sum=Sum('episode__id')).filter(sum__gt=0)
-        qs = qs.annotate(newest=Max('episode__end')).order_by('-newest')
+        qs = qs.annotate(newest=Max('episode__episodepart__end')).order_by('-newest')
         return qs
 
 
 class LandingView(ListView):
     template_name = "radioportal/episodes/landing.html"
-    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).order_by('-begin')[:5]
+    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).annotate(begin=Min('episodepart__begin')).order_by('-begin')[:5]
     context_object_name = 'running'
     
     def get_context_data(self, **kwargs):
         ctx = super(LandingView, self).get_context_data(**kwargs)
-        ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).order_by('-begin')[:5]
-        ctx['planned'] = Episode.objects.filter(status=Episode.STATUS[2][0]).order_by('begin')[:5]
+        ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).annotate(begin=Min('episodepart__begin')).order_by('-begin')[:5]
+        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('episodepart__begin')).order_by('begin')[:5]
         return ctx

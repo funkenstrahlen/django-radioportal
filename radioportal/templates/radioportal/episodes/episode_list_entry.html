@@ -2,7 +2,7 @@
 <div class="episode{% if episode.show.icon and not show %} showicon{% endif %}">
 	{% cache 900 episode.id episode.status %}
 	{% if episode.show.icon and not show %}<img src="{{ episode.show.icon.url }}" />{% endif %}
-	<h3><a href="{% url episode show_name=episode.show.slug,slug=episode.slug %}">{{ episode.show.name }} {{ episode.slug|upper }}{% if episode.topic %}: {{ episode.topic }}{% endif %}</a></h3>
+	<h3><a href="{% url episode show_name=episode.show.slug,slug=episode.slug %}">{{ episode.show.name }} {{ episode.slug|upper }}{% if episode.title %}: {{ episode.title }}{% endif %}</a></h3>
 	{% if episode.begin or episode.end %}
 	<small>{% if episode.begin %}{% trans "from" %} {{ episode.begin|date:"d. F Y H:i" }} {% endif %}{% if episode.end %}{% trans "until" %} {{ episode.end|date:"d. F Y H:i" }}{% endif %}</small>
 	{% endif %}

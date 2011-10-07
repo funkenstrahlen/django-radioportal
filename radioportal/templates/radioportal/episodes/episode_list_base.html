@@ -65,9 +65,9 @@
 		{% ifequal episode.status "ARCHIVED" %}
 			{% trans "Archived Episodes" %}
 		{% endifequal %}
-		{% ifequal episode.status "PLANNED" %}
-			{% if show_name %}<a href="{% url planned_show show_name=show.slug %}">{% endif %}
-				{% trans "Planned Episodes" %}
+		{% ifequal episode.status "UPCOMING" %}
+			{% if show_name %}<a href="{% url upcoming_show show_name=show.slug %}">{% endif %}
+				{% trans "Upcoming Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
 		</h2>

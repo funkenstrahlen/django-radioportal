@@ -10,7 +10,7 @@ from django_hosts.reverse import reverse_crossdomain
 from radioportal.models import Show, Episode
 from django.conf import settings
 
-_mapping = {'live': 'RUNNING', 'planned': 'PLANNED', 'latest': 'ARCHIVED'}
+_mapping = {'live': 'RUNNING', 'upcoming': 'UPCOMING', 'recent': 'ARCHIVED'}
 
 
 class _dummy:
@@ -38,7 +38,7 @@ class ShowFeed(Feed):
                 a = _("Currently streamed episodes on xenim streaming network")
                 obj.abstract = a
             elif status == _mapping.keys()[1]:
-                obj.name = _("Planned episodes")
+                obj.name = _("Upcoming episodes")
                 a = _("Episodes which are scheduled to be aired in the future")
                 obj.abstract = a
             elif status == _mapping.keys()[2]:
@@ -65,7 +65,7 @@ class ShowFeed(Feed):
         return eps.order_by('-end')[:30]
 
     def item_title(self, item):
-        return _("xsn archive entry %s: %s" % (item.slug, item.topic))
+        return _("xsn archive entry %s: %s" % (item.slug, item.title))
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
@@ -81,12 +81,12 @@ def ical_feed(request, show_name=None):
         str= " for %s" % Show.objects.get(slug=show_name).name
     cal.add('X-WR-CALNAME').value = "Upcoming episodes%s on xsn" % str
     cal.add('X-WR-TIMEZONE').value = settings.TIME_ZONE
-    ep = Episode.objects.filter(status='PLANNED')
+    ep = Episode.objects.filter(status='UPCOMING')
     if show_name:
         ep = ep.filter(show__slug=show_name)
     for episode in ep.order_by('begin')[:30]:
         vevent = cal.add('vevent')
-        val = "%s: %s" % (episode.slug, episode.topic)
+        val = "%s: %s" % (episode.slug, episode.title)
         vevent.add('summary').value = val
         vevent.add('description').value = episode.description
         vevent.add('dtstart').value = episode.begin

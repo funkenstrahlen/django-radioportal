@@ -44,16 +44,16 @@ urlpatterns = patterns('',
     # archive
     url(r'^shows/$', episodes.ShowList.as_view(), name="shows"),
 
-    # latest
-    url(r'^latest/$', episodes.ShowView.as_view(what='old'), name="latest"),
-    url(r'^latest/(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what='old'), name="latest_show"),
+    # recent
+    url(r'^recent/$', episodes.ShowView.as_view(what='old'), name="recent"),
+    url(r'^recent/(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what='old'), name="recent_show"),
 
-    # planned
-    url(r'^planned/$', episodes.ShowView.as_view(what='future'),
-        name="planned"),
-    url(r'^planned/(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what='future'), name="planned_show"),
+    # upcoming
+    url(r'^upcoming/$', episodes.ShowView.as_view(what='future'),
+        name="upcoming"),
+    url(r'^upcoming/(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what='future'), name="upcoming_show"),
 
     # running streams
     url(r'^live/$', episodes.ShowView.as_view(what='now'), name="live"),

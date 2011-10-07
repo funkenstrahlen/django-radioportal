@@ -4,6 +4,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.db.models import Min, Max
 
 from autoslug import AutoSlugField
 
@@ -23,6 +24,20 @@ class Show(models.Model):
         verbose_name=_("Description"))
     abstract = models.TextField(blank=True, default='',
         verbose_name=_('Longer description of the show'))
+
+    LICENCES = (
+        ('none', _('none')),
+        ('cc-by', _('cc-by')),
+        ('cc-by-sa', _('cc-by-sa')),
+        ('cc-by-nd', _('cc-by-nd')),
+        ('cc-by-nc', _('cc-by-nc')),
+        ('cc-by-nc-sa', _('cc-by-nc-sa')),
+        ('cc-by-nc-nd', _('cc-by-nc-nd')),
+    )
+
+    licence  = models.CharField(max_length=100,
+        choices=LICENCES, default=LICENCES[0][0])
+
     defaultShortName = models.SlugField(default='',
         help_text=_('Used to construct the episode' +
                     ' identifier.'),
@@ -48,7 +63,7 @@ class ShowFeed(models.Model):
         verbose_name=_("Feed of the podcast"),)
     titlePattern = models.CharField(max_length=240, blank=True,
         verbose_name=_("Regular expression for the title"),
-        help_text=_(u"Used to extract the id and topic from the »topic« field of the feed. Should contain the match groups »id« and »topic«. "))
+        help_text=_(u"Used to extract the id and title from the »title« field of the feed. Should contain the match groups »id« and »title«. "))
 
 
 class Episode(models.Model):
@@ -59,39 +74,53 @@ class Episode(models.Model):
     STATUS = (
         ('ARCHIVED', _("Archived Episode")),
         ('RUNNING', _("Running Episode")),
-        ('PLANNED', _("Planned Episode")),
+        ('UPCOMING', _("Upcoming Episode")),
     )
     show = models.ForeignKey(Show, verbose_name=_("Show"))
-    topic = models.CharField(max_length=200, blank=True, default='', verbose_name=_("Topic"))
-    description = models.CharField(max_length=200, blank=True,
-        default='', verbose_name=_("Description"))
     slug = models.SlugField(max_length=30, default='',
         verbose_name=_("Short Name"))
-    url = models.URLField(blank=True, verify_exists=False,
-        help_text=_('Page of the Episode'),
-        verbose_name=_("URL"))
-    begin = models.DateTimeField(verbose_name=_("Begin"))
-    end = models.DateTimeField(blank=True, null=True, verbose_name=_("End"))
+    
+    def begin(self):
+        return self.episodepart_set.aggregate(Min('begin'))['begin__min']
+    
+    def end(self):
+        return self.episodepart_set.aggregate(Max('end'))['end__max']
+    
+    def title(self):
+        if len(self.episodepart_set.all()) > 0:
+            return self.episodepart_set.all()[0].title
+        return None
+    
+    def description(self):
+        if len(self.episodepart_set.all()) > 0:
+            return self.episodepart_set.all()[0].description
+        return None        
+    
+    def url(self):
+        if len(self.episodepart_set.all()) > 0:
+            return self.episodepart_set.all()[0].url
+        return None        
+    
     status = models.CharField(max_length=10,
         choices=STATUS, default=STATUS[2][0])
 
     def __unicode__(self):
-        if self.topic:
-            if self.slug:
-                return u'%s: %s' % (self.slug, self.topic)
-            else:
-                return u'%s' % self.topic
-        else:
+#        if self.title:
+#            if self.slug:
+#                return u'%s: %s' % (self.slug, self.title)
+#            else:
+#                return u'%s' % self.title
+#        else:
             return u'%s' % self.slug
 
-    def save(self, force_insert=False, force_update=False):
-        #if self.topic == '':
-        #    self.topic = _("Episode %(number)s of %(show)s") % \
-        #                    {'number': self.slug, 'show': self.show.name}
-        self.slug = self.slug.lower()
-        if self.slug == re.sub("\W", "", self.topic):
-            self.topic = ""
-        super(Episode, self).save(force_insert, force_update)
+#    def save(self, force_insert=False, force_update=False):
+#        #if self.title == '':
+#        #    self.title = _("Episode %(number)s of %(show)s") % \
+#        #                    {'number': self.slug, 'show': self.show.name}
+#        self.slug = self.slug.lower()
+#        if self.slug == re.sub("\W", "", self.title):
+#            self.title = ""
+#        super(Episode, self).save(force_insert, force_update)
 
     class Meta:
         unique_together = (('show', 'slug'),)
@@ -103,9 +132,14 @@ class EpisodePart(models.Model):
     should be used for timelines
     """
     episode = models.ForeignKey(Episode)
-    begin = models.PositiveIntegerField()
-    end = models.PositiveIntegerField()
-    description = models.CharField(max_length=255, blank=True, default='')
+    title = models.CharField(max_length=200, blank=True, default='', verbose_name=_("Topic"))
+    description = models.CharField(max_length=200, blank=True,
+        default='', verbose_name=_("Description"))    
+    begin = models.DateTimeField(verbose_name=_("Begin"))
+    end = models.DateTimeField(blank=True, null=True, verbose_name=_("End"))
+    url = models.URLField(blank=True, verify_exists=False,
+        help_text=_('Page of the Episode'),
+        verbose_name=_("URL"))
 
 
 class Graphic(models.Model):
@@ -266,3 +300,22 @@ class Status(models.Model):
 
     def __unicode__(self):
         return u"<Status for %s>" % self.name
+
+
+from django.db.models.signals import post_save
+def saved(sender, instance, created, **kwargs):
+    print sender, repr(instance)
+
+
+post_save.connect(saved, Show)
+post_save.connect(saved, ShowFeed)
+post_save.connect(saved, Episode)
+post_save.connect(saved, EpisodePart)
+post_save.connect(saved, Graphic)
+post_save.connect(saved, Recording)
+post_save.connect(saved, StreamSetup)
+post_save.connect(saved, Stream)
+post_save.connect(saved, SourcedStream)
+post_save.connect(saved, RecodedStream)
+post_save.connect(saved, UserProfile)
+post_save.connect(saved, Status)

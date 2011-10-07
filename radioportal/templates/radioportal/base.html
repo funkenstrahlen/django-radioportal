@@ -6,16 +6,16 @@
   <a class="{% block collapsed_live %}{% endblock %}collapsed" href="{{ live_url }}">{% trans "Live" %}</a>
   {% block navi_live %}{% endblock %}
 </li>
-{% url planned as planned_url %}
-<li{% if request.path|startswith:planned_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_planned %}{% endblock %}collapsed" href="{{ planned_url }}">{% trans "Planned" %}</a>
-  {% block navi_planned %}{% endblock %}
+{% url upcoming as upcoming_url %}
+<li{% if request.path|startswith:upcoming_url %} class="active"{% endif %}>
+  <a class="{% block collapsed_upcoming %}{% endblock %}collapsed" href="{{ upcoming_url }}">{% trans "Upcoming" %}</a>
+  {% block navi_upcoming %}{% endblock %}
 </li>
 {% comment %}
-{% url latest as latest_url %}
-<li{% if request.path|startswith:latest_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_latest %}{% endblock %}collapsed" href="{{ latest_url }}">{% trans "Latest" %}</a>
-  {% block navi_latest %}{% endblock %}
+{% url recent as recent_url %}
+<li{% if request.path|startswith:recent_url %} class="active"{% endif %}>
+  <a class="{% block collapsed_recent %}{% endblock %}collapsed" href="{{ recent_url }}">{% trans "Recent" %}</a>
+  {% block navi_recent %}{% endblock %}
 </li>
 {% endcomment %}
 {% comment %}{% url statistic as stat_url %}

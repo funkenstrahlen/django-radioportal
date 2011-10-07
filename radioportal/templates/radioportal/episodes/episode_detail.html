@@ -2,11 +2,11 @@
 {% block breadcrumb %}
 {{ block.super }} 
 » <a href="{% url show show_name=episode.show.slug %}">{{ episode.show.name }}</a>
-» {{ episode.topic }}{% endblock %}
+» {{ episode.title }}{% endblock %}
 {% block title %} 
 	&middot; {% trans "Archive" %}
 	&middot; {{ episode.show.name }} 
-	&middot; {{ episode.topic }}
+	&middot; {{ episode.title }}
 {% endblock %}
 {% block head_css %}
 	{{ block.super }}
@@ -39,15 +39,15 @@
 {% endblock %}
 {% block content %}
 {% cache 300 episode_detail episode.id episode.status %}
-	<h2>{{ episode.slug|upper }}: {{ episode.topic }}</h2>
+	<h2>{{ episode.slug|upper }}: {{ episode.title }}</h2>
 	<small>
 		{{ episode.begin|date:"d. F Y H:i" }} bis {{ episode.end|date:"d. F Y H:i" }}
 		(<a href="{{ episode.url }}">Homepage zur Sendung</a>)
 
 	</small>
-	{% ifequal episode.status "RUNNING" %}
-	<br /><small>{% trans "Current Content" %}: {{ episode.currentSong }}</small>
-	{% endifequal %}
+	{% ifequal episode.status "RUNNING" %}{% if episode.streamsetup.streamCurrentSong %}
+	<br /><small>{% trans "Current Content" %}: {{ episode.streamsetup.streamCurrentSong }}</small>
+	{% endif %}{% endifequal %}
 	{% include "radioportal/episodes/episode_streams.html" %}
 	<p>{{ episode.description|safe }}</p>
 	<div class="graphs">

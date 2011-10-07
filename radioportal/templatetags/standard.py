@@ -24,7 +24,7 @@ def contains(value, arg):
 def hashEpisode(episode, what):
     if what == "content":
         val = episode.description
-        val += episode.topic
+        val += episode.title
         val += episode.currentSong
         val += episode.genre
         return hash()
