@@ -1,13 +1,16 @@
 {% extends 'radioportal/dashboard/base.html' %}{% load i18n guardian_tags hosts %}
 {% block content %}
 <h2>{% trans "Dashboard" %}</h2>
-<p>{% blocktrans %}Nachfolgend sind alle Ressourcen aufgeführt, die bearbeitbar sind.{% endblocktrans %}</p>
+<p>{% blocktrans %}Welcome to the configuration panel of the xenim streaming network. 
+Here you can change all settings regarding the appearance of your show and the behavior of the streams.
+You might also have a look at the wiki for additional features, documentation and contact informations.{% endblocktrans %}</p>
 
 {% if shows or perms.portal.add_show %}
 <h3>{% trans "Shows" %}</h3>
 <p class="explanation">
 {% blocktrans %}
-Sendungen fassen Folgen zusammen
+Shows are the entities that are responsible for representing your streams at the homepage of the xenim streaming network. 
+They also contain episodes for time a stream is online.
 {% endblocktrans %}
 </p>
 <ul>
@@ -29,8 +32,8 @@ Sendungen fassen Folgen zusammen
 <h3>{% trans "Streams" %}</h3>
 <p class="explanation">
 {% blocktrans %}
-Ein StreamSetup fasst alle Streams einer Folge zusammen. Streams unterscheiden sich
-inFormat und Qualität.
+For every show there is usually a setup of streams. Such a setup of streams combines various streams which differ in bitrates or formats. 
+This is the place to view or change the credentials for your streams.
 {% endblocktrans %}
 </p>
 <ul>

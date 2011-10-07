@@ -14,8 +14,105 @@ from django.forms.util import ErrorList
 from radioportal import models
 from django.utils.safestring import mark_safe
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from django.forms.widgets import Media, HiddenInput
+from django.forms.widgets import Media, HiddenInput, SelectMultiple
 from radioportal.models import StreamSetup, RecodedStream, SourcedStream, Stream
+
+
+
+from django.utils.html import conditional_escape
+from django.utils.encoding import force_unicode
+from itertools import chain
+
+class CheckboxSelectMultipleTable(forms.SelectMultiple):
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        has_id = attrs and 'id' in attrs
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = [] #[u'</td>']
+        # Normalize to strings
+        str_values = set([force_unicode(v) for v in value])
+        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            # If an ID attribute was given, add a numeric index as a suffix,
+            # so that the checkboxes don't all have the same ID attribute.
+            if has_id:
+                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+                label_for = u' for="%s"' % final_attrs['id']
+            else:
+                label_for = ''
+
+            cb = forms.widgets.CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
+            option_value = force_unicode(option_value)
+            rendered_cb = cb.render(name, option_value)
+            option_label = conditional_escape(force_unicode(option_label))
+            output.append(u'<label%s>%s %s</label></td><td>' % (label_for, rendered_cb, option_label))
+        #output.append(u'<td>')
+        return mark_safe(u'\n'.join(output))
+
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
+
+
+from guardian import shortcuts
+
+class PermissionForm(forms.Form):
+    def __init__(self, user, model, *args, **kwargs):
+        self.user = user
+        self.model = model
+        super(PermissionForm, self).__init__(*args, **kwargs)
+        qs = self.model.objects.all()
+        #qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+        for instance in qs:
+            self.fields[unicode(instance.pk)] = forms.MultipleChoiceField(
+                        label=self.get_obj_perms_field_label(instance),
+                        choices=self.get_obj_perms_field_choices(),
+                        initial=self.get_obj_perms_field_initial(instance),
+                        widget=CheckboxSelectMultipleTable,
+                        required=False)
+        print "bound",self.is_bound
+
+    def get_obj_perms_field_label(self, instance):
+        return unicode(instance)
+
+    def get_obj_perms_field_choices(self):
+        """
+        Returns choices for object permissions management field. Default:
+        list of tuples ``(codename, name)`` for each ``Permission`` instance
+        for the managed object.
+        """
+        choices = [(p.codename, p.codename) for p in shortcuts.get_perms_for_model(self.model)]
+        return choices
+
+    def get_obj_perms_field_initial(self, obj):
+        perms = shortcuts.get_perms(self.user, obj)
+        return perms
+    
+    def save_obj_perms(self):
+        """
+        Saves selected object permissions by creating new ones and removing
+        those which were not selected but already exists.
+
+        Should be called *after* form is validated.
+        """
+        print "save_obj_perms", self.cleaned_data
+        for item in self.cleaned_data:
+            print "checking", item
+            instance = self.model.objects.get(pk=item)
+            perms = self.cleaned_data[item]
+            model_perms = [c[0] for c in self.get_obj_perms_field_choices()]
+
+            print "perms", perms, model_perms
+            
+            to_remove = set(model_perms) - set(perms)
+            for perm in to_remove:
+                shortcuts.remove_perm(perm, self.user, instance)
+
+            for perm in perms:
+                shortcuts.assign(perm, self.user, instance)
+
 
 class EpisodeForm(forms.ModelForm):
     required_css_class = "required"

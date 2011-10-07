@@ -43,7 +43,7 @@
 
 <tr><td colspan="2"><h3>{% trans "Sourced Streams" %}</h3>{{ form.forms.1.management_form }}</td></tr>
 {% for f in form.forms.1 %}
-<tr><td colspan="2"><h4>{% trans "Stream" %} {{ f.instance.mount }}</h4></td></tr>
+<tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Sourced Stream" %}{% endif %}</h4></td></tr>
 {{ f.as_table }}
 {% endfor %}
 
@@ -51,7 +51,7 @@
 <tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3>{{ form.forms.2.management_form }}</td></tr>
 {% endif %}
 {% for f in form.forms.2 %}
-<tr><td colspan="2"><h4>{% trans "Stream" %} {{ f.instance.mount }}</h4></td></tr>
+<tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Recoded Stream" %}{% endif %}</h4></td></tr>
 {{ f.as_table }}
 {% endfor %}
 

@@ -211,7 +211,7 @@ class StreamSetup(models.Model):
         self.save()
 
     def __unicode__(self):
-        return _("Setup for %(cluster)s" % {'cluster': self.cluster})
+        return _("Setup for %(cluster)s") % {'cluster': self.cluster}
 
     class Meta:
         permissions = (

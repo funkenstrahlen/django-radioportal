@@ -1,5 +1,7 @@
-{% extends 'radioportal/dashboard/base.html' %}{% load i18n %}
-{% block breadcrumb %} » {% trans "Delete Episode" %}{% endblock %}
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}{{ block.super }} »
+	<a href="{% host_url admin-episode-list object.show.slug on dashboard %}">{{ episode.show }}</a>  » {% trans "Delete Episode" %}
+{% endblock %}
 {% block content %}
 <h2>{% trans "Delete Episode" %}</h2>
 <form method="POST" action=".">

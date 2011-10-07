@@ -1,0 +1,17 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url admin-list-users on dashboard %}">{% trans "User List" %}</a> »
+	{% trans "Permissions for" %} {{ editeduser }} {% trans "on" %} {{ model }}
+{% endblock %}
+{% block content %}
+<h2>{% trans "Change Permissions for" %} {{ editeduser }} {% trans "on" %} {{ model }}</h2>
+
+<form method="POST">
+{% csrf_token %}
+<table>
+{{ form }}
+</table>
+<input type="submit" />
+</form>
+{% endblock %}

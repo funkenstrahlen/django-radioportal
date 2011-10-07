@@ -65,7 +65,7 @@ class ShowFeed(Feed):
         return eps.order_by('-end')[:30]
 
     def item_title(self, item):
-        return _("xsn archive entry %s: %s" % (item.slug, item.title))
+        return _("xsn archive entry %(slug)s: %(title)s" % {'slug': item.slug, 'title': item.title})
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
