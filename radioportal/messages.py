@@ -13,35 +13,59 @@ from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.datetime_safe import datetime
 import radioportal
 
+from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFeed, UserProfile,\
+        Episode, EpisodePart, Stream, Graphic, Recording
+
 #### Part one: sending notifications for changed objects ####
 
-class DTOSerializer(json.Serializer):
-    """
-    Convert a queryset to JSON.
-    """
-    def end_serialization(self):
-        self.objects = self.objects[0]
-#        print "2, %s" % self.objects
-        self.objects['fields']['pk'] = self.objects['pk']
-#        print "3, %s" % self.objects
-        self.objects['fields']['model'] = self.objects['model']
-#        print "4, %s" % self.objects
-        self.objects = self.objects['fields']
-#        print "5, %s" % self.objects
-        return json.Serializer.end_serialization(self)
+class DTO(object):
+    def serialize(self):
+        return simplejson.dumps(self.__dict__)
 
-dto_serializer = DTOSerializer()
-#dto_serializer = json.Serializer()
+class DTOSourcedStream(DTO):
+    def __init__(self, instance):
+        self.mount = instance.mount
+        self.user = instance.user
+        self.password = instance.password
+        self.encoding = instance.encoding
+        self.cluster = instance.setup.cluster
+        self.id = instance.id
+
+class DTOShowFeed(DTO):
+    def __init__(self, instance):
+        self.enabled = instance.enabled
+        self.feed = instance.feed
+        self.title_regex = instance.titlePattern
+        self.show = instance.show.slug
+
+class DTOUserProfile(DTO):
+    def __init__(self, instance):
+        self.id = instance.id
+        self.htdigest = instance.htdigest
+
+class DTOSerializer(object):
+    def serialize(self, instance):
+        if instance._meta.object_name == "SourcedStream":
+            return DTOSourcedStream(instance).serialize()
+        elif instance._meta.object_name == "ShowFeed":
+            return DTOShowFeed(instance).serialize()
+        elif instance._meta.object_name == "UserProfile":
+            return DTOUserProfile(instance).serialize()
+        else:
+            return json.Serializer().serialize((instance,))
+
+#dto_serializer = DTOSerializer()
+dto_serializer = json.Serializer()
 
 def object_changed(sender, instance, created, **kwargs):
     conn = DjangoBrokerConnection()
     action = "created" if created else "changed"
     publisher = Publisher(connection=conn,
         exchange="django", 
-    #    routing_key="%s.%s" % (sender._meta.verbose_name, action)
+        routing_key="%s.%s.%s" % (sender._meta.app_label, sender._meta.module_name, action),
         exchange_type="topic",
     )
-    data = dto_serializer.serialize((instance,))
+    data = DTOSerializer().serialize(instance)
     publisher.send(data) 
     publisher.close()                 
     print "Object change message sent"
@@ -50,17 +74,13 @@ def object_deleted(sender, instance, **kwargs):
     conn = DjangoBrokerConnection()
     publisher = Publisher(connection=conn,
         exchange="django", 
-    #    routing_key="%s.deleted" % sender._meta.verbose_name
+        routing_key="%s.%s.deleted" % (sender._meta.app_label, sender._meta.module_name),
         exchange_type="topic",
     )
-    data = dto_serializer.serialize((instance,))
+    data = DTOSerializer().serialize(instance)
     publisher.send(data)
     publisher.close()                  
     print "Object delete message sent"
-
-from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFeed, UserProfile,\
-        Episode, EpisodePart, Stream, Graphic, Recording
-
 
 #### Part two: receiving updates ####
 
@@ -85,7 +105,7 @@ def DTODeserializer(stream_or_string, **options):
     return py_obs.next()
 
 class BackendInterpreter(object):
-    def show_start(self, data):
+    def show_startmaster(self, data):
         """
             value={'name': cpwd, 'time': int, 'show' : {'name': 'CR001 Titel der Sendung'}}
             FIXME: need show
@@ -192,7 +212,7 @@ class BackendInterpreter(object):
         data = simplejson.loads(data)
         mount = data['name'].split("-")
         
-        stream = Stream.objects.get(setup__cluster=mount[0], format=mount[1].lower(), bitrate=int(mount[2]))
+        stream = Stream.objects.get(setup__cluster=mount[0], format=mount[2].lower(), bitrate=int(mount[1]))
         stream.running = False
         stream.save()
 
@@ -252,7 +272,7 @@ class BackendInterpreter(object):
             part = setup.currentEpisode.current_part
         
         r = Recording(episode=part)
-        r.path = data['path']
+        r.path = data['file']
         r.format = data['format']
         r.bitrate = data['bitrate']
         r.size = 0
@@ -261,14 +281,10 @@ class BackendInterpreter(object):
     
     def recording_stop(self, data):
         data = simplejson.loads(data)
-        cpwd = data["cluster"]
-        setup = StreamSetup.objects.get(cluster=cpwd)
-        if setup.currentEpisode:
-            part = setup.currentEpisode.current_part
-            rec = part.recordings.get(path=data['path'])
-            rec.running = False
-            rec.size = data['size']
-            rec.save()
+        rec = Recordings.objects.get(path=data['file'])
+        rec.running = False
+        rec.size = data['size']
+        rec.save()
 
 
 def process_message(message_data, message):
@@ -306,7 +322,7 @@ def process_message(message_data, message):
 class AMQPInitMiddleware(object):
     def __init__(self):
         print "in middleware"
-#        self.send_messages()
+        self.send_messages()
         self.receive_messages()
         from django.core.exceptions import MiddlewareNotUsed
         raise MiddlewareNotUsed()
@@ -318,20 +334,20 @@ class AMQPInitMiddleware(object):
         
         post_save.connect(object_changed, RecodedStream, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, SourcedStream, dispatch_uid="my_dispatch_uid")
-        post_save.connect(object_changed, StreamSetup, dispatch_uid="my_dispatch_uid")
+        #post_save.connect(object_changed, StreamSetup, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, UserProfile, dispatch_uid="my_dispatch_uid")
         
         post_delete.connect(object_deleted, RecodedStream, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, SourcedStream, dispatch_uid="my_dispatch_uid")
-        post_delete.connect(object_deleted, StreamSetup, dispatch_uid="my_dispatch_uid")
+        #post_delete.connect(object_deleted, StreamSetup, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, UserProfile, dispatch_uid="my_dispatch_uid")
 
     def receive_messages(self):
         print "Starting amqp-listener"
         conn = DjangoBrokerConnection()
-        consumer = Consumer(connection=conn, queue="input", exchange="django", routing_key="#", exchange_type="topic")
+        consumer = Consumer(connection=conn, queue="input", exchange="main", routing_key="#", exchange_type="topic")
         consumer.register_callback(process_message)
         import threading
         t = threading.Thread(target=consumer.wait)

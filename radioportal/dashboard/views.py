@@ -15,8 +15,28 @@ from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render_to_response
+
 
 from radioportal.dashboard import forms as dforms
+
+
+from guardian.forms import UserObjectPermissionsForm
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def my_view(request, post_slug, user_id):
+    user = get_object_or_404(User, id=user_id)
+    post = get_object_or_404(Show, slug=post_slug)
+    form = UserObjectPermissionsForm(user, post, request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save_obj_perms()
+    return render_to_response('radioportal/dashboard/perm.html', {
+        'form': form,
+    })
+
 
 class UserGroupListView(ListView):
     template_name = "radioportal/dashboard/user_list.html"
@@ -80,9 +100,9 @@ class LandingView(TemplateResponseMixin, View):
 
     def get(self, request, *args, **kwargs):
         ctx = {}
-        ctx['shows'] = get_objects_for_user(request.user, 'change_show', Show).extra(
+        ctx['shows'] = get_objects_for_user(request.user, 'radioportal.change_show', Show).extra(
 			select={'lower_name': 'lower(name)'}).order_by('lower_name')
-        ctx['setups'] = get_objects_for_user(request.user, 'change_streamsetup', StreamSetup).order_by('cluster')
+        ctx['setups'] = get_objects_for_user(request.user, 'radioportal.change_streamsetup').order_by('cluster')
         return self.render_to_response(ctx)
 
     @method_decorator(login_required)
@@ -316,8 +336,11 @@ class StreamSetupEditView(UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(StreamSetupEditView, self).get_form_kwargs()
-        kwargs['extra'] = 1
-        kwargs['can_delete'] = self.request.user.has_perm('change_stream', self.object)
+        if self.request.user.has_perm('radioportal.add_stream'):
+            kwargs['extra'] = 1
+        else:
+            kwargs['extra'] = 0
+        kwargs['can_delete'] = self.request.user.has_perm('radioportal.add_stream')
         return kwargs
 
     #FIXME

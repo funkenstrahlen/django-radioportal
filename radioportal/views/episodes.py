@@ -49,6 +49,9 @@ class ShowView(ListView):
     def get_queryset(self):
         qs = Episode.objects.all().annotate(begin=Min('parts__begin')).order_by('-begin')
         if 'show_name' in self.kwargs:
+            self.allow_empty = False
+            if Show.objects.filter(slug=self.kwargs['show_name']).count() == 0:
+                return Episode.objects.none()
             qs = qs.filter(show__slug=self.kwargs['show_name'])
         if hasattr(self, 'what'):
             if self.what in ('old'):
@@ -63,7 +66,9 @@ class ShowView(ListView):
         context = super(ShowView, self).get_context_data(**kwargs)
         if 'show_name' in self.kwargs:
             context['show_name'] = self.kwargs['show_name']
-            context['show'] = Show.objects.get(slug=self.kwargs['show_name'])
+            context['show'] = Show.objects.filter(slug=self.kwargs['show_name'])
+            if len(context['show']) > 0:
+                context['show'] = context['show'][0]
         else:
             context['show_name'] = False
         return context

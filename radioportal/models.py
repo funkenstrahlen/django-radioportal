@@ -155,7 +155,7 @@ class Graphic(models.Model):
 
 class Recording(models.Model):
     episode = models.ForeignKey('EpisodePart', related_name='recordings')
-    path = models.CharField(max_length=250)
+    path = models.CharField(max_length=250, unique=True)
 
     format = models.CharField(max_length=50)
     bitrate = models.CharField(max_length=50)
@@ -212,6 +212,11 @@ class StreamSetup(models.Model):
 
     def __unicode__(self):
         return _("Setup for %(cluster)s" % {'cluster': self.cluster})
+
+    class Meta:
+        permissions = (
+            ('change_stream', 'Change Stream'),
+        )
 
 
 class Stream(models.Model):

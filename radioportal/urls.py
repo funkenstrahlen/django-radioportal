@@ -60,11 +60,11 @@ urlpatterns = patterns('',
     url(r'^live/(?P<show_name>[\w-]+)/$',
         episodes.ShowView.as_view(what='now'), name="live_show"),
 
-    url(r'^(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what="all"), name="show"),
-
     url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
         episodes.EpisodeView.as_view(), name="episode"),
+
+    url(r'^(?P<show_name>[\w-]+)/$',
+        episodes.ShowView.as_view(what="all"), name="show"),
 
     url(r'^(?P<slug>.*\..{3}).m3u$',
         cache_page(stream.StreamTemplateView.as_view(), 60 * 60 * 3),
