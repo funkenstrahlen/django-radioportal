@@ -72,7 +72,6 @@ class PermissionForm(forms.Form):
                         initial=self.get_obj_perms_field_initial(instance),
                         widget=CheckboxSelectMultipleTable,
                         required=False)
-        print "bound",self.is_bound
 
     def get_obj_perms_field_label(self, instance):
         return unicode(instance)
@@ -83,7 +82,10 @@ class PermissionForm(forms.Form):
         list of tuples ``(codename, name)`` for each ``Permission`` instance
         for the managed object.
         """
-        choices = [(p.codename, p.codename) for p in shortcuts.get_perms_for_model(self.model)]
+        choices = []
+        for p in shortcuts.get_perms_for_model(self.model):
+            if not p.codename.startswith("add_") and not p.codename.startswith("delete_"):
+                choices.append((p.codename, p.codename))
         return choices
 
     def get_obj_perms_field_initial(self, obj):
@@ -97,15 +99,11 @@ class PermissionForm(forms.Form):
 
         Should be called *after* form is validated.
         """
-        print "save_obj_perms", self.cleaned_data
         for item in self.cleaned_data:
-            print "checking", item
             instance = self.model.objects.get(pk=item)
             perms = self.cleaned_data[item]
             model_perms = [c[0] for c in self.get_obj_perms_field_choices()]
 
-            print "perms", perms, model_perms
-            
             to_remove = set(model_perms) - set(perms)
             for perm in to_remove:
                 shortcuts.remove_perm(perm, self.user, instance)
