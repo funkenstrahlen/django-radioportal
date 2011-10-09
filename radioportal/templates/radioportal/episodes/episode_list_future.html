@@ -3,7 +3,7 @@
 {% block breadcrumb %}{{ block.super }} » {% trans "Upcoming Episodes" %}{% endblock %}
 {% block head %}
 {% if show %}
-	<link href="{% host_url show-feed status="upcoming" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="{% host_url shows-feed status="upcoming" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 	<link href="{% host_url upcoming-show-ical show_name=show.slug on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
 {% else %}
 	<link href="{% host_url all-feed status="upcoming" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
@@ -12,7 +12,7 @@
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url show-feed status="upcoming" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url shows-feed status="upcoming" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 	<li><a href="{% host_url upcoming-show-ical show_name=show.slug on feeds %}" class="feed ical">{% trans "ical" %}</a></li>
 {% else %}
 	<li><a href="{% host_url all-feed status="upcoming" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>

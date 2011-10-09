@@ -1,4 +1,4 @@
-{% extends 'radioportal/base.html' %}{% load cache i18n shorturl %}
+{% extends 'radioportal/base.html' %}{% load cache i18n shorturl guardian_tags hosts %}
 {% block breadcrumb %}
 {{ block.super }} 
 » <a href="{% url show show_name=episode.show.slug %}">{{ episode.show.name }}</a>
@@ -21,7 +21,7 @@
 {% block shorturl_footer %}{% cache 36000 episode.id %}
 <!--  <a rev="canonical" href="{% shorturl episode %}">{% trans "Short URL" %}</a> -->
 {% shorturl episode %}
-{% endcache %}{% endblock %}
+{% endcache %}{% get_obj_perms request.user for episode as "episode_perm" %}{% if "change_episode" in episode_perm %} <a class="dashboard" href="{% host_url admin-episode-edit episode.pk on dashboard %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
 {% block collapsed_shows %}{% endblock %}
 {% block navi_shows %}
 {% comment %}

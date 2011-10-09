@@ -13,6 +13,10 @@ from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.datetime_safe import datetime
 import radioportal
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFeed, UserProfile,\
         Episode, EpisodePart, Stream, Graphic, Recording
 
@@ -67,8 +71,8 @@ def object_changed(sender, instance, created, **kwargs):
     )
     data = DTOSerializer().serialize(instance)
     publisher.send(data) 
-    publisher.close()                 
-    print "Object change message sent"
+    publisher.close()
+    logger.debug("Object change message for %s sent" % unicode(instance))
 
 def object_deleted(sender, instance, **kwargs):
     conn = DjangoBrokerConnection()
@@ -80,7 +84,7 @@ def object_deleted(sender, instance, **kwargs):
     data = DTOSerializer().serialize(instance)
     publisher.send(data)
     publisher.close()                  
-    print "Object delete message sent"
+    logger.debug("Object delete message for %s sent" % unicode(instance))
 
 #### Part two: receiving updates ####
 
@@ -113,9 +117,10 @@ class BackendInterpreter(object):
         data = simplejson.loads(data)
         setup = StreamSetup.objects.get(cluster=data['name'])
         if len(setup.show.all()) == 0:
+            logger.error("show_startmaster: No show found for cluster %s" % data['name'])
             # FIXME
-            print "no show"
             return
+
         # take the first show available
         show = setup.show.all()[0]
         
@@ -159,7 +164,7 @@ class BackendInterpreter(object):
             episode.current_part = part
             episode.save()
         else:
-            print "error"
+            logger.error("More than one episode found for show %s and episode slug %s" % (show.slug, episode_slug))
             #FIXME
 
     def show_stop(self, data):
@@ -167,7 +172,6 @@ class BackendInterpreter(object):
             value={'name': cpwd}
         """
         data = simplejson.loads(data)
-        print "in show_stop"
         setup = StreamSetup.objects.get(cluster=data['name'])
         if setup.currentEpisode:
             episode = setup.currentEpisode 
@@ -180,7 +184,7 @@ class BackendInterpreter(object):
             setup.currentEpisode = None
             setup.save()
         else:
-            print "no episode"
+            logger.error("show_stop: no current episode found for cluster %s" % data['name'])
             # FIXME
             
 
@@ -232,7 +236,7 @@ class BackendInterpreter(object):
             setattr(setup, map2setup[data['key']], data['val'])
             setup.save()
         else:
-            print "key not in setup map"
+            logger.debug("show_metadata: key %s not in setup map" % data['key'])
          
         # mapping between internal keys and episode fields
         map2eps={'name': 'title', 'description': 'description', 'url': 'url'}
@@ -245,6 +249,8 @@ class BackendInterpreter(object):
             if data['key'] in map2eps:
                 setattr(part, map2eps[data['key']], data['val'])
                 part.save()
+        else:
+            logger.error("show_metadata: no current episode for %s" % setup.cluster)
         
     def graphic_created(self, data):
         """
@@ -259,6 +265,8 @@ class BackendInterpreter(object):
         
         if setup.currentEpisode:
             g.episode = setup.currentEpisode.current_part
+        else:
+            logger.error("graphic_create: no current episode for %s" % setup.cluster)
         
         g.save()
         
@@ -270,7 +278,9 @@ class BackendInterpreter(object):
         setup = StreamSetup.objects.get(cluster=cpwd)
         if setup.currentEpisode:
             part = setup.currentEpisode.current_part
-        
+        else:
+            logger.error("recording_start: no current episode for %s" % setup.cluster)
+       
         r = Recording(episode=part)
         r.path = data['file']
         r.format = data['format']
@@ -292,21 +302,21 @@ def process_message(message_data, message):
         routing_key = message.delivery_info['routing_key']
         keys = routing_key.split(".", 1)
         if len(keys) != 2:
-            print "routing_key %s to short" % routing_key
+            logger.warning("routing_key %s to short" % routing_key)
             message.ack()
             return
-	print "calling bi.%s_%s(data)" % (keys[0], keys[1])
+        logger.debug("calling bi.%s_%s(data)" % (keys[0], keys[1]))
         
         bi = BackendInterpreter()
         if not hasattr(bi, '%s_%s' % (keys[0], keys[1])):
-            print "no method for routing_key %s" % routing_key
+            logger.debug("no method for routing_key %s" % routing_key)
             message.ack()
             return
         getattr(bi, '%s_%s' % (keys[0], keys[1]))(message_data)
     except Exception as inst:
-        print "Exception: ", inst 
+        logger.exception(inst)
     message.ack()
-    print "Received message: %s" % repr(message_data)
+    logger.debug("Received message: %s" % repr(message_data))
     #obj = DTODeserializer(message_data)
     
     
@@ -321,14 +331,14 @@ def process_message(message_data, message):
 
 class AMQPInitMiddleware(object):
     def __init__(self):
-        print "in middleware"
+        logger.info("Loading AMQP Middleware")
         self.send_messages()
         self.receive_messages()
         from django.core.exceptions import MiddlewareNotUsed
         raise MiddlewareNotUsed()
 
     def send_messages(self):
-        print "Connecting signals"
+        logger.info("Connecting model change signals to amqp")
         
         from django.db.models.signals import post_save, post_delete
         
@@ -345,7 +355,7 @@ class AMQPInitMiddleware(object):
         post_delete.connect(object_deleted, UserProfile, dispatch_uid="my_dispatch_uid")
 
     def receive_messages(self):
-        print "Starting amqp-listener"
+        logger.info("Connecting to AMQP-Broker")
         conn = DjangoBrokerConnection()
         consumer = Consumer(connection=conn, queue="input", exchange="main", routing_key="#", exchange_type="topic")
         consumer.register_callback(process_message)
