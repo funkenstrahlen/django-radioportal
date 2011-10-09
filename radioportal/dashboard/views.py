@@ -5,7 +5,7 @@ Created on 28.05.2011
 '''
 from django.views.generic.list import ListView
 from django.contrib.auth.models import User, Group
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
@@ -15,27 +15,41 @@ from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render_to_response
-
 
 from radioportal.dashboard import forms as dforms
 
+from django.contrib.contenttypes.models import ContentType
 
-from guardian.forms import UserObjectPermissionsForm
 
-from django.views.decorators.csrf import csrf_exempt
+from radioportal.dashboard.decorators import superuser_only
 
-@csrf_exempt
-def my_view(request, post_slug, user_id):
-    user = get_object_or_404(User, id=user_id)
-    post = get_object_or_404(Show, slug=post_slug)
-    form = UserObjectPermissionsForm(user, post, request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+class PermissionChangeView(FormView):
+    template_name = "radioportal/dashboard/perm.html"
+    
+    form_class = dforms.PermissionForm
+    
+    success_url = '/dashboard/user/'
+    
+    def get_form_kwargs(self):
+        kwargs = super(PermissionChangeView, self).get_form_kwargs()
+        kwargs['user'] = User.objects.get(username=self.kwargs['user_name'])
+        kwargs['model'] = ContentType.objects.get(model=self.kwargs['model']).model_class()
+        return kwargs
+       
+    def get_context_data(self, **kwargs):
+        ctx = super(PermissionChangeView, self).get_context_data(**kwargs)
+        ctx['editeduser'] = User.objects.get(username=self.kwargs['user_name'])
+        ctx['model'] = ContentType.objects.get(model=self.kwargs['model']).model_class()._meta.object_name
+        return ctx
+
+    
+    def form_valid(self, form):
         form.save_obj_perms()
-    return render_to_response('radioportal/dashboard/perm.html', {
-        'form': form,
-    })
+        return super(PermissionChangeView, self).form_valid(form)
+    
+    @method_decorator(superuser_only)
+    def dispatch(self, *args, **kwargs):
+        return super(PermissionChangeView, self).dispatch(*args, **kwargs)
 
 
 class UserGroupListView(ListView):
@@ -48,6 +62,10 @@ class UserGroupListView(ListView):
         ctx['groups'] = Group.objects.all()
         return ctx
 
+    @method_decorator(superuser_only)
+    def dispatch(self, *args, **kwargs):
+        return super(UserGroupListView, self).dispatch(*args, **kwargs)
+
 
 class UserCreateView(CreateView):
     template_name = "radioportal/dashboard/user_edit.html"
@@ -55,7 +73,7 @@ class UserCreateView(CreateView):
     form_class = forms.UserForm
     success_url = '/dashboard/user/%(username)s/'
 
-    @method_decorator(permission_required('add_user'))
+    @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(UserCreateView, self).dispatch(*args, **kwargs)
 
@@ -67,7 +85,7 @@ class UserEditView(UpdateView):
     form_class = forms.UserForm
     success_url = '/dashboard/user/%(username)s/'
 
-    @method_decorator(permission_required('add_user'))
+    @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(UserEditView, self).dispatch(*args, **kwargs)
 
@@ -78,7 +96,7 @@ class GroupCreateView(CreateView):
     success_url = '/dashboard/group/%(id)s/'
     form_class = forms.GroupForm
     
-    @method_decorator(permission_required('add_group'))
+    @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(GroupCreateView, self).dispatch(*args, **kwargs)
 
@@ -90,7 +108,7 @@ class GroupEditView(UpdateView):
     success_url = '/dashboard/group/%(id)s/'
     form_class = forms.GroupForm
     
-    @method_decorator(permission_required('add_group'))
+    @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(GroupEditView, self).dispatch(*args, **kwargs)
 
@@ -261,15 +279,16 @@ class EpisodeEditView(UpdateView):
         ctx['show'] = self.object.show
         return ctx
 
-    #FIXME
-    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('change_episodes', (Show, 'episode__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeEditView, self).dispatch(*args, **kwargs)
 
 class EpisodeDeleteView(DeleteView):
     template_name = "radioportal/dashboard/episode_delete.html"
-    success_url = "/dashboard/"
     model = Episode
+
+    def get_success_url(self):
+        return "/dashboard/show/%s/" % self.object.show.slug
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -277,8 +296,7 @@ class EpisodeDeleteView(DeleteView):
             return HttpResponse("Currently Running Episodes cannot be deleted")
         return super(EpisodeDeleteView, self).delete(request, *args, **kwargs)
 
-    #FIXME
-    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('change_episodes', (Show, 'episode__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeDeleteView, self).dispatch(*args, **kwargs)
 
@@ -294,8 +312,7 @@ class EpisodePartEditView(UpdateView):
         ctx['show'] = self.object.episode.show
         return ctx
 
-    #FIXME
-    #@method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('change_episodes', (Show, 'episode__parts__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodePartEditView, self).dispatch(*args, **kwargs)
 
@@ -312,7 +329,7 @@ class StreamSetupCreateView(CreateView):
         form_class.form_classes[0].base_fields['show'].queryset = qs
         return form_class
 
-    @method_decorator(permission_required('create_streamsetup'))
+    @method_decorator(permission_required('add_streamsetup'))
     def dispatch(self, *args, **kwargs):
         return super(StreamSetupCreateView, self).dispatch(*args, **kwargs)
 
@@ -336,14 +353,13 @@ class StreamSetupEditView(UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(StreamSetupEditView, self).get_form_kwargs()
-        if self.request.user.has_perm('radioportal.add_stream'):
+        if self.request.user.has_perm('radioportal.change_stream', self.object):
             kwargs['extra'] = 1
         else:
             kwargs['extra'] = 0
-        kwargs['can_delete'] = self.request.user.has_perm('radioportal.add_stream')
+        kwargs['can_delete'] = self.request.user.has_perm('radioportal.change_stream', self.object)
         return kwargs
 
-    #FIXME
     @method_decorator(permission_required('change_streamsetup', (StreamSetup, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(StreamSetupEditView, self).dispatch(*args, **kwargs)

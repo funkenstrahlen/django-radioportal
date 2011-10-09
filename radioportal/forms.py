@@ -25,15 +25,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         exclude = ('password', 'is_staff', 'is_superuser',
-                   'last_login', 'date_joined')
-
-    def __init__(self, *args, **kwargs):
-        super(UserForm, self).__init__(*args, **kwargs)
-        f = self.fields.get('user_permissions', None)
-        if f is not None:
-            perms = ['add_show', 'add_streamsetup']
-            f.queryset = Permission.objects.filter(codename__in=perms)
-            f.queryset = f.queryset.select_related('content_type')
+                   'last_login', 'date_joined', 'user_permissions', 'groups')
 
 from django.contrib.auth import forms as authforms
 

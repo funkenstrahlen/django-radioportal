@@ -14,6 +14,9 @@
 <input type="submit" value="{% trans "Apply" %}" />
 </form>
 <h3>{% trans "Parts of this Episode" %}</h3>
+<p>{% blocktrans %}An episode might be split up into several parts when for example the streams gets 
+disconnected due to network problems. The parts can also be transferred to other episodes in case of wrong matching.
+This is currently not possible with the webinterface, so ask the administrator.{% endblocktrans %}</p>
 <ul>
 {% for part in form.instance.parts.all %}
 <li><a href="{% url admin-episodepart-edit part.id %}">{{ part }}</a></li>

@@ -11,6 +11,12 @@
 {% if object %}{% trans "Edit" %} {{ object|object_name }}
 {% else %}{% trans "Create Show" %}{% endif %}
 </h2>
+<p>{% blocktrans %}It is possible to update the show and episode from the podcast feed of your show. 
+To use this feature enable it below and enter the URL to your feed. Additionally it is necessary to 
+specify a regular expression to separate the title of a feed entry into a id for an episode and the 
+topic of this episode. This is used to correlate an entry from the feed with an episode of the xenim
+streaming network. The regular expression should contain the two named groups "id" and "topic". An
+Example for an entry like "MM073 Creepy" is "(?P<id>\w*) (?P<topic>.*)".{% endblocktrans %}</p>
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <table>

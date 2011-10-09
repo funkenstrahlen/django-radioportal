@@ -7,7 +7,7 @@ import django.contrib.auth.views
 urlpatterns = patterns('',
     url(r'^$', views.LandingView.as_view(), name="dashboard"),
 
-    url(r'^perm/(?P<user_id>[\w]+)/(?P<post_slug>[\w]+)/$', views.my_view, name="admin-perm"),
+    url(r'^perm/(?P<model>[\w]+)/(?P<user_name>[\w]+)/$', views.PermissionChangeView.as_view(), name="admin-perm"),
 
     url(r'^user/$', views.UserGroupListView.as_view(), name="admin-list-users"),
     url(r'^user/create/$', views.UserCreateView.as_view() , name="admin-user-create"),

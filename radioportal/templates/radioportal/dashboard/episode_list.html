@@ -2,18 +2,20 @@
 {% block breadcrumb %}{{ block.super }} » {{ show.name }}{% endblock %}
 {% block content %}
 <h2>{{ show }}</h2>
+{% get_obj_perms request.user for show as "show_perms" %}
 <ul>
 	<li><a href="{% host_url admin-show-edit show.slug on dashboard %}">{% trans "Edit show properties" %}</a></li>
 	<li><a href="{% host_url admin-show-feed show.slug on dashboard %}">{% trans "Configure update from podcast feed" %}</a></li>
+{% if "change_episodes" in show_perms %}
 	<li><a href="{% host_url admin-episode-create show.slug on dashboard %}">{% trans "Create new episode" %}</a></li>
+{% endif %}
 </ul>
 {% if object_list %}
 <h3>{% trans "Episodes" %}</h3>
 <ul>
-{% get_obj_perms request.user for show as "show_perms" %}
 {% for o in object_list %}
-	<li>
-<a href="{% host_url admin-episode-edit o.pk on dashboard %}">{{ o }}</a>
+<li>
+{% if "change_episodes" in show_perms %}<a href="{% host_url admin-episode-edit o.pk on dashboard %}">{% endif %}{{ o }}{% if "change_episodes" in show_perms %}</a>{% endif %}
 {% if "change_episodes" in show_perms %}(<a href="{% host_url admin-episode-delete o.pk on dashboard %}">{% trans "delete" %}</a>){% endif %}
 </li>
 {% endfor %}
