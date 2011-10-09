@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from django.db.models.aggregates import Max, Sum, Min
 
 import vobject
-from django_hosts.reverse import reverse_crossdomain
+from django_hosts.reverse import reverse_full
 
 from radioportal.models import Show, Episode
 from django.conf import settings
@@ -70,7 +70,7 @@ class ShowFeed(Feed):
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
-        url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
+        url = reverse_full("www", "episode", view_kwargs=kwargs)
         return 'http:%s' % url
 
 
@@ -94,7 +94,7 @@ def ical_feed(request, show_name=None):
         vevent.add('dtend').value = episode.end
         vevent.add('uid').value = '%s' % episode.pk
         kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
-        url = reverse_crossdomain("www", "episode", view_kwargs=kwargs)
+        url = reverse_full("www", "episode", view_kwargs=kwargs)
         vevent.add('url').value = 'http:%s' % url 
     icalstream = cal.serialize()
     response = HttpResponse(icalstream, mimetype='text/calendar')
