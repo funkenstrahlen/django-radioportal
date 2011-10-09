@@ -1,0 +1,24 @@
+{% load hosts %}
+<html>
+        <head>
+                <title>Feeds for xsn</title>
+        </head>
+        <body>
+                <ul>
+                        <li><a href="{% host_url upcoming-all-ical on feeds %}">{% host_url upcoming-all-ical on feeds %}</a></li>
+                        <li><a href="{% host_url all-feed status="upcoming" on feeds %}">{% host_url all-feed status="upcoming" on feeds %}</a></li>
+                        <li><a href="{% host_url all-feed status="live" on feeds %}">{% host_url all-feed status="live" on feeds %}</a></li>
+                        <li><a href="{% host_url all-feed status="recent" on feeds %}">{% host_url all-feed status="recent" on feeds %}</a></li>
+{% for show in shows %}
+                        <li>{{ show.name }}<ul>
+                        <li><a href="{% host_url show-feed show_name=show.slug on feeds %}">{% host_url show-feed show_name=show.slug on feeds %}</a></li>
+                        <li><a href="{% host_url upcoming-show-ical show_name=show.slug on feeds %}">{% host_url upcoming-show-ical show_name=show.slug on feeds %}</a></li>
+                        <li><a href="{% host_url shows-feed status="upcoming" show_name=show.slug on feeds %}">{% host_url shows-feed status="upcoming" show_name=show.slug on feeds %}</a></li>
+                        <li><a href="{% host_url shows-feed status="live" show_name=show.slug on feeds %}">{% host_url shows-feed status="live" show_name=show.slug on feeds %}</a></li>
+                        <li><a href="{% host_url shows-feed status="recent" show_name=show.slug on feeds %}">{% host_url shows-feed status="recent" show_name=show.slug on feeds %}</a></li>
+                        </ul></li>
+{% endfor %}
+                </ul>
+        </body>
+</html>
+

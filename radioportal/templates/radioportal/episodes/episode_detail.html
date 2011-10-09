@@ -21,7 +21,7 @@
 {% block shorturl_footer %}{% cache 36000 episode.id %}
 <!--  <a rev="canonical" href="{% shorturl episode %}">{% trans "Short URL" %}</a> -->
 {% shorturl episode %}
-{% endcache %}{% get_obj_perms request.user for episode as "episode_perm" %}{% if "change_episode" in episode_perm %} <a class="dashboard" href="{% host_url admin-episode-edit episode.pk on dashboard %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
+{% endcache %}{% get_obj_perms request.user for episode.show as "episode_perm" %}{% if "change_episodes" in episode_perm %} <a class="dashboard" href="{% host_url admin-episode-edit episode.pk on dashboard %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
 {% block collapsed_shows %}{% endblock %}
 {% block navi_shows %}
 {% comment %}

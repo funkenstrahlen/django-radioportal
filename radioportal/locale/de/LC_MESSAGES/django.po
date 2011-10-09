@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-07 23:03+0200\n"
+"POT-Creation-Date: 2011-10-09 14:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,8 +26,7 @@ msgstr "Name der Sendung"
 msgid "Homepage of the Show"
 msgstr "Webseite der Sendung"
 
-#: models.py:23
-#: models.py:135
+#: models.py:23 models.py:135
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -75,7 +74,8 @@ msgstr "Abkürzung des Sendungsnamens"
 msgid ""
 "The number of the next episode to be aired. Used to construct the episode "
 "identifier"
-msgstr "Nummer der nächsten gesendeten Folge. Wird verwendet, um den Bezeichner "
+msgstr ""
+"Nummer der nächsten gesendeten Folge. Wird verwendet, um den Bezeichner "
 "einer neuen Folge zu erstellen."
 
 #: models.py:46
@@ -98,7 +98,9 @@ msgstr "Regulärer Ausdruck für den Titel"
 msgid ""
 "Used to extract the id and title from the »title« field of the feed. Should "
 "contain the match groups »id« and »title«. "
-msgstr "Wird verwendet, um die ID der Folge und den Titel aus dem Feed zu separieren. Sollte die Gruppen »id« und »title« enthalten."
+msgstr ""
+"Wird verwendet, um die ID der Folge und den Titel aus dem Feed zu "
+"separieren. Sollte die Gruppen »id« und »title« enthalten."
 
 #: models.py:74
 msgid "Archived Episode"
@@ -245,8 +247,7 @@ msgstr ""
 msgid "Associated"
 msgstr ""
 
-#: feeds/feeds.py:37
-#: templates/radioportal/episodes/episode_list_now.html:2
+#: feeds/feeds.py:37 templates/radioportal/episodes/episode_list_now.html:2
 #: templates/radioportal/episodes/episode_list_now.html:3
 msgid "Running episodes"
 msgstr "Laufende Folgen"
@@ -289,27 +290,19 @@ msgstr "Live"
 msgid "Upcoming"
 msgstr "Geplant"
 
-#: templates/radioportal/base.html:17
-msgid "Recent"
-msgstr ""
-
-#: templates/radioportal/base.html:23
-msgid "Statistics"
-msgstr ""
-
-#: templates/radioportal/base.html:29
+#: templates/radioportal/base.html:30
 #: templates/radioportal/dashboard/landing.html:9
 #: templates/radioportal/episodes/episode_list_base.html:3
-#: templates/radioportal/episodes/show_list.html:16
+#: templates/radioportal/episodes/show_list.html:17
 msgid "Shows"
 msgstr "Sendungen"
 
-#: templates/radioportal/base.html:36
+#: templates/radioportal/base.html:37
 #: templates/radioportal/dashboard/landing.html:3
 msgid "Dashboard"
 msgstr ""
 
-#: templates/radioportal/base.html:41
+#: templates/radioportal/base.html:42
 msgid "Start"
 msgstr "Start"
 
@@ -409,11 +402,12 @@ msgid ""
 "other episodes in case of wrong matching.\n"
 "This is currently not possible with the webinterface, so ask the "
 "administrator."
-msgstr "Eine Folge kann in Teile mehrere Teile unterbrochen werden, wenn beispielsweise"
-"der Stream aufgrund von Netzwerkproblemen abbricht."
-"<br />"
-"Die Teile können auch anderen Folgen zugeordnet werden. Dies ist momentan nicht"
-"über das Webinterface möglich, bei Bedarf bitte an den Administrator wenden."
+msgstr ""
+"Eine Folge kann in Teile mehrere Teile unterbrochen werden, wenn "
+"beispielsweiseder Stream aufgrund von Netzwerkproblemen abbricht.<br />Die "
+"Teile können auch anderen Folgen zugeordnet werden. Dies ist momentan "
+"nichtüber das Webinterface möglich, bei Bedarf bitte an den Administrator "
+"wenden."
 
 #: templates/radioportal/dashboard/episode_list.html:7
 msgid "Edit show properties"
@@ -463,10 +457,11 @@ msgid ""
 "the behavior of the streams.\n"
 "You might also have a look at the wiki for additional features, "
 "documentation and contact informations."
-msgstr "Willkommen auf den Konfigurationsseiten des xenim streaming networks. "
-"Hier können alle Einstellungen bezüglich der Erscheinung der Sendungen"
-" und des Verhaltens der Streams geändert werden. Im Wiki finden sich "
-"Informationen zu weiteren Features sowie allgemeine Dokumentation und Kontaktdaten."
+msgstr ""
+"Willkommen auf den Konfigurationsseiten des xenim streaming networks. Hier "
+"können alle Einstellungen bezüglich der Erscheinung der Sendungen und des "
+"Verhaltens der Streams geändert werden. Im Wiki finden sich Informationen zu "
+"weiteren Features sowie allgemeine Dokumentation und Kontaktdaten."
 
 #: templates/radioportal/dashboard/landing.html:11
 msgid ""
@@ -474,10 +469,12 @@ msgid ""
 "Shows are the entities that are responsible for representing your streams at "
 "the homepage of the xenim streaming network. \n"
 "They also contain episodes for time a stream is online.\n"
-msgstr "\n"
-"Sendungen sind die Objekte, die dafür zuständig sind, wie die Streams auf"
-" der Webseite des xenim streaming networks dargestellt werden. Sendungen "
-"enthalten auch die Folgen, die erstellt werden, wenn ein Stream online geht.\n"
+msgstr ""
+"\n"
+"Sendungen sind die Objekte, die dafür zuständig sind, wie die Streams auf "
+"der Webseite des xenim streaming networks dargestellt werden. Sendungen "
+"enthalten auch die Folgen, die erstellt werden, wenn ein Stream online "
+"geht.\n"
 
 #: templates/radioportal/dashboard/landing.html:26
 msgid "Create new Show"
@@ -493,11 +490,12 @@ msgid ""
 "For every show there is usually a setup of streams. Such a setup of streams "
 "combines various streams which differ in bitrates or formats. \n"
 "This is the place to view or change the credentials for your streams.\n"
-msgstr "\n"
-"Zu jeder Sendung gehört üblicherweise eine Sammlung von Streams. "
-"Eine solche Sammlung vereint verschiedene Streams, die sich in Format "
-"und Bitrate unterscheiden. Hier können neben den üblichen Einstellungen"
-" auch die Zugangsdaten für die Streams eingesehen und geändert werden.\n"
+msgstr ""
+"\n"
+"Zu jeder Sendung gehört üblicherweise eine Sammlung von Streams. Eine solche "
+"Sammlung vereint verschiedene Streams, die sich in Format und Bitrate "
+"unterscheiden. Hier können neben den üblichen Einstellungen auch die "
+"Zugangsdaten für die Streams eingesehen und geändert werden.\n"
 
 #: templates/radioportal/dashboard/landing.html:48
 #: templates/radioportal/dashboard/streamsetup_edit.html:4
@@ -556,11 +554,12 @@ msgid ""
 "podcast feed. If you want to change\n"
 "properties of the show either update the podcast feed or disable the "
 "automatic update via the feed\n"
-msgstr "\n"
-"Die Eigenschaften dieser Sendung werden momentan über den "
-"eingestellten Podcast Feed aktualisiert. Um die Einstellungen dieser Sendung zu ändern, muss"
-"entweder der Podcast Feed aktualisiert werden oder das automatische Update über den Feed"
-" deaktiviert werden:\n"
+msgstr ""
+"\n"
+"Die Eigenschaften dieser Sendung werden momentan über den eingestellten "
+"Podcast Feed aktualisiert. Um die Einstellungen dieser Sendung zu ändern, "
+"mussentweder der Podcast Feed aktualisiert werden oder das automatische "
+"Update über den Feed deaktiviert werden:\n"
 
 #: templates/radioportal/dashboard/show_edit.html:19
 msgid "here"
@@ -579,13 +578,16 @@ msgid ""
 "streaming network. The regular expression should contain the two named "
 "groups \"id\" and \"topic\". An\n"
 "Example for an entry like \"MM073 Creepy\" is \"(?P<id>\\w*) (?P<topic>.*)\"."
-msgstr "Es ist möglich die Sendung und die zugehörigen Folgen über den Podcast Feed zu aktualisieren."
-"Um dieses Feature zu nutzen, muss es unten aktiviert werden, es muss die URL des Podcast"
-" Feeds eintragen und ein Regulärer Ausdruck angeben werden. Der Reguläre Ausdruck dient dazu"
-"den Titel eines Eintrages im Feed in eine ID für eine Episode und einen Titel zu zerlegen. Die ID wird"
-"anschließend verwendet, um den Feed Eintrag einer Folge zuzuordnen. Der Reguläre Ausdruck sollte "
-"die beiden named groups \"id\" und \"topic\" enthalten. Wenn der Titel im Feed "
-"beispielsweise \"MM073 Creepy\" lautet, ist ein passender Ausdruck \"(?P<id>\\w*) (?P<topic>.*)\"."
+msgstr ""
+"Es ist möglich die Sendung und die zugehörigen Folgen über den Podcast Feed "
+"zu aktualisieren.Um dieses Feature zu nutzen, muss es unten aktiviert "
+"werden, es muss die URL des Podcast Feeds eintragen und ein Regulärer "
+"Ausdruck angeben werden. Der Reguläre Ausdruck dient dazuden Titel eines "
+"Eintrages im Feed in eine ID für eine Episode und einen Titel zu zerlegen. "
+"Die ID wirdanschließend verwendet, um den Feed Eintrag einer Folge "
+"zuzuordnen. Der Reguläre Ausdruck sollte die beiden named groups \"id\" und "
+"\"topic\" enthalten. Wenn der Titel im Feed beispielsweise \"MM073 Creepy\" "
+"lautet, ist ein passender Ausdruck \"(?P<id>\\w*) (?P<topic>.*)\"."
 
 #: templates/radioportal/dashboard/streamsetup_delete.html:2
 #: templates/radioportal/dashboard/streamsetup_delete.html:4
@@ -645,7 +647,7 @@ msgstr "Gruppen"
 
 #: templates/radioportal/episodes/episode_detail.html:7
 #: templates/radioportal/episodes/show_list.html:2
-#: templates/radioportal/episodes/show_list.html:18
+#: templates/radioportal/episodes/show_list.html:19
 msgid "Archive"
 msgstr "Archiv"
 
@@ -655,6 +657,11 @@ msgstr "Archiv"
 #: templates/radioportal/episodes/landing.html:3
 msgid "Short URL"
 msgstr "KurzURL"
+
+#: templates/radioportal/episodes/episode_detail.html:24
+#: templates/radioportal/episodes/episode_list.html:6
+msgid "edit"
+msgstr "bearbeiten"
 
 #: templates/radioportal/episodes/episode_detail.html:45
 msgid "From"
@@ -689,12 +696,10 @@ msgstr "Webseite"
 
 #: templates/radioportal/episodes/episode_list_base.html:62
 #: templates/radioportal/episodes/landing.html:27
-#: templates/radioportal/episodes/landing.html:53
 msgid "Running Episodes"
 msgstr "Laufende Folgen"
 
 #: templates/radioportal/episodes/episode_list_base.html:66
-#: templates/radioportal/episodes/landing.html:57
 msgid "Archived Episodes"
 msgstr "Archivierte Folgen"
 
@@ -702,7 +707,6 @@ msgstr "Archivierte Folgen"
 #: templates/radioportal/episodes/episode_list_future.html:2
 #: templates/radioportal/episodes/episode_list_future.html:3
 #: templates/radioportal/episodes/landing.html:35
-#: templates/radioportal/episodes/landing.html:61
 msgid "Upcoming Episodes"
 msgstr "Geplante Folgen"
 
@@ -712,32 +716,32 @@ msgid "No episodes available."
 msgstr "Keine Folgen verfügbar."
 
 #: templates/radioportal/episodes/episode_list_base.html:85
-#: templates/radioportal/episodes/show_list.html:40
+#: templates/radioportal/episodes/show_list.html:41
 msgid "First"
 msgstr "Anfang"
 
 #: templates/radioportal/episodes/episode_list_base.html:87
-#: templates/radioportal/episodes/show_list.html:42
+#: templates/radioportal/episodes/show_list.html:43
 msgid "Previous"
 msgstr "Zurück"
 
 #: templates/radioportal/episodes/episode_list_base.html:89
-#: templates/radioportal/episodes/show_list.html:44
+#: templates/radioportal/episodes/show_list.html:45
 msgid "Page"
 msgstr "Seite"
 
 #: templates/radioportal/episodes/episode_list_base.html:89
-#: templates/radioportal/episodes/show_list.html:44
+#: templates/radioportal/episodes/show_list.html:45
 msgid "of"
 msgstr "von"
 
 #: templates/radioportal/episodes/episode_list_base.html:91
-#: templates/radioportal/episodes/show_list.html:46
+#: templates/radioportal/episodes/show_list.html:47
 msgid "Next"
 msgstr "Weiter"
 
 #: templates/radioportal/episodes/episode_list_base.html:93
-#: templates/radioportal/episodes/show_list.html:48
+#: templates/radioportal/episodes/show_list.html:49
 msgid "Last"
 msgstr "Ende"
 
@@ -746,7 +750,7 @@ msgid "from"
 msgstr "von"
 
 #: templates/radioportal/episodes/episode_list_entry.html:9
-#: templates/radioportal/episodes/show_list.html:28
+#: templates/radioportal/episodes/show_list.html:29
 msgid "Read more"
 msgstr "Weiter"
 
@@ -807,21 +811,23 @@ msgstr "archivierte Folgen"
 msgid "Recent Episodes"
 msgstr "Archivierte Folgen"
 
-#: templates/radioportal/episodes/show_list.html:19
+#: templates/radioportal/episodes/show_list.html:20
 msgid ""
 "Here are informations about the shows available, which were distributed "
 "through this streaming system. This includes the graphical statistic about "
 "listener counts."
-msgstr "Hier gibt es Informationen und die grafischen Darstellungen der Hörerzahlen"
-"der Sendungen, die über dieses Streamingsystem verbreitet wurden."
+msgstr ""
+"Hier gibt es Informationen und die grafischen Darstellungen der "
+"Hörerzahlender Sendungen, die über dieses Streamingsystem verbreitet wurden."
 
-#: templates/radioportal/episodes/show_list.html:33
+#: templates/radioportal/episodes/show_list.html:34
 msgid "No shows available."
 msgstr "Keine Sendungen verfügbar."
 
 #: templates/registration/login.html:6
 msgid "Your username and password didn't match. Please try again."
-msgstr "Der Nutzername und das Passwort passen nicht zueinander, bitte erneut "
+msgstr ""
+"Der Nutzername und das Passwort passen nicht zueinander, bitte erneut "
 "versuchen."
 
 #: templates/registration/login.html:21
@@ -977,4 +983,3 @@ msgstr ""
 #: views/stream.py:28
 msgid "This URL should be mapped to the backend."
 msgstr ""
-

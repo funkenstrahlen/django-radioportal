@@ -7,7 +7,7 @@ from django.conf.urls.defaults import url, patterns
 
 urlpatterns = patterns('',
     url(r'^$', direct_to_template, 
-         {'template': 'portal/feeds/overview.html', 
+         {'template': 'radioportal/feeds/overview.html', 
           'extra_context': {'shows': Show.objects.all(), 'p': 'upcoming', 'l': 'live', 'la': 'recent' } }),
     url(r'^upcoming/ical/$', ical_feed, name="upcoming-all-ical"),
     url(r'^(?P<status>(recent|live|upcoming))/feed/$', ShowFeed(), name="all-feed"),

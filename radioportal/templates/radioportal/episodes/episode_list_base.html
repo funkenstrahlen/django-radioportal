@@ -46,7 +46,7 @@
 {% block list_head %}
 {% cache 900 episode_list_head show.slug %}
 <div class="showheader">
-{% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" />{% endif %}
+{% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" alt="{{ show.name }} logo" />{% endif %}
 <h1><a href="{% url show show_name=show.slug %}">{{ show.name }}</a></h1>
 <small>{{ show.description }} (<a href="{{ show.url }}">{% trans "Homepage" %}</a>)</small>
 <p>{{ show.abstract }}</p>

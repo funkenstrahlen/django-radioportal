@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from django.db.models.aggregates import Max, Sum, Min
 
 import vobject
 from django_hosts.reverse import reverse_crossdomain
@@ -62,10 +63,10 @@ class ShowFeed(Feed):
             eps = eps.filter(show=obj[0])
         if obj[1] is not None:
             eps = eps.filter(status=_mapping[obj[1]])
-        return eps.order_by('-end')[:30]
+        return eps.annotate(end=Min('parts__end')).order_by('-end')[:30]
 
     def item_title(self, item):
-        return _("xsn archive entry %(slug)s: %(title)s" % {'slug': item.slug, 'title': item.title})
+        return unicode(_(u"xsn archive entry %(slug)s: %(title)s")) % {'slug': unicode(item.slug), 'title': unicode(item.title())}
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
