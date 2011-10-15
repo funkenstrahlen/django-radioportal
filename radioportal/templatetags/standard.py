@@ -5,6 +5,14 @@ from django.conf import settings
 from django import template
 register = template.Library()
 
+import urlparse
+
+@register.filter
+def urlsplit(value, arg):
+    result = getattr(urlparse.urlparse(value), arg)
+    if arg == "path":
+        result = result[1:]
+    return result
 
 @register.filter
 def startswith(value, arg):
