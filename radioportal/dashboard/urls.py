@@ -1,10 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls.defaults import patterns, url, include
+
 from radioportal.dashboard import views
 import django.contrib.auth.views
 
+from django.contrib import admin
+admin.autodiscover()
+
+
 urlpatterns = patterns('',
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^jsi18n', 'django.views.i18n.javascript_catalog', name="jsi18n"),
+
     url(r'^$', views.LandingView.as_view(), name="dashboard"),
 
     url(r'^perm/(?P<model>[\w]+)/(?P<user_name>[\w]+)/$', views.PermissionChangeView.as_view(), name="admin-perm"),

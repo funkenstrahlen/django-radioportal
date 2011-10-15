@@ -1,37 +1,37 @@
 {% extends 'base.html' %}
 {% block navigation %}
 {% load i18n hosts %}
-{% url live as live_url %}
+{% host_url live on www as live_url %}
 <li{% if request.path|startswith:live_url %} class="active"{% endif %}>
   <a class="{% block collapsed_live %}{% endblock %}collapsed" href="{{ live_url }}">{% trans "Live" %}</a>
   {% block navi_live %}{% endblock %}
 </li>
-{% url upcoming as upcoming_url %}
+{% host_url upcoming on www as upcoming_url %}
 <li{% if request.path|startswith:upcoming_url %} class="active"{% endif %}>
   <a class="{% block collapsed_upcoming %}{% endblock %}collapsed" href="{{ upcoming_url }}">{% trans "Upcoming" %}</a>
   {% block navi_upcoming %}{% endblock %}
 </li>
 {% comment %}
-{% url recent as recent_url %}
+{% host_url recent on www as recent_url %}
 <li{% if request.path|startswith:recent_url %} class="active"{% endif %}>
   <a class="{% block collapsed_recent %}{% endblock %}collapsed" href="{{ recent_url }}">{% trans "Recent" %}</a>
   {% block navi_recent %}{% endblock %}
 </li>
 {% endcomment %}
-{% comment %}{% url statistic as stat_url %}
+{% comment %}{% host_url statistic on www as stat_url %}
 <li{% if request.path|startswith:stat_url %} class="active"{% endif %}>
   <a  href="{{ stat_url }}">{% trans "Statistics" %}</a>
   {% block navi_stats %}{% endblock %}
 </li>{% endcomment %}
 
-{% url shows as show_url %}
+{% host_url shows on www as show_url %}
 <li{% if request.path|startswith:show_url %} class="active"{% endif %}>
   <a class="{% block collapsed_shows %}{% endblock %}collapsed"	href="{{ show_url }}">{% trans "Shows" %}</a>
   <!-- {% block navi_shows %}{% endblock %} -->
 </li>
 
 {% if user.is_authenticated %}
-{% url dashboard as profile_url %}
+{% host_url dashboard on dashboard as profile_url %}
 <li{% if request.path|startswith:profile_url %} class="active"{% endif %}>
 	<a href="{% host_url dashboard on dashboard %}">{% trans "Dashboard" %}</a>
 	{% block navi_account %}{% endblock %}
