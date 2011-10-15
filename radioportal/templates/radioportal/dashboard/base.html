@@ -1,5 +1,13 @@
 {% extends 'radioportal/base.html' %}
 {% load i18n hosts %}
+{% block messages %}
+  	{% if messages %}
+	<ul class="messages">
+	{% for message in messages %}<li>{{ message }}</li>{% endfor %}
+	</ul>
+	{% endif %}
+{% endblock %}
+
 {% block shorturl_footer %}{% endblock %}
 {% block shorturl_head %}{% endblock %}
 {% block head %}
