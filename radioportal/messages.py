@@ -33,7 +33,7 @@ class DTOSourcedStream(DTO):
         self.password = instance.password
         self.encoding = instance.encoding
         self.cluster = instance.setup.cluster
-        self.id = instance.id
+        self.id = instance.pk
 
 class DTOShowFeed(DTO):
     def __init__(self, instance):
@@ -41,10 +41,11 @@ class DTOShowFeed(DTO):
         self.feed = instance.feed
         self.title_regex = instance.titlePattern
         self.show = instance.show.slug
+        self.id = instance.pk
 
 class DTOUserProfile(DTO):
     def __init__(self, instance):
-        self.id = instance.id
+        self.id = instance.pk
         self.htdigest = instance.htdigest
 
 class DTOSerializer(object):
@@ -72,6 +73,7 @@ def object_changed(sender, instance, created, **kwargs):
     data = DTOSerializer().serialize(instance)
     publisher.send(data) 
     publisher.close()
+    conn.close()
     logger.debug("Object change message for %s sent" % unicode(instance))
 
 def object_deleted(sender, instance, **kwargs):
@@ -84,6 +86,7 @@ def object_deleted(sender, instance, **kwargs):
     data = DTOSerializer().serialize(instance)
     publisher.send(data)
     publisher.close()                  
+    conn.close()
     logger.debug("Object delete message for %s sent" % unicode(instance))
 
 #### Part two: receiving updates ####
@@ -291,7 +294,7 @@ class BackendInterpreter(object):
     
     def recording_stop(self, data):
         data = simplejson.loads(data)
-        rec = Recordings.objects.get(path=data['file'])
+        rec = Recording.objects.get(path=data['file'])
         rec.running = False
         rec.size = data['size']
         rec.save()
@@ -333,7 +336,7 @@ class AMQPInitMiddleware(object):
     def __init__(self):
         logger.info("Loading AMQP Middleware")
         self.send_messages()
-        self.receive_messages()
+        #self.receive_messages()
         from django.core.exceptions import MiddlewareNotUsed
         raise MiddlewareNotUsed()
 
