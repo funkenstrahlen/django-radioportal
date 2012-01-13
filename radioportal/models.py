@@ -63,6 +63,8 @@ class ShowFeed(models.Model):
     titlePattern = models.CharField(max_length=240, blank=True,
         verbose_name=_("Regular expression for the title"),
         help_text=_(u"Used to extract the id and title from the »title« field of the feed. Should contain the match groups »id« and »title«. "))
+    icalfeed = models.URLField(max_length=255, blank=True,
+        verbose_name=_("iCal feed for upcoming shows"))
 
 
 class Episode(models.Model):
