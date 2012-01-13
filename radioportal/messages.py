@@ -41,6 +41,7 @@ class DTOShowFeed(DTO):
     def __init__(self, instance):
         self.enabled = instance.enabled
         self.feed = instance.feed
+        self.ical = instance.icalfeed
         self.title_regex = instance.titlePattern
         self.show = instance.show.slug
         self.id = instance.pk
