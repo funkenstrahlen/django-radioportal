@@ -330,6 +330,7 @@ class BackendInterpreter(object):
         )
         publisher.send(result) 
         publisher.close()
+        conn.close()
         logger.debug("Object list to %s sent" % unicode(data['answer']))
 
 
