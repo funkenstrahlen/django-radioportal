@@ -11,6 +11,8 @@ from pkg_resources import StringIO
 from django.utils import simplejson
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.datetime_safe import datetime
+from django.contrib.contenttypes.models import ContentType
+
 import radioportal
 
 import logging
@@ -24,7 +26,7 @@ from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFe
 
 class DTO(object):
     def serialize(self):
-        return simplejson.dumps(self.__dict__)
+        return simplejson.dumps((self.__dict__,))
 
 class DTOSourcedStream(DTO):
     def __init__(self, instance):
@@ -48,14 +50,17 @@ class DTOUserProfile(DTO):
         self.id = instance.pk
         self.htdigest = instance.htdigest
 
+dto_map = {
+    "sourcedstream": DTOSourcedStream,
+    "showfeed": DTOShowFeed,
+    "userprofile": DTOUserProfile,
+}
+
 class DTOSerializer(object):
     def serialize(self, instance):
-        if instance._meta.object_name == "SourcedStream":
-            return DTOSourcedStream(instance).serialize()
-        elif instance._meta.object_name == "ShowFeed":
-            return DTOShowFeed(instance).serialize()
-        elif instance._meta.object_name == "UserProfile":
-            return DTOUserProfile(instance).serialize()
+        name = instance._meta.object_name.lower()
+        if name in dto_map:
+            return dto_map[name](instance).serialize()
         else:
             return json.Serializer().serialize((instance,))
 
@@ -219,9 +224,11 @@ class BackendInterpreter(object):
         data = simplejson.loads(data)
         mount = data['name'].split("-")
         
-        stream = Stream.objects.get(setup__cluster=mount[0], format=mount[2].lower(), bitrate=int(mount[1]))
-        stream.running = False
-        stream.save()
+        stream = Stream.objects.filter(setup__cluster=mount[0], format=mount[2].lower(), bitrate=int(mount[1]))
+        if len(stream) == 1:
+            stream = stream[0]
+            stream.running = False
+            stream.save()
 
     def show_metadata(self, data):
         """
@@ -299,6 +306,32 @@ class BackendInterpreter(object):
         rec.size = data['size']
         rec.save()
 
+    def objects_get(self, data):
+        data = simplejson.loads(data)
+        type = ContentType.objects.get(app_label="radioportal", model=data['model'])
+        model = type.model_class()
+        name = model._meta.object_name.lower()
+        if name not in dto_map:
+            return
+        objects = model.objects.all()
+        Serializer = dto_map[name]
+        plain_dict = []
+        for o in objects:
+            so = Serializer(o)
+            plain_dict.append(so.__dict__)
+        result = simplejson.dumps(plain_dict)
+        
+        conn = DjangoBrokerConnection()
+        print "key", "%s.%s.%s" % (model._meta.app_label, model._meta.module_name, "changed")
+        publisher = Publisher(connection=conn,
+            exchange="django", 
+            routing_key="%s.%s.%s" % (model._meta.app_label, model._meta.module_name, "changed"),
+            exchange_type="topic",
+        )
+        publisher.send(result) 
+        publisher.close()
+        logger.debug("Object list to %s sent" % unicode(data['answer']))
+
 
 def process_message(message_data, message):
     try: 
@@ -315,11 +348,14 @@ def process_message(message_data, message):
             logger.debug("no method for routing_key %s" % routing_key)
             message.ack()
             return
+        message_data = message_data.decode("utf-8", 'replace')
+        print message_data
         getattr(bi, '%s_%s' % (keys[0], keys[1]))(message_data)
     except Exception as inst:
-        logger.exception(inst)
+        print inst
+        #logger.exception(inst)
     message.ack()
-    logger.debug("Received message: %s" % repr(message_data))
+    print "Received message: %s" % repr(message_data)
     #obj = DTODeserializer(message_data)
     
     
