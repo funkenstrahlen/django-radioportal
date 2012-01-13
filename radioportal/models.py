@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.db.models import Min, Max
 
 from autoslug import AutoSlugField
+from django_hosts.reverse import reverse_full
 
 import hashlib
 
@@ -49,7 +50,10 @@ class Show(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
+    def get_absolute_url(self):
+        return reverse_full("www", "show", view_kwargs={'show_name': self.slug})
+
     class Meta:
         permissions = (
             ('change_episodes', _('Delete Episodes')),
