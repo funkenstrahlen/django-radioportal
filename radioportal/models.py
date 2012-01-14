@@ -262,6 +262,7 @@ class Stream(models.Model):
                             (self.format, self.bitrate, self.mount))
 
     WAVE = (
+        ('none', _("No Fallback")),
         ('sine', _("Sine")),
         ('square', _("Square")),
         ('saw', _("Saw")),

@@ -35,6 +35,7 @@ class DTOSourcedStream(DTO):
         self.password = instance.password
         self.encoding = instance.encoding
         self.cluster = instance.setup.cluster
+        self.fallback = instance.fallback
         self.id = instance.pk
 
 class DTOShowFeed(DTO):
