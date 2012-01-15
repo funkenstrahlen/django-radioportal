@@ -14,3 +14,4 @@ python-dateutil==1.5
 simplejson
 translitcodec
 vobject
+-e hg+https://bitbucket.org/schinckel/django-jsonfield#egg=django-jsonfield
