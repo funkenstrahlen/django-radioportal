@@ -3,7 +3,8 @@
 {{ block.super }} » 
 	{% if object %}{{ object }}{% else %}{% trans "Create new StreamSetup" %}{% endif %}
 {% endblock %}
-{% block head_js %}{{ block.super }}
+{% block head_js %}
+{{ block.super }}
 <script type="text/javascript">                                         
    // we will add our javascript code here
    function toggle(event) {
@@ -30,7 +31,18 @@
    			$('#id_stream_set-' + i + '-status').bind('change', i, toggle);
    			$('#id_stream_set-' + i + '-status').change();
    		};
-   });                        
+                $('#id_mapping_method').asmSelect({
+                        addItemTarget: 'bottom',
+                        // animate: true,
+                        highlight: true,
+                        sortable: true,
+                        removeLabel: '{% trans "[x]" %}',
+                        highlightAddedLabel: '{% trans "Added" %}: ',
+                        highlightRemovedLabel: '{% trans "Removed" %}: ',
+                        addLabel: '{% trans "Add another item" %}',
+                        hideWhenAdded: true,
+                });
+   });
  </script>
 {% endblock %}
 {% block content %}

@@ -11,6 +11,8 @@ from django_hosts.reverse import reverse_full
 
 import hashlib
 
+import jsonfield
+
 class Show(models.Model):
     name = models.CharField(max_length=50, unique=True,
         verbose_name=_('Name of the show'),
@@ -199,6 +201,12 @@ class StreamSetup(models.Model):
     show = models.ManyToManyField(Show, blank=True, null=True,
         help_text=_('show which is assigned to this setup'),
         verbose_name=_('Associated shows'))
+
+    mapping_method = jsonfield.JSONField(
+        verbose_name=_('Method for mapping between streams and episodes'),
+        help_text=_('Configure order for mapping methods. Use drop-down box for adding new items, [x] for removing items and drag&drop for changing order.'),
+    )
+
     currentEpisode = models.OneToOneField(Episode, blank=True, null=True)
 
     graphic_differ_by = models.CharField(max_length=255, blank=True)

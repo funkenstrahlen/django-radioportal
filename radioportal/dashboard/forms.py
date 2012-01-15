@@ -7,6 +7,7 @@ Created on 14.09.2011
 from django import forms
 from django.contrib.admin import widgets as adminwidgets
 from django.forms import widgets
+from django.utils.translation import ugettext as _
 
 from datetime import timedelta
 from django.forms.util import ErrorList
@@ -17,7 +18,7 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms.widgets import Media, HiddenInput, SelectMultiple
 from radioportal.models import StreamSetup, RecodedStream, SourcedStream, Stream
 
-
+import jsonfield.forms
 
 from django.utils.html import conditional_escape
 from django.utils.encoding import force_unicode
@@ -172,14 +173,56 @@ class CreateEpisodeForm(EpisodeForm):
         }
 
 
+class OrderedSelectMultiple(SelectMultiple):
+
+    def render_options(self, choices, selected_choices):
+        selected_choices = list(force_unicode(v) for v in selected_choices)
+        choices = list(chain(self.choices, choices))
+        iterchoices = []
+        for c in selected_choices:
+            for t in choices:
+                if t[0] == c:
+                    iterchoices.append(t)
+        for t in (set(choices) - set(iterchoices)):
+            iterchoices.append(t)
+        output = []
+        for option_value, option_label in iterchoices: #chain(self.choices, choices):
+            if isinstance(option_label, (list, tuple)):
+                output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
+                for option in option_label:
+                    output.append(self.render_option(selected_choices, *option))
+                output.append(u'</optgroup>')
+            else:
+                output.append(self.render_option(selected_choices, option_value, option_label))
+        return u'\n'.join(output)
+     	
+    class Media:
+        js = (
+           'jquery-ui/js/jquery-1.6.2.min.js',
+           'jquery-ui/js/jquery-ui-1.8.17.custom.min.js',
+           'asmselect/jquery.asmselect.js',
+        )
+        css = {
+           'all': ('asmselect/jquery.asmselect.css',),
+        }
+
 
 class StreamSetupForm(forms.ModelForm):
     required_css_class = "required"
+    mapping_method = jsonfield.forms.JSONFormField #widget=OrderedSelectMultiple(choices=MAPPINGS))
     class Meta:
+        MAPPINGS=(
+          ('guess-from-last', _("Create new episode, get episode number by adding one to last episode number")),
+          ('append-to-live', _("Append new episode part to generic episode \"live\"")),
+          ('nothing','nothing'))
+    
         model = models.StreamSetup
         exclude = ('running', 'streamCurrentSong', 'streamGenre', 'streamShow',
                    'streamDescription', 'streamURL', 'currentEpisode', 'feed',
                    'graphic_differ_by', 'graphic_title')
+        widgets = {
+            'mapping_method': OrderedSelectMultiple(choices=MAPPINGS),
+        }
 
 
 class StreamForm(forms.ModelForm):
