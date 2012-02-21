@@ -5,17 +5,17 @@
 {% block collapsed_live %}un{% endblock %}
 {% block head %}
 {% if show %}
-	<link href="{% host_url show-feed status="live" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="http:{% host_url show-feed status="live" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% else %}
-	<link href="{% host_url all-feed status="live" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="http:{% host_url all-feed status="live" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% endif %}
 
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url show-feed status="live" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="http:{% host_url show-feed status="live" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 {% else %}
-	<li><a href="{% host_url all-feed status="live" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="http:{% host_url all-feed status="live" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 {% endif %}
 
 {% endblock %}

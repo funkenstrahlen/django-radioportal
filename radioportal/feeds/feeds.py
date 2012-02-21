@@ -2,10 +2,13 @@ from django.contrib.syndication.views import Feed
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.utils.feedgenerator import Atom1Feed, rfc3339_date
+
 
 from django.db.models.aggregates import Max, Sum, Min
 
 import vobject
+import datetime
 from django_hosts.reverse import reverse_full
 
 from radioportal.models import Show, Episode
@@ -24,14 +27,26 @@ class _dummy:
     description = ""
     isdummy = True
 
+class StreamAtom1Feed(Atom1Feed):
+    def root_attributes(self):
+        attrs = super(StreamAtom1Feed, self).root_attributes()
+        attrs['xmlns:xsn'] = 'http://static.streams.xenim.de/feed-1.0.dtd'
+        return attrs
+
+    def add_item_elements(self, handler, item):
+        super(StreamAtom1Feed, self).add_item_elements(handler, item)
+        handler.addQuickElement('xsn:begin', rfc3339_date(item['begin']))
+        handler.addQuickElement('xsn:end', rfc3339_date(item['end']))
+
 
 class ShowFeed(Feed):
+    feed_type = StreamAtom1Feed
     def get_object(self, request, show_name=None, status=None):
         if not show_name:
             obj = _dummy()
 
             def _link():
-                return "http://streams.xenim.de/%s/" % status
+                return  reverse_full("www", status)
 
             obj.get_absolute_url = _link
             if status == _mapping.keys()[0]:
@@ -48,11 +63,26 @@ class ShowFeed(Feed):
             return (obj, status)
         return (get_object_or_404(Show, slug=show_name), status)
 
+    def item_extra_kwargs(self, item):
+        #print type(item), type(item.begin), type(item.end)
+        extra_dict = {
+            'begin': item.begin(),
+            'end': item.end,
+        }
+        return extra_dict
+
+    def item_author_name(self, item):
+        return item.show.name
+
+    def item_pubdate(self):
+	return datetime.datetime.now()
+
     def title(self, obj):
         return _("xsn Archive for %s" % obj[0].name)
 
     def link(self, obj):
-        return obj[0].get_absolute_url()
+        url = obj[0].get_absolute_url()
+        return 'http:%s' % url
 
     def description(self, obj):
         return "%s %s" % (obj[0].abstract, obj[0].description)
@@ -66,13 +96,19 @@ class ShowFeed(Feed):
         return eps.annotate(end=Min('parts__end')).order_by('-end')[:30]
 
     def item_title(self, item):
-        return unicode(_(u"xsn archive entry %(slug)s: %(title)s")) % {'slug': unicode(item.slug), 'title': unicode(item.title())}
+        return item.title()
+        #return unicode(_(u"xsn archive entry %(slug)s: %(title)s")) % {'slug': unicode(item.slug), 'title': unicode(item.title())}
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
         url = reverse_full("www", "episode", view_kwargs=kwargs)
         return 'http:%s' % url
 
+    def item_guid(self, item):
+        return unicode("%s-%s") % (item.show.slug, item.slug)
+
+    def item_description(self, item):
+        return item.description()
 
 def ical_feed(request, show_name=None):
     cal = vobject.iCalendar()
@@ -85,13 +121,13 @@ def ical_feed(request, show_name=None):
     ep = Episode.objects.filter(status='UPCOMING')
     if show_name:
         ep = ep.filter(show__slug=show_name)
-    for episode in ep.order_by('begin')[:30]:
+    for episode in ep.annotate(beginfilter=Min('parts__begin')).order_by('-beginfilter')[:30]:
         vevent = cal.add('vevent')
-        val = "%s: %s" % (episode.slug, episode.title)
+        val = "%s: %s" % (episode.slug, episode.title())
         vevent.add('summary').value = val
-        vevent.add('description').value = episode.description
-        vevent.add('dtstart').value = episode.begin
-        vevent.add('dtend').value = episode.end
+        vevent.add('description').value = episode.description()
+        vevent.add('dtstart').value = episode.begin()
+        vevent.add('dtend').value = episode.end()
         vevent.add('uid').value = '%s' % episode.pk
         kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
         url = reverse_full("www", "episode", view_kwargs=kwargs)

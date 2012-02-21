@@ -11,11 +11,11 @@
 {% endblock %}
 {% block head %}
 
-<link href="{% host_url show-feed show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+<link href="http:{% host_url show-feed show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% endblock %}
 {% block feed_footer %}
 
-<li><a href="{% host_url show-feed show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+<li><a href="http:{% host_url show-feed show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
 {% endblock %}
 {% block collapsed_shows %}un{% endblock %}
 {% block navi_shows %}
