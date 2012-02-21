@@ -49,7 +49,10 @@
 	</small>
 	{% if part.description %}<p>{{ part.description|safe }}</p>{% endif %}
 	{% if forloop.first %}
-	{% include "radioportal/episodes/episode_streams.html" %}
+		{% include "radioportal/episodes/episode_streams.html" %}
+	        {% if episode.show.chat %}{% ifequal episode.status "RUNNING" %}
+			<iframe src="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"path" }}" width="100%" height="400"></iframe>
+	        {% endifequal %}{% endif %}
 	{% endif %}
 	<div class="graphs">
 	{% for graphic in part.graphics.all %}
