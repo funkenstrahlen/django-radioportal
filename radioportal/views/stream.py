@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from radioportal.models import Stream
-from django.views.generic import base, detail
+from django.views.generic import base, detail, list
 
 
 class StreamTemplateView(base.TemplateResponseMixin,
@@ -19,6 +19,22 @@ class StreamTemplateView(base.TemplateResponseMixin,
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         context['streamurl'] = request.build_absolute_uri(self.object.mount)
+        response_kwargs = {}
+        response_kwargs['mimetype'] = 'audio/x-mpegurl'
+        return self.render_to_response(context, **response_kwargs)
+
+class StreamListTemplateView(base.TemplateResponseMixin,
+                         base.View, list.MultipleObjectMixin):
+
+    template_name = 'radioportal/stream/playlist_list.m3u'
+    queryset = Stream.objects.filter(running=True)
+    context_object_name = 'streams'
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        for o in self.object_list:
+            o.fullurl = request.build_absolute_uri(o.mount)
+        context = self.get_context_data(object_list=self.object_list)
         response_kwargs = {}
         response_kwargs['mimetype'] = 'audio/x-mpegurl'
         return self.render_to_response(context, **response_kwargs)

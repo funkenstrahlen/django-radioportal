@@ -1,0 +1,4 @@
+#EXTM3U
+{% for s in streams %}#EXTINF:-1,{{ s.setup.currentEpisode.show.name }}: {{ s.setup.currentEpisode.slug }} {{ s.setup.currentEpisode.title }}
+{{ s.fullurl }}
+{% endfor %}
