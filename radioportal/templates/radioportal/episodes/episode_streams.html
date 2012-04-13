@@ -12,7 +12,11 @@
 &#9658;
 </span>
 <span class="player">
-Here should appear the Webplayer
+<audio id="player{{ episode.streamsetup.id}}" controls="controls" preload="none" class="mejs-xsn">
+{% for stream in episode.streamsetup.running_streams %}
+  <source src="http:{% host_url mount stream=stream.mount on www %}" type="audio/{{ stream.format }}" />
+{% endfor %}
+</audio>
 </span>
 </li>
 		{% for stream in episode.streamsetup.running_streams %}

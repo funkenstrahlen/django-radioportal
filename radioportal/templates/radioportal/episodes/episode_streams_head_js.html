@@ -1,48 +1,20 @@
         <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.6.2.min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}slimbox2/js/slimbox2.js"></script>
-        <script type='text/javascript' src='{{ STATIC_URL }}mediaplayer-5.7/jwplayer.js'></script>
-        <script type='text/javascript' src='{{ STATIC_URL }}mediaplayer-5.7/jquery.jwplayer.js'></script>
-  <script type="text/javascript">
-    if(typeof(String.prototype.trim) === "undefined") {
-        String.prototype.trim = function() {
-            return String(this).replace(/^\s+|\s+$/g, '');
-        };
-    }
+        <script src="{{ STATIC_URL }}mediaelement/build/jquery.js"></script>
+        <script src="{{ STATIC_URL }}mediaelement/build/mediaelement-and-player.min.js"></script>
 
+  <script type="text/javascript">
     function showplayer(index, element) {
       $(element).bind('click', false);
       $(element).click(function() {
-      		el=$(this).parent();
-			$(el).find('.player').show();
-   		    $(el).find('.play').hide();
-            media = {}
-            $(el).parent().find("li.stream.direct").each(function () {
-              var mount = $(this).find("a.mount").attr("href");
-              var format = mount.substr(mount.length-3)
-              if (format == "ogg") { format = "oga"; }
-              media[format] = mount;
-            });
-
-   		    $(el).find('.player').jwplayer({
-   		        'modes': [
-       				{type: 'flash', src: '{{ STATIC_URL }}/mediaplayer-5.7/player.swf'},
-      				{type: 'html5'},       				
-   				],
-			    'id': 'playerID',
-{#//			    'file': 'http://rbb.ic.llnwd.net/stream/rbb_fritz_mp3_m_a', #}
-  			    'file': media['mp3'],
-			    'type': 'sound',
-			    'height': '',
-			    'width': '163',
-			    'backcolor': 'eeeeee',
-			    'screencolor': 'eeeeee',
-			    'controlbar': 'bottom',
-			    'skin': '{{ STATIC_URL }}mediaplayer-5.7/skin/xsn.xml',
-                   });
-    	});
+          el=$(this).parent();
+          $(el).find('.player').show();
+          $(el).find('.play').hide();
+      });
     }
 
     $(document).ready(function() {
       $(".play").each(showplayer);
+      $('audio,video').mediaelementplayer({features: ['playpause', 'current', 'volume'], audioWidth: 160, audioHeight: "1em"});
     });
   </script>
