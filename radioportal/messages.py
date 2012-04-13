@@ -12,6 +12,7 @@ from django.utils import simplejson
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.datetime_safe import datetime
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import ugettext as _
 
 import radioportal
 
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFeed, UserProfile,\
         Episode, EpisodePart, Stream, Graphic, Recording
+
+from url_normalize import url_normalize
 
 #### Part one: sending notifications for changed objects ####
 
@@ -118,6 +121,141 @@ def DTODeserializer(stream_or_string, **options):
     py_obs = PythonDeserializer(newob, **options)
     return py_obs.next()
 
+class EpisodeFinder(object):
+    def get_name(self):
+        return "nothing"
+
+    def get_description(self):
+        return _("Does nothing.")
+
+    def get_episode(self, streamsetup, metadata):
+        return None
+
+
+class EpisodeSlugFromTitle(EpisodeFinder):
+    def get_name(self):
+        return "find-from-title"
+
+    def get_description(self):
+        return _("Try to find an existing episode with a slug,"+
+           " which is the same as the first word of the stream name")
+
+    def get_episode(self, streamsetup, metadata):
+        episode_slug = metadata['name'].split(" ")[0]
+        episode_slug = re.sub(r'[^a-zA-Z0-9]+', '', episode_slug)
+        try:
+            episode = Episode.objects.get(
+                         show__in=streamsetup.show.all(),
+                         slug__iexact=episode_slug)
+            return episode
+        except Episode.MultipleObjectsReturned:
+            logger.error("more than one episode found")
+        except Episode.DoesNotExist:
+            pass
+
+
+class LatestPlannedEpisode(EpisodeFinder):
+    def get_name(self):
+        return "find-latest-planned"
+
+    def get_description(self):
+        return _("Try to find the earliest possible, existing, upcoming episode")
+
+    def get_episode(self, streamsetup, metadata):
+        try:
+            episode = Episode.objects.filter(
+                        show__in=streamsetup.show.all(), 
+                        status='UPCOMING').annotate(
+                           begin=Min('parts__begin')).order_by('begin')[0]
+            return episode
+        except:
+            pass
+
+
+class MakeEpisodeMixin(object):
+    def _make_episode(self, show, number):
+        episode_slug = "%s%03i" % (show.defaultShortName, 
+                    number)
+        return self._make_episode_slug(show, episode_slug)
+
+    def _make_episode_slug(self, show, slug):
+        episode = Episode(show=show, slug=slug, status=Episode.STATUS[1][0])
+        episode.save()
+        return episode
+
+
+class MakeEpisodeFromNumberInShow(EpisodeFinder, MakeEpisodeMixin):
+    def get_name(self):
+        return "make-from-number-in-show"
+
+    def get_description(self):
+        return _("Create a new episode using the episodeNumber stored in the show")
+
+    def get_episode(self, streamsetup, metadata):
+        for show in streamsetup.show.all():
+            show.nextEpisodeNumber += 1
+            show.save()
+        
+            return self._make_episode(show, show.nextEpisodeNumber)
+
+class MakeEpisodeFromLastEpisode(EpisodeFinder, MakeEpisodeMixin):
+    def get_name(self):
+        return "make-from-number-of-last-episode"
+
+    def get_description(self):
+        return _("Create a new episode by incrementing the number of" +
+                 " the last episode by one")
+
+    def get_episode(self, streamsetup, metadata):
+        try:
+            last_episode = Episode.objects.filter(
+                             show__in=streamsetup.show.all(), 
+                             status='ARCHIVED').annotate(
+                                begin=Min('parts__begin')).order_by('-begin')[0]
+        except:
+            return
+        id_str = re.sub(r'[^0-9]+', '', last_episode.slug)
+        if id_str == '':
+            id_str = '0'
+        id = int(id_str) + 1
+        return self._make_episode(last_episode.show, id)
+
+class FindLiveEpisode(EpisodeFinder, MakeEpisodeMixin):
+    name = "live"
+    def get_name(self):
+        return "find-or-make-live"
+
+    def get_description(self):
+        return _("Find or create an episode named \"%s\"" % self.name)
+
+    def get_episode(self, streamsetup, metadata):
+        for show in streamsetup.show.all():
+            try:
+                live = Episode.objects.get(show=show, slug=self.name)
+            except Episode.DoesNotExist:
+                live = self._make_episode_slug(show, self.name)
+            return live
+
+import inspect, sys
+
+def get_episode_finder():
+    clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    finders = {}
+    for name, cls in clsmembers:
+        if issubclass(cls, EpisodeFinder):
+            finders[cls().get_name()] = cls
+    return finders
+
+class episode_finder_list:
+    def __iter__(self):    
+        finders = get_episode_finder()
+        doc_finders = {}
+        for name, cls in finders.iteritems():
+            doc_finders[name] = cls().get_description()
+        return doc_finders.iteritems()
+    def next(self):
+        raise StopIteration
+
 class BackendInterpreter(object):
     def show_startmaster(self, data):
         """
@@ -126,56 +264,43 @@ class BackendInterpreter(object):
         """
         data = simplejson.loads(data)
         setup = StreamSetup.objects.get(cluster=data['name'])
-        if len(setup.show.all()) == 0:
-            logger.error("show_startmaster: No show found for cluster %s" % data['name'])
-            # FIXME
+
+        available_methods = get_episode_finder()
+        episode = None
+
+        for method in setup.mapping_method:
+            if method not in available_methods:
+                logger.warning("Mapping method %s not found" % method)
+                continue
+            finder = available_methods[method]()
+            try:
+                episode = finder.get_episode(setup, data['show'])
+            except Exception, e:
+                logger.warning("Mapping method %s failed: %s" % (method, e))
+            if episode:
+                break
+                
+        if not episode:
+            logger.error("No episode found for cluster %s" % data['name'])
             return
-
-        # take the first show available
-        show = setup.show.all()[0]
         
-        # Guess episode name from stream metadata
-        episode_slug = data['show']['name'].split(" ")[0].lower()
-        episode = Episode.objects.filter(show=show, slug=episode_slug)
-        if len(episode) == 1:
-            episode = episode[0]
-            
-            if episode.status == Episode.STATUS[2][0]:
-                part = episode.parts.all().reverse()[0]
-            else:
-                part = EpisodePart(episode=episode)
-
-            part.begin = datetime.now()
-            part.save()                
-
-            episode.status = "RUNNING"
-            episode.current_part = part
-            episode.save()
-
-            setup.currentEpisode = episode
-            setup.save()
-        elif len(episode) == 0:
-            show.nextEpisodeNumber += 1
-            show.save()
-            
-            episode_slug = "%s%03i" % (show.defaultShortName, 
-                            show.nextEpisodeNumber)
-            episode = Episode(show=show, slug=episode_slug)
-            episode.status = "RUNNING"
-            episode.save()
-           
-            setup.currentEpisode = episode
-            setup.save()
- 
+        part = None
+        if episode.status == Episode.STATUS[2][0]:
+            parts = episode.parts.all().reverse()
+            if len(parts) > 0:
+                part = parts[0]
+        if not part:
             part = EpisodePart(episode=episode)
-            part.begin = datetime.now()
-            part.save()
-            
-            episode.current_part = part
-            episode.save()
-        else:
-            logger.error("More than one episode found for show %s and episode slug %s" % (show.slug, episode_slug))
-            #FIXME
+
+        part.begin = datetime.now()
+        part.save()                
+
+        episode.status = "RUNNING"
+        episode.current_part = part
+        episode.save()
+
+        setup.currentEpisode = episode
+        setup.save()
 
     def show_stop(self, data):
         """
@@ -258,6 +383,8 @@ class BackendInterpreter(object):
             part = episode.current_part
             if data['key'] == 'name' and data['val'].lower().startswith(episode.slug):
                 data['val'] = data['val'][len(episode.slug):].strip()
+            if data['key'] == 'url' and data['val'] != '':
+                data['val'] = url_normalize(data['val'])
             if data['key'] in map2eps:
                 setattr(part, map2eps[data['key']], data['val'])
                 part.save()
@@ -292,6 +419,7 @@ class BackendInterpreter(object):
             part = setup.currentEpisode.current_part
         else:
             logger.error("recording_start: no current episode for %s" % setup.cluster)
+            return
        
         r = Recording(episode=part)
         r.path = data['file']
@@ -324,7 +452,7 @@ class BackendInterpreter(object):
         result = simplejson.dumps(plain_dict)
         
         conn = DjangoBrokerConnection()
-        print "key", "%s.%s.%s" % (model._meta.app_label, model._meta.module_name, "changed")
+        #print "key", "%s.%s.%s" % (model._meta.app_label, model._meta.module_name, "changed")
         publisher = Publisher(connection=conn,
             exchange="django", 
             routing_key="%s.%s.%s" % (model._meta.app_label, model._meta.module_name, "changed"),
@@ -335,6 +463,7 @@ class BackendInterpreter(object):
         conn.close()
         logger.debug("Object list to %s sent" % unicode(data['answer']))
 
+import traceback
 
 def process_message(message_data, message):
     try: 
@@ -352,24 +481,12 @@ def process_message(message_data, message):
             message.ack()
             return
         message_data = message_data.decode("utf-8", 'replace')
-        print message_data
+        #print message_data
         getattr(bi, '%s_%s' % (keys[0], keys[1]))(message_data)
     except Exception as inst:
-        print inst
-        #logger.exception(inst)
+        print traceback.format_exc()
+        logger.exception(inst)
     message.ack()
-    print "Received message: %s" % repr(message_data)
-    #obj = DTODeserializer(message_data)
-    
-    
-    #obj.save()
-    #obj = json.Deserializer(message_data)
-    #for o in obj:
-    #print "Parsed object: %s" % obj
-    #obj = obj.next()
-    
-    
-    #obj.save()
 
 class AMQPInitMiddleware(object):
     def __init__(self):
