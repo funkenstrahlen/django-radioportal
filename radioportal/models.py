@@ -9,6 +9,8 @@ from django.db.models import Min, Max
 from autoslug import AutoSlugField
 from django_hosts.reverse import reverse_full
 
+from easy_thumbnails.fields import ThumbnailerImageField
+
 import hashlib
 
 import jsonfield
@@ -20,8 +22,10 @@ class Show(models.Model):
     slug = AutoSlugField(populate_from='name', always_update=True)
     url = models.URLField(verify_exists=False, blank=True, default='',
         verbose_name=_('Homepage of the Show'))
-    twitter = models.CharField(max_length=100, blank=True, default='')
-    chat = models.CharField(max_length=100, blank=True, default='')
+    twitter = models.CharField(max_length=100, blank=True, default='',
+        help_text='Name of the associated Twitter account')
+    chat = models.CharField(max_length=100, blank=True, default='',
+        help_text='URL to the associated IRC-Channel (e.g. irc://irc.freenode.net/#chaosradio)')
     description = models.CharField(max_length=200, blank=True, default='',
         verbose_name=_("Description"))
     abstract = models.TextField(blank=True, default='',
@@ -38,7 +42,8 @@ class Show(models.Model):
     )
 
     licence  = models.CharField(max_length=100,
-        choices=LICENCES, default=LICENCES[0][0])
+        choices=LICENCES, default=LICENCES[0][0], blank=True,
+        verbose_name=_("Licence"))
 
     defaultShortName = models.SlugField(default='',
         help_text=_('Used to construct the episode' +
@@ -48,7 +53,7 @@ class Show(models.Model):
         help_text=_('The number of the next episode to be aired. Used to construct the episode identifier'),
         verbose_name=_("Number of the next episode"))
 
-    icon = models.ImageField(upload_to="show-icons/", blank=True)
+    icon = ThumbnailerImageField(resize_source=dict(size=(150, 150), crop='smart'), upload_to="show-icons/", blank=True)
 
     def __unicode__(self):
         return self.name
@@ -63,7 +68,7 @@ class Show(models.Model):
 
 class ShowFeed(models.Model):
     show = models.OneToOneField(Show)
-    enabled = models.BooleanField()
+    enabled = models.BooleanField(verbose_name=_("Enable"))
     feed = models.URLField(max_length=240, blank=True,
         verbose_name=_("Feed of the podcast"),)
     titlePattern = models.CharField(max_length=240, blank=True,
@@ -130,6 +135,9 @@ class Episode(models.Model):
 
     class Meta:
         unique_together = (('show', 'slug'),)
+
+    def get_absolute_url(self):
+        return reverse_full("www", "episode", view_kwargs={'show_name': self.show.slug, 'slug': self.slug})
 
 
 class EpisodePart(models.Model):
@@ -253,7 +261,38 @@ class Stream(models.Model):
 
     format = models.CharField(max_length=100,
         choices=FORMATS, default=FORMATS[0][0])
-    bitrate = models.CharField(max_length=100, default='0')
+    BITRATES = (
+        ('32', '~32 KBit/s'),
+        ('40', '~40 KBit/s'),
+        ('48', '~48 KBit/s'),
+        ('56', '~56 KBit/s'),
+        ('64', '~64 KBit/s'),
+        ('72', '~72 KBit/s'),
+        ('80', '~80 KBit/s'),
+        ('88', '~88 KBit/s'),
+        ('96', '~96 KBit/s'),
+        ('104', '~104 KBit/s'),
+        ('112', '~112 KBit/s'),
+        ('120', '~120 KBit/s'),
+        ('128', '~128 KBit/s'),
+        ('136', '~136 KBit/s'),
+        ('144', '~144 KBit/s'),
+        ('152', '~152 KBit/s'),
+        ('160', '~160 KBit/s'),
+        ('168', '~168 KBit/s'),
+        ('176', '~176 KBit/s'),
+        ('184', '~184 KBit/s'),
+        ('192', '~192 KBit/s'),
+        ('200', '~200 KBit/s'),
+        ('208', '~208 KBit/s'),
+        ('216', '~216 KBit/s'),
+        ('224', '~224 KBit/s'),
+        ('232', '~232 KBit/s'),
+        ('240', '~240 KBit/s'),
+        ('248', '~248 KBit/s'),
+        ('256', '~256 KBit/s'),
+    )
+    bitrate = models.CharField(max_length=100, choices=BITRATES, default=BITRATES[12][0])
 
     ENCODINGS = (
         ('UTF-8', _('UTF-8')),
@@ -289,6 +328,9 @@ class Stream(models.Model):
 
     fallback = models.CharField(max_length=255,
         choices=WAVE, default=WAVE[0][0])    
+
+    def get_absolute_url(self):
+        return reverse_full("www", "mount", view_kwargs={'stream': self.mount})
 
 #    def save(self, force_insert=False, force_update=False):
 #        super(Stream, self).save(force_insert, force_update)
@@ -329,20 +371,20 @@ class Status(models.Model):
         return u"<Status for %s>" % self.name
 
 
-from django.db.models.signals import post_save
-def saved(sender, instance, created, **kwargs):
-    print "Saved (models.py:314): ", sender, repr(instance)
-
-
-post_save.connect(saved, Show)
-post_save.connect(saved, ShowFeed)
-post_save.connect(saved, Episode)
-post_save.connect(saved, EpisodePart)
-post_save.connect(saved, Graphic)
-post_save.connect(saved, Recording)
-post_save.connect(saved, StreamSetup)
-post_save.connect(saved, Stream)
-post_save.connect(saved, SourcedStream)
-post_save.connect(saved, RecodedStream)
-post_save.connect(saved, UserProfile)
-post_save.connect(saved, Status)
+# from django.db.models.signals import post_save
+# def saved(sender, instance, created, **kwargs):
+#     print "Saved (models.py:314): ", sender, repr(instance)
+# 
+# 
+# post_save.connect(saved, Show)
+# post_save.connect(saved, ShowFeed)
+# post_save.connect(saved, Episode)
+# post_save.connect(saved, EpisodePart)
+# post_save.connect(saved, Graphic)
+# post_save.connect(saved, Recording)
+# post_save.connect(saved, StreamSetup)
+# post_save.connect(saved, Stream)
+# post_save.connect(saved, SourcedStream)
+# post_save.connect(saved, RecodedStream)
+# post_save.connect(saved, UserProfile)
+# post_save.connect(saved, Status)

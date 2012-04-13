@@ -6,6 +6,10 @@
 	{% trans "Edit Show" %}
 	{% else %}{% trans "Create Show" %}{% endif %}
 {% endblock %}
+{% block head_js %}
+        {{ block.super }}
+        <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.6.2.min.js"></script>
+{% endblock %}
 {% block content %}
 <h2>
 {% if object %}{% trans "Edit" %} {{ object|object_name }}
@@ -24,4 +28,17 @@ Example for an entry like "MM073 Creepy" is "(?P<id>\w*) (?P<topic>.*)".{% endbl
 <tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
 </table>
 </form>
+  <script type="text/javascript">
+    function toggle() {
+          $("tr:gt(0):lt(3)").toggle();
+    }
+
+    $(document).ready(function() {
+      $('#id_enabled').bind('change', false);
+      $('#id_enabled').change(toggle);
+      if(!$('#id_enabled').is(':checked')) {
+         toggle();
+      }
+    });
+  </script>
 {% endblock %}

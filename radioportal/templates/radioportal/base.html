@@ -3,18 +3,18 @@
 {% load i18n hosts %}
 {% host_url live on www as live_url %}
 <li{% if request.path|startswith:live_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_live %}{% endblock %}collapsed" href="{{ live_url }}">{% trans "Live" %}</a>
+  <a class="{% block collapsed_live %}{% endblock %}collapsed" href="http:{{ live_url }}">{% trans "Live" %}</a>
   {% block navi_live %}{% endblock %}
 </li>
 {% host_url upcoming on www as upcoming_url %}
 <li{% if request.path|startswith:upcoming_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_upcoming %}{% endblock %}collapsed" href="{{ upcoming_url }}">{% trans "Upcoming" %}</a>
+  <a class="{% block collapsed_upcoming %}{% endblock %}collapsed" href="http:{{ upcoming_url }}">{% trans "Upcoming" %}</a>
   {% block navi_upcoming %}{% endblock %}
 </li>
 {% comment %}
 {% host_url recent on www as recent_url %}
 <li{% if request.path|startswith:recent_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_recent %}{% endblock %}collapsed" href="{{ recent_url }}">{% trans "Recent" %}</a>
+  <a class="{% block collapsed_recent %}{% endblock %}collapsed" href="http:{{ recent_url }}">{% trans "Recent" %}</a>
   {% block navi_recent %}{% endblock %}
 </li>
 {% endcomment %}
@@ -26,16 +26,16 @@
 
 {% host_url shows on www as show_url %}
 <li{% if request.path|startswith:show_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_shows %}{% endblock %}collapsed"	href="{{ show_url }}">{% trans "Shows" %}</a>
+  <a class="{% block collapsed_shows %}{% endblock %}collapsed"	href="http:{{ show_url }}">{% trans "Shows" %}</a>
   <!-- {% block navi_shows %}{% endblock %} -->
 </li>
 
 {% if user.is_authenticated %}
 {% host_url dashboard on dashboard as profile_url %}
 <li{% if request.path|startswith:profile_url %} class="active"{% endif %}>
-	<a href="{% host_url dashboard on dashboard %}">{% trans "Dashboard" %}</a>
+	<a href="https:{% host_url dashboard on dashboard %}">{% trans "Dashboard" %}</a>
 	{% block navi_account %}{% endblock %}
 </li>
 {% endif %}
 {% endblock %}
-{% block breadcrumb %}<a href="{% url root %}">{% trans "Start" %}</a>{% endblock %}
+{% block breadcrumb %}<a href="http:{% url root %}">{% trans "Start" %}</a>{% endblock %}

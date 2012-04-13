@@ -24,6 +24,8 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import force_unicode
 from itertools import chain
 
+from radioportal import messages
+
 class CheckboxSelectMultipleTable(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
@@ -154,7 +156,7 @@ class CreateEpisodeForm(EpisodeForm):
         (5.0, '5.0h'),
         (5.5, '5.5h'),
    )
-    duration = forms.TypedChoiceField(choices=DURATIONS, coerce=float, empty_value=0.0)
+    duration = forms.TypedChoiceField(choices=DURATIONS, coerce=float, empty_value=0.0, label=_("Duration"))
     slug = forms.SlugField()
     
     def save(self, commit=True):
@@ -214,14 +216,15 @@ class StreamSetupForm(forms.ModelForm):
         MAPPINGS=(
           ('guess-from-last', _("Create new episode, get episode number by adding one to last episode number")),
           ('append-to-live', _("Append new episode part to generic episode \"live\"")),
-          ('nothing','nothing'))
+          ('nothing','nothing'),
+          ('default', _("Default")),)
     
         model = models.StreamSetup
         exclude = ('running', 'streamCurrentSong', 'streamGenre', 'streamShow',
                    'streamDescription', 'streamURL', 'currentEpisode', 'feed',
                    'graphic_differ_by', 'graphic_title')
         widgets = {
-            'mapping_method': OrderedSelectMultiple(choices=MAPPINGS),
+            'mapping_method': OrderedSelectMultiple(choices=messages.episode_finder_list()),
         }
 
 
@@ -234,7 +237,7 @@ class SourcedStreamForm(StreamForm):
     required_css_class = "required"
     class Meta:
         model = models.SourcedStream
-        fields = ('mount', 'user', 'password', 'encoding', 'fallback')
+        fields = ('mount', 'user', 'password', 'encoding')
 #    class Media:
 #        js = ('http://code.jquery.com/jquery-1.6.1.min.js', 'dashboard/stream.js',)
 

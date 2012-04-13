@@ -12,7 +12,7 @@ urlpatterns = patterns('',
         cache_page(episodes.RobotsTxtView.as_view(), 60 * 60 * 3),
         name="robots"),
         
-    url(r'^dashboard/', include('radioportal.dashboard.urls')),
+    #url(r'^dashboard/', include('radioportal.dashboard.urls')),
     
     url(r'^feeds/', include('radioportal.feeds.urls')),
     

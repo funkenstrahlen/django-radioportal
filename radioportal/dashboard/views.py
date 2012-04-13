@@ -239,7 +239,7 @@ class EpisodeCreateView(CreateView):
         s = Show.objects.get(slug=self.kwargs['slug'])
         initial = super(EpisodeCreateView, self).get_initial()
         initial['show'] = s.id
-        initial['slug'] = "%s%03i" % (s.defaultShortName.lower(), s.nextEpisodeNumber)
+        initial['slug'] = "%s%03i" % (s.defaultShortName, s.nextEpisodeNumber)
         return initial
 
     def get_form_class(self):
