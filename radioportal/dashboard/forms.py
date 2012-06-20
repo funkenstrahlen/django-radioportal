@@ -131,7 +131,7 @@ class EpisodePartForm(forms.ModelForm):
             'episode': widgets.HiddenInput(),
         }
 
-class CreateEpisodeForm(EpisodeForm):
+class CreateEpisodeForm(forms.ModelForm):
     required_css_class = "required"
     
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -163,7 +163,7 @@ class CreateEpisodeForm(EpisodeForm):
         if self.instance.begin and not self.cleaned_data['duration'] == 0.0:
             td = timedelta(hours=self.cleaned_data['duration'])
             self.instance.end = self.instance.begin + td 
-        return EpisodeForm.save(self, commit)
+        return super(CreateEpisodeForm, self).save(commit)
     
     class Meta:
         model = models.EpisodePart
