@@ -56,4 +56,8 @@ This is the place to view or change the credentials for your streams.
     <li><a href="{% host_url admin-list-users on dashboard %}">{% trans "List of Users" %}</a></li>
 {% endif %}
 </ul>
+<h3>{% trans "Recordings" %}</h3>
+<ul>
+<li><a href="{% host_url archive-list on dashboard %}">{% trans "List of Recordings" %}</a></li>
+</ul>
 {% endblock %}

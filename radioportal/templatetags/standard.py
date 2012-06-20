@@ -126,3 +126,25 @@ class URLNode(Node):
 
 from django.template import defaulttags
 defaulttags.URLNode = URLNode
+
+import time, hashlib
+
+from django.utils.http import urlquote
+
+@register.filter
+def secdownload(rel_path):
+    secret = getattr(settings, "RP_DL_SECRET", "verysecret")
+    uri_prefix = getattr(settings, "RP_DL_PREFIX", "/dl/")
+    hextime = "%08x" % time.time()
+    token = hashlib.md5((secret + rel_path + hextime).encode('utf-8')).hexdigest()
+    return '%s%s/%s%s' % (uri_prefix, token, hextime, urlquote(rel_path))
+
+import os.path
+
+@register.filter
+def fileexists(rel_path):
+    if rel_path[0] == "/":
+        rel_path = rel_path[1:]
+    base = getattr(settings, 'RP_DL_BASEDIR', '/tmp/')
+    path = os.path.join(base, rel_path)
+    return os.path.exists(path)

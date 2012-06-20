@@ -28,7 +28,7 @@
 <h3>{% trans "Associated Recordings" %}</h3>
 <ul>
 {% for r in form.instance.recordings.all %}
-	<li><a href="http://archiv.streams.xenim.de/recordings{{ r.path }}">
+	<li><a href="{{ r.path|secdownload }}">
 	{% trans "Recording" %} {{ r.format }}, {{ r.bitrate }}KBit/s, {{ r.size }}B <span style="display:inline-block; min-width: 1em; background-color: {% if r.running %}green{% else %}red{% endif %};">&nbsp;</span>
 	</a></li>
 {% endfor %}
