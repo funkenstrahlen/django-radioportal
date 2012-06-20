@@ -146,6 +146,15 @@ class ShowEditView(UpdateView):
     slug_field = 'slug'
     model = Show
 
+    def get_form_class(self):
+        try:
+            feed = self.object.showfeed
+            if feed.enabled:
+                return dforms.ShowReducedForm
+        except ShowFeed.DoesNotExist:
+            pass
+        return dforms.ShowForm
+
     @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowEditView, self).dispatch(*args, **kwargs)

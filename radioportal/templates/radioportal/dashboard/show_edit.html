@@ -12,12 +12,15 @@
 {% else %}{% trans "Create Show" %}{% endif %}
 </h2>
 {% if object.showfeed.enabled %}
+<p>
 {% blocktrans %}
 The properties of this show are currently updated from the configured podcast feed. If you want to change
 properties of the show either update the podcast feed or disable the automatic update via the feed
 {% endblocktrans %}
 <a href="{% host_url admin-show-feed object.slug on dashboard %}">{% trans "here" %}</a> 
-{% else %}
+</p><br />
+{% endif %}
+
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <table>
@@ -25,5 +28,4 @@ properties of the show either update the podcast feed or disable the automatic u
 <tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
 </table>
 </form>
-{% endif %}
 {% endblock %}

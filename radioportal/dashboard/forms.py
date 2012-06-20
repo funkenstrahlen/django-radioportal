@@ -254,6 +254,14 @@ class ShowForm(forms.ModelForm):
     class Meta:
         model = models.Show
 
+
+class ShowReducedForm(forms.ModelForm):
+    required_css_class = "required"
+    class Meta:
+        model = models.Show
+        exclude = ('name', 'url', 'abstract', 'description', 'icon')
+
+
 class ShowFeedForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
