@@ -11,7 +11,7 @@
 	<li>
 		<a href="{% host_url admin-user-edit u.username on dashboard %}">{{ u.get_full_name }} ({{ u.username }})</a>
 		(<a href="{% host_url admin-perm "show" u.username on dashboard %}">{% trans "show perm" %}</a>,
-		<a href="{% host_url admin-perm "streamsetup" u.username on dashboard %}">{% trans "setup perm" %}</a>)
+		<a href="{% host_url admin-perm "channel" u.username on dashboard %}">{% trans "channel perm" %}</a>)
 	</li>
 {% endfor %}
 </ul>

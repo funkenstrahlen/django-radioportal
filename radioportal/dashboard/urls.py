@@ -37,9 +37,10 @@ urlpatterns = patterns('',
 
     url(r'^episodepart/(?P<pk>[\w-]+)/$', views.EpisodePartEditView.as_view(), name="admin-episodepart-edit"),
 
-    url(r'^streamsetup/create/$', views.StreamSetupCreateView.as_view(), name="admin-streamsetup-create"),
-    url(r'^streamsetup/(?P<pk>[\w-]+)/$', views.StreamSetupEditView.as_view(), name="admin-streamsetup-edit"),
-    url(r'^streamsetup/(?P<pk>[\w-]+)/delete/$', views.StreamSetupDeleteView.as_view(), name="admin-streamsetup-delete"),
+    url(r'^channel/create/$', views.ChannelCreateView.as_view(), name="admin-channel-create"),
+    url(r'^channel/(?P<pk>[\w-]+)/$', views.ChannelEditView.as_view(), name="admin-channel-edit"),
+    url(r'^cluster/(?P<slug>[\w-]+)/$', views.ChannelClusterEditView.as_view(), name="admin-channel-edit-cluster"),
+    url(r'^channel/(?P<pk>[\w-]+)/delete/$', views.ChannelDeleteView.as_view(), name="admin-channel-delete"),
     
     url(r'^accounts/login/$', django.contrib.auth.views.login, {}, name="login"),
     url(r'^accounts/logout/$', django.contrib.auth.views.logout_then_login, {}, name="logout"),

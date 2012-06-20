@@ -28,24 +28,24 @@ They also contain episodes for time a stream is online.
 </ul>
 {% endif %}
 
-{% if setups or perms.portal.add_streamsetup %}
+{% if channels or perms.portal.add_channel %}
 <h3>{% trans "Streams" %}</h3>
 <p class="explanation">
 {% blocktrans %}
-For every show there is usually a setup of streams. Such a setup of streams combines various streams which differ in bitrates or formats. 
+For every show there is usually a channel of streams. Such a channel of streams combines various streams which differ in bitrates or formats. 
 This is the place to view or change the credentials for your streams.
 {% endblocktrans %}
 </p>
 <ul>
-{% for s in setups %}
-{% get_obj_perms request.user for s as "setup_perms" %}
+{% for s in channels %}
+{% get_obj_perms request.user for s as "channel_perms" %}
 	<li>
-		<a href="{% host_url admin-streamsetup-edit s.id on dashboard %}">{{ s }}</a>
-		{% if "delete_streamsetup" in setup_perms %}(<a href="{% host_url admin-streamsetup-delete s.id on dashboard %}">{% trans "delete" %}</a>){% endif %}
+		<a href="{% host_url admin-channel-edit s.id on dashboard %}">{{ s }}</a>
+		{% if "delete_channel" in channel_perms %}(<a href="{% host_url admin-channel-delete s.id on dashboard %}">{% trans "delete" %}</a>){% endif %}
 	</li>
 {% endfor %}
-{% if perms.portal.add_streamsetup %}
-	<li><a href="{% host_url admin-streamsetup-create on dashboard %}">{% trans "Create new StreamSetup" %}</a></li>
+{% if perms.portal.add_channel %}
+	<li><a href="{% host_url admin-channel-create on dashboard %}">{% trans "Create new Channel" %}</a></li>
 {% endif %}
 </ul>
 {% endif %}

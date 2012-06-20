@@ -14,16 +14,26 @@ from django.utils.datetime_safe import datetime
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
 
+from django.db.models import Min
+from django.conf import settings
+
 import radioportal
 
 import logging
 
 logger = logging.getLogger(__name__)
 
-from radioportal.models import RecodedStream, SourcedStream, StreamSetup, ShowFeed, UserProfile,\
-        Episode, EpisodePart, Stream, Graphic, Recording
+import re, urlparse, urllib, os.path, urllib2
+import easy_thumbnails.files
+
+from radioportal.models import RecodedStream, SourcedStream, Channel, ShowFeed, UserProfile,\
+        Episode, EpisodePart, Stream, Graphic, Recording, Show
+
+from radioportal_auphonic.models import AuphonicSettings
 
 from url_normalize import url_normalize
+
+import dateutil.parser
 
 #### Part one: sending notifications for changed objects ####
 
@@ -37,7 +47,7 @@ class DTOSourcedStream(DTO):
         self.user = instance.user
         self.password = instance.password
         self.encoding = instance.encoding
-        self.cluster = instance.setup.cluster
+        self.cluster = instance.channel.cluster
         self.fallback = instance.fallback
         self.id = instance.pk
 
@@ -54,6 +64,25 @@ class DTOUserProfile(DTO):
     def __init__(self, instance):
         self.id = instance.pk
         self.htdigest = instance.htdigest
+
+class DTOShow(DTO):
+    def __init__(self, instance):
+        self.slug = instance.slug
+        self.cluster = instance.channel.cluster
+        self.twitter = instance.twitter
+        self.chat = instance.chat
+
+class DTOAuphonic(DTO):
+    def __init__(self, instance):
+        self.channel = instance.channel.cluster
+        if instance.preset:
+            self.preset = instance.preset.uuid
+        else:
+            self.preset = ""
+        self.update_md = instance.update_metadata
+        self.enabled = instance.enabled
+        self.oauth_token = instance.oauth_token
+        self.id = self.channel
 
 dto_map = {
     "sourcedstream": DTOSourcedStream,
@@ -128,7 +157,7 @@ class EpisodeFinder(object):
     def get_description(self):
         return _("Does nothing.")
 
-    def get_episode(self, streamsetup, metadata):
+    def get_episode(self, channel, metadata):
         return None
 
 
@@ -140,12 +169,13 @@ class EpisodeSlugFromTitle(EpisodeFinder):
         return _("Try to find an existing episode with a slug,"+
            " which is the same as the first word of the stream name")
 
-    def get_episode(self, streamsetup, metadata):
+    def get_episode(self, channel, metadata):
         episode_slug = metadata['name'].split(" ")[0]
         episode_slug = re.sub(r'[^a-zA-Z0-9]+', '', episode_slug)
+        print "episode_slug: ", episode_slug
         try:
             episode = Episode.objects.get(
-                         show__in=streamsetup.show.all(),
+                         show__in=channel.show.all(),
                          slug__iexact=episode_slug)
             return episode
         except Episode.MultipleObjectsReturned:
@@ -161,10 +191,10 @@ class LatestPlannedEpisode(EpisodeFinder):
     def get_description(self):
         return _("Try to find the earliest possible, existing, upcoming episode")
 
-    def get_episode(self, streamsetup, metadata):
+    def get_episode(self, channel, metadata):
         try:
             episode = Episode.objects.filter(
-                        show__in=streamsetup.show.all(), 
+                        show__in=channel.show.all(), 
                         status='UPCOMING').annotate(
                            begin=Min('parts__begin')).order_by('begin')[0]
             return episode
@@ -191,11 +221,10 @@ class MakeEpisodeFromNumberInShow(EpisodeFinder, MakeEpisodeMixin):
     def get_description(self):
         return _("Create a new episode using the episodeNumber stored in the show")
 
-    def get_episode(self, streamsetup, metadata):
-        for show in streamsetup.show.all():
+    def get_episode(self, channel, metadata):
+        for show in channel.show.all():
             show.nextEpisodeNumber += 1
             show.save()
-        
             return self._make_episode(show, show.nextEpisodeNumber)
 
 class MakeEpisodeFromLastEpisode(EpisodeFinder, MakeEpisodeMixin):
@@ -206,14 +235,11 @@ class MakeEpisodeFromLastEpisode(EpisodeFinder, MakeEpisodeMixin):
         return _("Create a new episode by incrementing the number of" +
                  " the last episode by one")
 
-    def get_episode(self, streamsetup, metadata):
-        try:
-            last_episode = Episode.objects.filter(
-                             show__in=streamsetup.show.all(), 
-                             status='ARCHIVED').annotate(
-                                begin=Min('parts__begin')).order_by('-begin')[0]
-        except:
-            return
+    def get_episode(self, channel, metadata):
+        last_episode = Episode.objects.filter(
+                        show__in=channel.show.all(), 
+                        status='ARCHIVED').annotate(
+                         begin=Min('parts__begin')).order_by('-begin')[0]
         id_str = re.sub(r'[^0-9]+', '', last_episode.slug)
         if id_str == '':
             id_str = '0'
@@ -228,8 +254,8 @@ class FindLiveEpisode(EpisodeFinder, MakeEpisodeMixin):
     def get_description(self):
         return _("Find or create an episode named \"%s\"" % self.name)
 
-    def get_episode(self, streamsetup, metadata):
-        for show in streamsetup.show.all():
+    def get_episode(self, channel, metadata):
+        for show in channel.show.all():
             try:
                 live = Episode.objects.get(show=show, slug=self.name)
             except Episode.DoesNotExist:
@@ -263,19 +289,22 @@ class BackendInterpreter(object):
             FIXME: need show
         """
         data = simplejson.loads(data)
-        setup = StreamSetup.objects.get(cluster=data['name'])
+        channel = Channel.objects.get(cluster=data['name'])
 
         available_methods = get_episode_finder()
         episode = None
 
-        for method in setup.mapping_method:
+        for method in channel.mapping_method:
+            #print "trying method", method
             if method not in available_methods:
                 logger.warning("Mapping method %s not found" % method)
                 continue
             finder = available_methods[method]()
             try:
-                episode = finder.get_episode(setup, data['show'])
+                episode = finder.get_episode(channel, data['show'])
             except Exception, e:
+                print "method", method, "failed"
+                print traceback.format_exc()
                 logger.warning("Mapping method %s failed: %s" % (method, e))
             if episode:
                 break
@@ -299,25 +328,25 @@ class BackendInterpreter(object):
         episode.current_part = part
         episode.save()
 
-        setup.currentEpisode = episode
-        setup.save()
+        channel.currentEpisode = episode
+        channel.save()
 
     def show_stop(self, data):
         """
             value={'name': cpwd}
         """
         data = simplejson.loads(data)
-        setup = StreamSetup.objects.get(cluster=data['name'])
-        if setup.currentEpisode:
-            episode = setup.currentEpisode 
+        channel = Channel.objects.get(cluster=data['name'])
+        if channel.currentEpisode:
+            episode = channel.currentEpisode 
             part = episode.current_part
             part.end = datetime.now()
             part.save()
             episode.current_part = None
             episode.status = Episode.STATUS[0][0]
             episode.save()
-            setup.currentEpisode = None
-            setup.save()
+            channel.currentEpisode = None
+            channel.save()
         else:
             logger.error("show_stop: no current episode found for cluster %s" % data['name'])
             # FIXME
@@ -336,13 +365,13 @@ class BackendInterpreter(object):
         if len(stream) == 1:
             stream = stream[0]
         else:
-            setup = StreamSetup.objects.get(cluster=data['name'].split("-")[0])
-            stream = Stream(mount=mp, setup=setup)
+            channel = Channel.objects.get(cluster=data['name'].split("-")[0])
+            stream = Stream(mount=mp, channel=channel)
         stream.running = True
         stream.bitrate = data['stream']['bitrate']
         stream.format = data['stream']['type'].lower()
         stream.save()
-        #stream.setup.updateRunning()
+        #stream.channel.updateRunning()
         
     def stream_stop(self, data):
         """
@@ -351,7 +380,7 @@ class BackendInterpreter(object):
         data = simplejson.loads(data)
         mount = data['name'].split("-")
         
-        stream = Stream.objects.filter(setup__cluster=mount[0], format=mount[2].lower(), bitrate=int(mount[1]))
+        stream = Stream.objects.filter(channel__cluster=mount[0], format=mount[2].lower(), bitrate=int(mount[1]))
         if len(stream) == 1:
             stream = stream[0]
             stream.running = False
@@ -363,23 +392,23 @@ class BackendInterpreter(object):
         """
         data = simplejson.loads(data)
         
-        setup = StreamSetup.objects.get(cluster=data['name'].split("-")[0])
+        channel = Channel.objects.get(cluster=data['name'].split("-")[0])
         
-        # mapping internal keys to attributes of stream setup
-        map2setup={'name': 'streamShow','genre':'streamGenre',
+        # mapping internal keys to attributes of stream channel
+        map2channel={'name': 'streamShow','genre':'streamGenre',
              'current_song': 'streamCurrentSong',
              'description':'streamDescription', 'url': 'streamURL'}
-        if data['key'] in map2setup:
-            setattr(setup, map2setup[data['key']], data['val'])
-            setup.save()
+        if data['key'] in map2channel:
+            setattr(channel, map2channel[data['key']], data['val'])
+            channel.save()
         else:
-            logger.debug("show_metadata: key %s not in setup map" % data['key'])
+            logger.debug("show_metadata: key %s not in channel map" % data['key'])
          
         # mapping between internal keys and episode fields
         map2eps={'name': 'title', 'description': 'description', 'url': 'url'}
         
-        if setup.currentEpisode:
-            episode = setup.currentEpisode
+        if channel.currentEpisode:
+            episode = channel.currentEpisode
             part = episode.current_part
             if data['key'] == 'name' and data['val'].lower().startswith(episode.slug):
                 data['val'] = data['val'][len(episode.slug):].strip()
@@ -389,7 +418,7 @@ class BackendInterpreter(object):
                 setattr(part, map2eps[data['key']], data['val'])
                 part.save()
         else:
-            logger.error("show_metadata: no current episode for %s" % setup.cluster)
+            logger.error("show_metadata: no current episode for %s" % channel.cluster)
         
     def graphic_created(self, data):
         """
@@ -398,14 +427,14 @@ class BackendInterpreter(object):
         data = simplejson.loads(data)
         
         cpwd = data['show'].split("-")[0]
-        setup = StreamSetup.objects.get(cluster=cpwd)
+        channel = Channel.objects.get(cluster=cpwd)
         
         g = Graphic(file='graphics/%s' % data['file'])
         
-        if setup.currentEpisode:
-            g.episode = setup.currentEpisode.current_part
+        if channel.currentEpisode:
+            g.episode = channel.currentEpisode.current_part
         else:
-            logger.error("graphic_create: no current episode for %s" % setup.cluster)
+            logger.error("graphic_create: no current episode for %s" % channel.cluster)
         
         g.save()
         
@@ -414,11 +443,11 @@ class BackendInterpreter(object):
         
         cpwd = data["cluster"]
         
-        setup = StreamSetup.objects.get(cluster=cpwd)
-        if setup.currentEpisode:
-            part = setup.currentEpisode.current_part
+        channel = Channel.objects.get(cluster=cpwd)
+        if channel.currentEpisode:
+            part = channel.currentEpisode.current_part
         else:
-            logger.error("recording_start: no current episode for %s" % setup.cluster)
+            logger.error("recording_start: no current episode for %s" % channel.cluster)
             return
        
         r = Recording(episode=part)
@@ -503,15 +532,19 @@ class AMQPInitMiddleware(object):
         
         post_save.connect(object_changed, RecodedStream, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, SourcedStream, dispatch_uid="my_dispatch_uid")
-        #post_save.connect(object_changed, StreamSetup, dispatch_uid="my_dispatch_uid")
+        #post_save.connect(object_changed, Channel, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, UserProfile, dispatch_uid="my_dispatch_uid")
+        post_save.connect(object_changed, AuphonicSettings, dispatch_uid="my_dispatch_uid")
+
         
         post_delete.connect(object_deleted, RecodedStream, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, SourcedStream, dispatch_uid="my_dispatch_uid")
-        #post_delete.connect(object_deleted, StreamSetup, dispatch_uid="my_dispatch_uid")
+        #post_delete.connect(object_deleted, Channel, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, UserProfile, dispatch_uid="my_dispatch_uid")
+        post_delete.connect(object_deleted, AuphonicSettings, dispatch_uid="my_dispatch_uid")
+
 
     def receive_messages(self):
         logger.info("Connecting to AMQP-Broker")

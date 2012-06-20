@@ -1,4 +1,4 @@
 #EXTM3U
-{% for s in streams %}#EXTINF:-1,{{ s.setup.currentEpisode.show.name }}: {{ s.setup.currentEpisode.slug }} {{ s.setup.currentEpisode.title }}
+{% for s in streams %}#EXTINF:-1,{{ s.channel.currentEpisode.show.name }}: {{ s.channel.currentEpisode.slug }} {{ s.channel.currentEpisode.title }}
 {{ s.fullurl }}
 {% endfor %}

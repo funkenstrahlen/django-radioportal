@@ -13,7 +13,7 @@ class InlineStream(admin.TabularInline):
     model = models.Stream
 
 
-class StreamSetupAdmin(GuardedModelAdmin):
+class ChannelAdmin(GuardedModelAdmin):
     inlines = [
         InlineStream,
     ]
@@ -43,5 +43,5 @@ class ShowAdmin(GuardedModelAdmin):
 
 admin.site.register(models.Show, ShowAdmin)
 admin.site.register(models.Episode, EpisodeAdmin)
-admin.site.register(models.StreamSetup, StreamSetupAdmin)
+admin.site.register(models.Channel, ChannelAdmin)
 admin.site.register(models.Status)

@@ -17,7 +17,7 @@ class GroupForm(forms.ModelForm):
         super(GroupForm, self).__init__(*args, **kwargs)
         f = self.fields.get('permissions', None)
         if f is not None:
-            perms = ['add_show', 'add_streamsetup']
+            perms = ['add_show', 'add_channel']
             f.queryset = Permission.objects.filter(codename__in=perms)
             f.queryset = f.queryset.select_related('content_type')
 

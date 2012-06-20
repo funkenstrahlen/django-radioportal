@@ -37,8 +37,8 @@ def hashEpisode(episode, what):
         val += episode.genre
         return hash()
     if what == "streams":
-        if episode.streamsetup:
-            val = episode.streamsetup.stream_set.values_list('id', 'running')
+        if episode.channel:
+            val = episode.channel.stream_set.values_list('id', 'running')
             return hash(val)
         else:
             return 0

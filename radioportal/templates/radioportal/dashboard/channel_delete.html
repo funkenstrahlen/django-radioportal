@@ -1,7 +1,7 @@
 {% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
-{% block breadcrumb %}{{ block.super }} » {% trans "Delete StreamSetup" %}{% endblock %}
+{% block breadcrumb %}{{ block.super }} » {% trans "Delete Channel" %}{% endblock %}
 {% block content %}
-<h2>{% trans "Delete StreamSetup" %}</h2>
+<h2>{% trans "Delete Channel" %}</h2>
 <form method="POST" action=".">
 {% csrf_token %}
 <p>{% trans "Should the object" %} "{{ object }}" {% trans "really be deleted" %}</p>

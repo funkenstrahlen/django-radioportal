@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     # # statistic, temp-hack
     # url(r'^statistic/$', list_detail.object_list,
     #    {
-    #        'queryset': StreamSetup.objects.select_related().all(),
+    #        'queryset': Channel.objects.select_related().all(),
     #        'template_name': 'portal/statistic.html',
     #    },
     #    name="statistic"

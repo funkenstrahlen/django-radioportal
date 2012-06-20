@@ -1,7 +1,7 @@
 {% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
 {% block breadcrumb %}
 {{ block.super }} » 
-	{% if object %}{{ object }}{% else %}{% trans "Create new StreamSetup" %}{% endif %}
+	{% if object %}{{ object }}{% else %}{% trans "Create new Channel" %}{% endif %}
 {% endblock %}
 {% block head_js %}
 {{ block.super }}
@@ -47,27 +47,29 @@
 {% endblock %}
 {% block content %}
 
-<h2>{% if object %}{% trans "Edit StreamSetup" %}{% else %}{% trans "Create new StreamSetup" %}{% endif %}</h2>
+{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url admin-auphonic-settings object.id on dashboard %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}
+
+<h2>{% if object %}{% trans "Edit Channel" %}{% else %}{% trans "Create new Channel" %}{% endif %}</h2>
 <form action="" method="POST">
 {% csrf_token %}
 <table>
 {{ form.forms.0.as_table }}
 
-<tr><td colspan="2"><h3>{% trans "Sourced Streams" %}</h3>{{ form.forms.1.management_form }}</td></tr>
+<tr><td colspan="2"><h3>{% trans "Sourced Streams" %}</h3></td></tr>
 {% for f in form.forms.1 %}
 <tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Sourced Stream" %}{% endif %}</h4></td></tr>
 {{ f.as_table }}
 {% endfor %}
 
 {% if form.forms.2 %}
-<tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3>{{ form.forms.2.management_form }}</td></tr>
+<tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3></td></tr>
 {% endif %}
 {% for f in form.forms.2 %}
 <tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Recoded Stream" %}{% endif %}</h4></td></tr>
 {{ f.as_table }}
 {% endfor %}
 
-<tr><td colspan="2"><input type="submit" value="{% trans "Save StreamSetup" %}" /></td></tr>
+<tr><td colspan="2">{{ form.forms.1.management_form }}{{ form.forms.2.management_form }}<input type="submit" value="{% trans "Save Channel" %}" /></td></tr>
 </table>
 </form>
 {% endblock %}

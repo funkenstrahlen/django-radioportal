@@ -16,7 +16,7 @@ from radioportal import models
 from django.utils.safestring import mark_safe
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms.widgets import Media, HiddenInput, SelectMultiple
-from radioportal.models import StreamSetup, RecodedStream, SourcedStream, Stream
+from radioportal.models import Channel, RecodedStream, SourcedStream, Stream
 
 import jsonfield.forms
 
@@ -209,7 +209,7 @@ class OrderedSelectMultiple(SelectMultiple):
         }
 
 
-class StreamSetupForm(forms.ModelForm):
+class ChannelForm(forms.ModelForm):
     required_css_class = "required"
     mapping_method = jsonfield.forms.JSONFormField #widget=OrderedSelectMultiple(choices=MAPPINGS))
     class Meta:
@@ -219,7 +219,7 @@ class StreamSetupForm(forms.ModelForm):
           ('nothing','nothing'),
           ('default', _("Default")),)
     
-        model = models.StreamSetup
+        model = models.Channel
         exclude = ('running', 'streamCurrentSong', 'streamGenre', 'streamShow',
                    'streamDescription', 'streamURL', 'currentEpisode', 'feed',
                    'graphic_differ_by', 'graphic_title')
@@ -265,10 +265,10 @@ class ShowFeedForm(forms.ModelForm):
 
 FeedFormSet = inlineformset_factory(models.Show, models.ShowFeed)
 
-StreamFormSet = inlineformset_factory(StreamSetup, Stream, form=StreamForm)
+StreamFormSet = inlineformset_factory(Channel, Stream, form=StreamForm)
 
-SourcedStreamFormSet = inlineformset_factory(StreamSetup, SourcedStream, form=SourcedStreamForm)
-RecodedStreamFormSet = inlineformset_factory(StreamSetup, RecodedStream, form=RecodedStreamForm)
+SourcedStreamFormSet = inlineformset_factory(Channel, SourcedStream, form=SourcedStreamForm)
+RecodedStreamFormSet = inlineformset_factory(Channel, RecodedStream, form=RecodedStreamForm)
 
 class GraphicForm(forms.ModelForm):
     required_css_class = "required"
@@ -372,16 +372,16 @@ class CompoundModelForm:
     def is_bound(self):
         return True
 
-class StreamSetupPlainCompoundForm(CompoundModelForm):
+class ChannelPlainCompoundForm(CompoundModelForm):
     required_css_class = "required"
     form_classes = [
-        StreamSetupForm,
+        ChannelForm,
     ]
     
-class StreamSetupCompoundForm(CompoundModelForm):
+class ChannelCompoundForm(CompoundModelForm):
     required_css_class = "required"
     form_classes = [
-        StreamSetupForm,
+        ChannelForm,
         SourcedStreamFormSet,
         RecodedStreamFormSet,
     ]

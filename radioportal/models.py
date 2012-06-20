@@ -183,10 +183,10 @@ class Recording(models.Model):
     running = models.BooleanField()
 
 
-class StreamSetup(models.Model):
+class Channel(models.Model):
     # Status
     #running = models.BooleanField(default=False,
-    #    help_text=_("A Stream of this setup is running"))
+    #    help_text=_("A Stream of this channel is running"))
     def running(self):
         return self.stream_set.filter(running=True).count() > 0
 
@@ -207,7 +207,7 @@ class StreamSetup(models.Model):
         help_text=_(u"Property »url« from stream meta data"))
 
     show = models.ManyToManyField(Show, blank=True, null=True,
-        help_text=_('show which is assigned to this setup'),
+        help_text=_('show which is assigned to this channel'),
         verbose_name=_('Associated shows'))
 
     mapping_method = jsonfield.JSONField(
@@ -233,7 +233,7 @@ class StreamSetup(models.Model):
         self.save()
 
     def __unicode__(self):
-        return _("Setup for %(cluster)s") % {'cluster': self.cluster}
+        return _("Channel for %(cluster)s") % {'cluster': self.cluster}
 
     class Meta:
         permissions = (
@@ -247,7 +247,7 @@ class Stream(models.Model):
         Relays
     """
 
-    setup = models.ForeignKey(StreamSetup)
+    channel = models.ForeignKey(Channel)
 
     mount = models.CharField(max_length=80, unique=True)
     running = models.BooleanField(default=False)
@@ -305,8 +305,8 @@ class Stream(models.Model):
     def updateRunning(self):
         self.running = False
         self.save()
-        if self.setup_id:
-            self.setup.updateRunning()
+        if self.channel_id:
+            self.channel.updateRunning()
 
     def __unicode__(self):
         return unicode("%s at %s at %s" % \
@@ -382,7 +382,7 @@ class Status(models.Model):
 # post_save.connect(saved, EpisodePart)
 # post_save.connect(saved, Graphic)
 # post_save.connect(saved, Recording)
-# post_save.connect(saved, StreamSetup)
+# post_save.connect(saved, Channel)
 # post_save.connect(saved, Stream)
 # post_save.connect(saved, SourcedStream)
 # post_save.connect(saved, RecodedStream)

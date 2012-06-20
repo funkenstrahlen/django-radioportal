@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, StreamSetup, Episode, ShowFeed, EpisodePart
+from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart
 from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
@@ -120,7 +120,7 @@ class LandingView(TemplateResponseMixin, View):
         ctx = {}
         ctx['shows'] = get_objects_for_user(request.user, 'radioportal.change_show', Show).extra(
 			select={'lower_name': 'lower(name)'}).order_by('lower_name')
-        ctx['setups'] = get_objects_for_user(request.user, 'radioportal.change_streamsetup').order_by('cluster')
+        ctx['channels'] = get_objects_for_user(request.user, 'radioportal.change_channel').order_by('cluster')
         return self.render_to_response(ctx)
 
     @method_decorator(login_required)
@@ -292,7 +292,7 @@ class EpisodeDeleteView(DeleteView):
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if hasattr(self.object, "streamsetup"):
+        if hasattr(self.object, "channel"):
             return HttpResponse("Currently Running Episodes cannot be deleted")
         return super(EpisodeDeleteView, self).delete(request, *args, **kwargs)
 
@@ -317,58 +317,69 @@ class EpisodePartEditView(UpdateView):
         return super(EpisodePartEditView, self).dispatch(*args, **kwargs)
 
 
-class StreamSetupCreateView(CreateView):
-    template_name = "radioportal/dashboard/streamsetup_edit.html"
-    success_url = '/dashboard/streamsetup/%(id)s/'
-    form_class = dforms.StreamSetupPlainCompoundForm
-    model = StreamSetup
+class ChannelCreateView(CreateView):
+    template_name = "radioportal/dashboard/channel_edit.html"
+    success_url = '/dashboard/channel/%(id)s/'
+    form_class = dforms.ChannelPlainCompoundForm
+    model = Channel
 
     def get_form_class(self):
-        form_class = super(StreamSetupCreateView, self).get_form_class()
+        form_class = super(ChannelCreateView, self).get_form_class()
         qs = get_objects_for_user(self.request.user, "change_show", Show)
         form_class.form_classes[0].base_fields['show'].queryset = qs
         return form_class
 
-    @method_decorator(permission_required('add_streamsetup'))
+    @method_decorator(permission_required('add_channel'))
     def dispatch(self, *args, **kwargs):
-        return super(StreamSetupCreateView, self).dispatch(*args, **kwargs)
+        return super(ChannelCreateView, self).dispatch(*args, **kwargs)
 
 
-class StreamSetupEditView(UpdateView):
-    template_name = "radioportal/dashboard/streamsetup_edit.html"
-    success_url = '/dashboard/streamsetup/%(id)s/'
-    form_class = dforms.StreamSetupCompoundForm
-    model = StreamSetup
+class ChannelEditView(UpdateView):
+    template_name = "radioportal/dashboard/channel_edit.html"
+    success_url = '/dashboard/channel/%(id)s/'
+    form_class = dforms.ChannelCompoundForm
+    model = Channel
 
     def get_form_class(self):
-        form_class = super(StreamSetupEditView, self).get_form_class()
+        form_class = super(ChannelEditView, self).get_form_class()
         qs = get_objects_for_user(self.request.user, "change_show", Show)
         form_class.form_classes[0].base_fields['show'].queryset = qs
         return form_class
 
     def get_context_data(self, **kwargs):
-        ctx = super(StreamSetupEditView, self).get_context_data(**kwargs)
+        ctx = super(ChannelEditView, self).get_context_data(**kwargs)
         ctx['show'] = self.object.show
         return ctx
 
     def get_form_kwargs(self):
-        kwargs = super(StreamSetupEditView, self).get_form_kwargs()
-        if self.request.user.has_perm('radioportal.change_stream', self.object):
+        kwargs = super(ChannelEditView, self).get_form_kwargs()
+        if self.request.user.has_perm('radioportal.add_stream', self.object):
             kwargs['extra'] = 1
         else:
             kwargs['extra'] = 0
-        kwargs['can_delete'] = self.request.user.has_perm('radioportal.change_stream', self.object)
+        kwargs['can_delete'] = self.request.user.has_perm('radioportal.delete_stream', self.object)
         return kwargs
 
-    @method_decorator(permission_required('change_streamsetup', (StreamSetup, 'pk', 'pk')))
+    @method_decorator(permission_required('change_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
-        return super(StreamSetupEditView, self).dispatch(*args, **kwargs)
+        return super(ChannelEditView, self).dispatch(*args, **kwargs)
 
-class StreamSetupDeleteView(DeleteView):
-    template_name = "radioportal/dashboard/streamsetup_delete.html"
+class ChannelClusterEditView(ChannelEditView):
+    slug_field = "cluster"
+
+    def get_object(self):
+        return Channel.objects.get(cluster=self.kwargs.get("slug"))
+
+    @method_decorator(permission_required('change_channel', (Channel, 'cluster', 'slug'), return_403=True))
+    def dispatch(self, *args, **kwargs):
+        return super(UpdateView, self).dispatch(*args, **kwargs)
+
+
+class ChannelDeleteView(DeleteView):
+    template_name = "radioportal/dashboard/channel_delete.html"
     success_url = "/dashboard/"
-    model = StreamSetup
+    model = Channel
 
-    @method_decorator(permission_required('delete_streamsetup', (StreamSetup, 'pk', 'pk')))
+    @method_decorator(permission_required('delete_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
-        return super(StreamSetupDeleteView, self).dispatch(*args, **kwargs)
+        return super(ChannelDeleteView, self).dispatch(*args, **kwargs)
