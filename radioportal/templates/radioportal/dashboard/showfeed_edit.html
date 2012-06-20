@@ -21,6 +21,11 @@ specify a regular expression to separate the title of a feed entry into a id for
 topic of this episode. This is used to correlate an entry from the feed with an episode of the xenim
 streaming network. The regular expression should contain the two named groups "id" and "topic". An
 Example for an entry like "MM073 Creepy" is "(?P<id>\w*) (?P<topic>.*)".{% endblocktrans %}</p>
+<p>Mit der Aktualisierung aus dem iCal-Feed werden aus den Einträgen im iCal-Feed geplante Sendungen
+ generiert. Dazu müssen der Startzeitpunkt der Einträge in der Zukunft liegen und das Feld "SUMMARY"
+ mit der gewünschten Folgen-ID beginnen, zum Beispiel "SUMMARY:MM091 Live". Existiert bereits eine
+geplante Folge mit dieser ID, so werden die Informationen dieser Folge aktualisiert. Enthält das Feld
+DESCRIPTION das Tag #noshow, so wird dieser Eintrag übersprungen.</p>
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <table>
