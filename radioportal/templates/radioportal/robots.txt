@@ -4,3 +4,4 @@ Disallow: /wiki/
 {% for s in streams %}Disallow: /{{ s.mount }}
 Disallow: /{{ s.mount }}.m3u
 {% endfor %}Disallow: /statistics/
+Disallow: /live.m3u

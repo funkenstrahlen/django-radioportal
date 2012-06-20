@@ -28,7 +28,7 @@
 {% for episode in running %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
 {% else %}
-<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}</h2>
+<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}&nbsp;<a href="http:{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
 {% endif %}
 
 {% if upcoming %}
