@@ -10,8 +10,9 @@
 	{% include "radioportal/episodes/episode_streams_head_js.html" %}
 {% endblock %}
 {% block head %}
-
+{% if show %}
 <link href="http:{% host_url show-feed show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+{% endif %}
 {% endblock %}
 {% block feed_footer %}
 
@@ -44,6 +45,7 @@
 {% endblock %}
 {% block content %}
 {% block list_head %}
+{% if show %}
 {% cache 900 episode_list_head show.slug %}
 <div class="showheader">
 {% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" alt="{{ show.name }} logo" />{% endif %}
@@ -52,6 +54,7 @@
 <p>{{ show.abstract }}</p>
 </div>
 {% endcache %}
+{% endif %}
 {% endblock %}
 {% if object_list %}
 {% for episode in object_list %}

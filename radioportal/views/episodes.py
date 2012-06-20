@@ -49,8 +49,8 @@ class ShowView(ListView):
     def get_queryset(self):
         qs = Episode.objects.all().annotate(begin=Min('parts__begin')).order_by('-begin')
         if 'show_name' in self.kwargs:
-            self.allow_empty = False
-            if Show.objects.filter(slug=self.kwargs['show_name']).count() == 0:
+            if not Show.objects.filter(slug=self.kwargs['show_name']).exists():
+                self.allow_empty = False
                 return Episode.objects.none()
             qs = qs.filter(show__slug=self.kwargs['show_name'])
         if hasattr(self, 'what'):
