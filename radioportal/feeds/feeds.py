@@ -4,11 +4,12 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, rfc3339_date
 
-
 from django.db.models.aggregates import Max, Sum, Min
 
 import vobject
 import datetime
+import pytz
+
 from django_hosts.reverse import reverse_full
 
 from radioportal.models import Show, Episode, Channel
@@ -76,9 +77,15 @@ class ShowFeed(Feed):
 
     def item_extra_kwargs(self, item):
         #print type(item), type(item.begin), type(item.end)
+        tz = pytz.timezone(settings.TIME_ZONE)
+        begin = item.begin()
+        begin = tz.localize(begin)
+        end = item.end
+        if end:
+            end = tz.localize(end)
         extra_dict = {
-            'begin': item.begin(),
-            'end': item.end,
+            'begin': begin,
+            'end': end,
         }
         if item.status == "RUNNING":
             try:
