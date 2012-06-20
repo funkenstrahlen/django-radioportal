@@ -21,6 +21,10 @@ def startswith(value, arg):
         return False
     return value.startswith(arg)
 
+@register.filter
+def sameday(date1, date2):
+    """Usage, {% if date1|sameday:date2 %}"""
+    return date1.year == date2.year and date1.month == date2.month and date1.day == date2.day
 
 @register.filter
 def contains(value, arg):
