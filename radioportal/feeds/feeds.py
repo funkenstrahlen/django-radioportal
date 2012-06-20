@@ -11,7 +11,7 @@ import vobject
 import datetime
 from django_hosts.reverse import reverse_full
 
-from radioportal.models import Show, Episode
+from radioportal.models import Show, Episode, Channel
 from django.conf import settings
 
 _mapping = {'live': 'RUNNING', 'upcoming': 'UPCOMING', 'recent': 'ARCHIVED'}
@@ -33,10 +33,21 @@ class StreamAtom1Feed(Atom1Feed):
         attrs['xmlns:xsn'] = 'http://static.streams.xenim.de/feed-1.0.dtd'
         return attrs
 
+    def add_root_elements(self, handler):
+        super(StreamAtom1Feed, self).add_root_elements(handler)
+        if 'icon' in self.feed and self.feed['icon']:
+            handler.addQuickElement('xsn:icon', self.feed['icon'])
+
     def add_item_elements(self, handler, item):
         super(StreamAtom1Feed, self).add_item_elements(handler, item)
         handler.addQuickElement('xsn:begin', rfc3339_date(item['begin']))
-        handler.addQuickElement('xsn:end', rfc3339_date(item['end']))
+        if item['end']:
+            handler.addQuickElement('xsn:end', rfc3339_date(item['end']))
+        if 'icon' in item and item['icon']:
+            handler.addQuickElement('xsn:icon', item['icon'])
+        if 'streams' in item:
+            for stream in item['streams']:
+                handler.addQuickElement('xsn:stream', stream)
 
 
 class ShowFeed(Feed):
@@ -69,6 +80,22 @@ class ShowFeed(Feed):
             'begin': item.begin(),
             'end': item.end,
         }
+        if item.status == "RUNNING":
+            try:
+                extra_dict['streams'] = []
+                for stream in item.channel.stream_set.all():
+                    url = reverse_full("www", "mount", view_kwargs={'stream':stream.mount})
+                    extra_dict['streams'].append("http:%s" % url)
+            except Channel.DoesNotExist:
+                pass
+        if item.show.icon:
+            extra_dict['icon'] = "http:%s" % item.show.icon.url
+        return extra_dict
+
+    def feed_extra_kwargs(self, obj):
+        extra_dict = {}
+        if hasattr(obj[0], 'icon') and obj[0].icon:
+            extra_dict['icon'] = "http:%s" % obj[0].icon.url
         return extra_dict
 
     def item_author_name(self, item):
