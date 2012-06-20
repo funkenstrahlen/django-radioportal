@@ -10,6 +10,9 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
+    url(r'^auphonic/', include('radioportal_auphonic.urls')),
+    url(r'^control/', include('radioportal_control.urls')),
+
     url(r'^admin/', include(admin.site.urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n', 'django.views.i18n.javascript_catalog', name="jsi18n"),

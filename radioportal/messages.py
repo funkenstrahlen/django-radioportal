@@ -88,6 +88,7 @@ dto_map = {
     "sourcedstream": DTOSourcedStream,
     "showfeed": DTOShowFeed,
     "userprofile": DTOUserProfile,
+    "auphonicsettings": DTOAuphonic,
 }
 
 class DTOSerializer(object):
@@ -491,6 +492,82 @@ class BackendInterpreter(object):
         publisher.close()
         conn.close()
         logger.debug("Object list to %s sent" % unicode(data['answer']))
+
+    def feed_updated(self, data):
+        data = simplejson.loads(data)
+        if data['global']['type'] == 'calendar':
+            try:
+                show = Show.objects.get(slug=data['showid'])
+            except Show.DoesNotExist:
+                return
+            for id, e in data['entries'].iteritems():
+                slug = e['title'].split()[0] # get first word from title
+                slug = re.sub("\W", "", slug) # remove non alpha numeric chars
+                try:
+                    ep = Episode.objects.get(show=show, slug=slug, status=Episode.STATUS[2][0])
+                except Episode.DoesNotExist:
+                    ep = Episode(show=show, slug=slug, status=Episode.STATUS[2][0])
+                    ep.save()
+                    epp = EpisodePart(episode=ep)
+                    epp.begin = dateutil.parser.parse(e['begin'], ignoretz=True)
+                    epp.save()
+                    ep.current_part = epp
+                    ep.save()
+                epp = ep.current_part
+                epp.begin = dateutil.parser.parse(e['begin'], ignoretz=True)
+                if 'end' in e:
+                    epp.end = dateutil.parser.parse(e['end'], ignoretz=True)
+                if 'url' in e:
+                    epp.url = e['url']
+                if 'description' in e:
+                    epp.description = e['description']
+                title = e['title'].split(None, 1)
+                if len(title) == 2:
+                    epp.title = title[1]
+                else:
+                    epp.title = ""
+                epp.save()
+        elif data['global']['type'] == 'podcast':
+            try:
+                show = Show.objects.get(slug=data['showid'])
+            except Show.DoesNotExist:
+                return
+            for item in ('url', 'description', 'abstract'):
+                if item in data['global']:
+                    setattr(show, item, data['global'][item])
+            show.save()
+            if 'icon' in data['global']:
+                # print "got icon url: ", data['global']['icon']
+                fetch_icon = True
+                if show.icon:
+                    # print "existing icon"
+                    local_modtime = show.icon.get_source_modtime()
+                    request = urllib2.Request(data['global']['icon'])
+                    request.get_method = lambda : 'HEAD'
+                    response = urllib2.urlopen(request)
+                    time_s = response.headers['last-modified']
+                    time_d = dateutil.parser.parse(time_s)
+                    remote_modtime = time_d.strftime("%s")
+                    # print "local time", local_modtime
+                    # print "remote time", remote_modtime
+                    # print "comparison: ", (int(remote_modtime) <= int(local_modtime))
+                    if int(remote_modtime) <= int(local_modtime):
+                        # print "don't fetch"
+                        fetch_icon = False
+                # print "fetch icon: ", fetch_icon
+                if fetch_icon:
+                    fname = urlparse.urlsplit(data['global']['icon']).path.split("/")[-1]
+                    path = show._meta.get_field_by_name("icon")[0].upload_to
+                    fname = os.path.join(settings.MEDIA_ROOT, path, "%s-%s" % (show.slug, fname))
+                    # print "name to save to:", fname
+                    file, info = urllib.urlretrieve (data['global']['icon'], fname)
+                    # print "retrieve result: ", file, info
+                    options = show._meta.get_field_by_name("icon")[0].resize_source
+                    thumbnailer = easy_thumbnails.files.get_thumbnailer(file)
+                    content = thumbnailer.generate_thumbnail(options)
+                    # print content
+                    show.icon = content
+                    show.save()
 
 import traceback
 
