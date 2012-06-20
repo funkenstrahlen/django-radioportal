@@ -264,11 +264,16 @@ class EpisodeCreateView(CreateView):
 
     def form_valid(self, form):
         s = Show.objects.get(slug=self.kwargs['slug'])
-        s.nextEpisodeNumber+=1
-        s.save()
         if form.instance.episode_id is None:
+            qs = Episode.objects.filter(slug=form.cleaned_data['slug'], show=s)
+            if qs.count() > 0:
+                msg = u"An episode with this slug already exists in this show"
+                form._errors["slug"] = form.error_class([msg])
+                return super(EpisodeCreateView, self).form_invalid(form)
             e = Episode(slug=form.cleaned_data['slug'], show=s)
             e.save()
+            s.nextEpisodeNumber+=1
+            s.save()
             form.instance.episode = e
         return super(EpisodeCreateView, self).form_valid(form)
 
