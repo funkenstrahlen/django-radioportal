@@ -14,7 +14,7 @@ from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from radioportal.dashboard import forms as dforms
 
@@ -176,7 +176,11 @@ class ShowFeedEditView(UpdateView):
     model = ShowFeed
     form_class = dforms.ShowFeedForm
     
-    def get_object(self, queryset=None):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(request=request)
+        return super(BaseUpdateView, self).get(request, *args, **kwargs)
+
+    def get_object(self, queryset=None, request=None):
         """
         Returns the object the view is displaying.
 
@@ -193,22 +197,25 @@ class ShowFeedEditView(UpdateView):
         slug = self.kwargs.get('slug', None)
         if pk is not None:
             queryset = queryset.filter(pk=pk)
-
         # Next, try looking up by slug.
         elif slug is not None:
             slug_field = self.get_slug_field()
             queryset = queryset.filter(**{slug_field: slug})
-
         # If none of those are defined, it's an error.
         else:
             raise AttributeError(u"Generic detail view %s must be called with "
                                  u"either an object pk or a slug."
                                  % self.__class__.__name__)
-
         try:
             obj = queryset.get()
         except ObjectDoesNotExist:
             obj = ShowFeed(show=Show.objects.get(slug=slug))
+            obj.save()
+        
+        if request is not None:
+            if not request.user.has_perm('change_show', obj.show):
+                raise PermissionDenied()
+
         return obj
     
     def get_success_url(self):
@@ -240,7 +247,7 @@ class EpisodeListView(ListView):
 
 class EpisodeCreateView(CreateView):
     template_name = "radioportal/dashboard/episode_create.html"
-    success_url = '/dashboard/episode/%(id)s/'
+    success_url = '/dashboard/episodepart/%(id)s/'
     form_class = dforms.CreateEpisodeForm
     model = Episode
 

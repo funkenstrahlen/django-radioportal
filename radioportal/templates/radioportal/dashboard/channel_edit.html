@@ -47,7 +47,7 @@
 {% endblock %}
 {% block content %}
 
-{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url admin-auphonic-settings object.id on dashboard %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}
+{% comment %}{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url admin-auphonic-settings object.id on dashboard %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}{% endcomment %}
 
 <h2>{% if object %}{% trans "Edit Channel" %}{% else %}{% trans "Create new Channel" %}{% endif %}</h2>
 <form action="" method="POST">
