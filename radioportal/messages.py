@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
 
 from django.db.models import Min
+from django.db import connection
 from django.conf import settings
 
 import radioportal
@@ -193,14 +194,11 @@ class LatestPlannedEpisode(EpisodeFinder):
         return _("Try to find the earliest possible, existing, upcoming episode")
 
     def get_episode(self, channel, metadata):
-        try:
-            episode = Episode.objects.filter(
-                        show__in=channel.show.all(), 
-                        status='UPCOMING').annotate(
-                           begin=Min('parts__begin')).order_by('begin')[0]
-            return episode
-        except:
-            pass
+        episode = Episode.objects.filter(
+                    show__in=channel.show.all(), 
+                    status='UPCOMING').annotate(
+                       begin=Min('parts__begin')).order_by('begin')[0]
+        return episode
 
 
 class MakeEpisodeMixin(object):
@@ -307,6 +305,7 @@ class BackendInterpreter(object):
                 print "method", method, "failed"
                 print traceback.format_exc()
                 logger.warning("Mapping method %s failed: %s" % (method, e))
+                connection._rollback()
             if episode:
                 break
                 
@@ -599,6 +598,7 @@ def process_message(message_data, message):
     except Exception as inst:
         print traceback.format_exc()
         logger.exception(inst)
+        connection._rollback()
     message.ack()
 
 class AMQPInitMiddleware(object):
