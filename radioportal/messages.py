@@ -526,7 +526,7 @@ class BackendInterpreter(object):
                 if 'url' in e:
                     epp.url = e['url']
                 if 'description' in e:
-                    epp.description = e['description']
+                    epp.description = e['description'][:200]
                 title = e['title'].split(None, 1)
                 if len(title) == 2:
                     epp.title = title[1]
@@ -538,9 +538,10 @@ class BackendInterpreter(object):
                 show = Show.objects.get(slug=data['showid'])
             except Show.DoesNotExist:
                 return
+            limit = {'url': 180, 'description': 180, 'abstract': 400}
             for item in ('url', 'description', 'abstract'):
                 if item in data['global']:
-                    setattr(show, item, data['global'][item])
+                    setattr(show, item, data['global'][item][:limit[item]])
             show.save()
             if 'icon' in data['global']:
                 # print "got icon url: ", data['global']['icon']
