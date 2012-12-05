@@ -161,6 +161,13 @@ class EpisodePart(models.Model):
     class Meta:
         ordering = ['-id']
 
+class Marker(models.Model):
+    episode = models.ForeignKey(EpisodePart)
+    pointoftime = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255)
+    link = models.URLField(blank=True, verify_exists=False)
+    delete = models.BooleanField(default=True)
+
 class Graphic(models.Model):
     file = models.ImageField(upload_to='archiv', blank=True)
     episode = models.ForeignKey('EpisodePart', related_name='graphics')

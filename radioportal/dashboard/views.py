@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart
+from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker
 from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
@@ -397,3 +397,15 @@ class ChannelDeleteView(DeleteView):
     @method_decorator(permission_required('delete_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(ChannelDeleteView, self).dispatch(*args, **kwargs)
+
+# class MarkerListView(ListView):
+#     model = Marker
+# 
+#     template_name = "radioportal/dashboard/marker_list.html"
+# 
+#     def get_queryset(self):
+#         self.episodepart = get_object_or_404(EpisodePart, id=self.args[0])
+#         return Marker.objects.filter(episode=self.episodepart)
+# 
+# class MarkerCreateView(CreateView):
+#     model = Marker
