@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-09 14:43+0200\n"
+"POT-Creation-Date: 2012-04-13 19:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,59 +18,88 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: models.py:15
+#: messages.py:129
+msgid "Does nothing."
+msgstr "Tut nichts."
+
+#: messages.py:140
+msgid "Try to find an existing episode with a slug,"
+msgstr ""
+
+#: messages.py:162
+msgid "Try to find the earliest possible, existing, upcoming episode"
+msgstr ""
+
+#: messages.py:192
+msgid "Create a new episode using the episodeNumber stored in the show"
+msgstr ""
+
+#: messages.py:206
+msgid "Create a new episode by incrementing the number of"
+msgstr ""
+
+#: messages.py:229
+#, python-format
+msgid "Find or create an episode named \"%s\""
+msgstr ""
+
+#: models.py:20
 msgid "Name of the show"
 msgstr "Name der Sendung"
 
-#: models.py:19
+#: models.py:24
 msgid "Homepage of the Show"
 msgstr "Webseite der Sendung"
 
-#: models.py:23 models.py:135
+#: models.py:30 models.py:151
 msgid "Description"
 msgstr "Beschreibung"
 
-#: models.py:25
+#: models.py:32
 msgid "Longer description of the show"
 msgstr "Ausführliche Beschreibung"
 
-#: models.py:28
+#: models.py:35
 msgid "none"
 msgstr ""
 
-#: models.py:29
+#: models.py:36
 msgid "cc-by"
 msgstr ""
 
-#: models.py:30
+#: models.py:37
 msgid "cc-by-sa"
 msgstr ""
 
-#: models.py:31
+#: models.py:38
 msgid "cc-by-nd"
 msgstr ""
 
-#: models.py:32
+#: models.py:39
 msgid "cc-by-nc"
 msgstr ""
 
-#: models.py:33
+#: models.py:40
 msgid "cc-by-nc-sa"
 msgstr ""
 
-#: models.py:34
+#: models.py:41
 msgid "cc-by-nc-nd"
 msgstr ""
 
-#: models.py:41
+#: models.py:46
+msgid "Licence"
+msgstr "Lizenz"
+
+#: models.py:49
 msgid "Used to construct the episode"
 msgstr "Wird verwendet, um Folgen zu erstellen"
 
-#: models.py:43
+#: models.py:51
 msgid "Abbreviation of the show"
 msgstr "Abkürzung des Sendungsnamens"
 
-#: models.py:45
+#: models.py:53
 msgid ""
 "The number of the next episode to be aired. Used to construct the episode "
 "identifier"
@@ -78,23 +107,27 @@ msgstr ""
 "Nummer der nächsten gesendeten Folge. Wird verwendet, um den Bezeichner "
 "einer neuen Folge zu erstellen."
 
-#: models.py:46
+#: models.py:54
 msgid "Number of the next episode"
 msgstr "Nummer der nächsten Folge"
 
-#: models.py:55
+#: models.py:66
 msgid "Delete Episodes"
 msgstr "Lösche Folgen"
 
-#: models.py:62
+#: models.py:71
+msgid "Enable"
+msgstr "Aktivieren"
+
+#: models.py:73
 msgid "Feed of the podcast"
 msgstr "Feed des Podcasts"
 
-#: models.py:64
+#: models.py:75
 msgid "Regular expression for the title"
 msgstr "Regulärer Ausdruck für den Titel"
 
-#: models.py:65
+#: models.py:76
 msgid ""
 "Used to extract the id and title from the »title« field of the feed. Should "
 "contain the match groups »id« and »title«. "
@@ -102,185 +135,215 @@ msgstr ""
 "Wird verwendet, um die ID der Folge und den Titel aus dem Feed zu "
 "separieren. Sollte die Gruppen »id« und »title« enthalten."
 
-#: models.py:74
+#: models.py:78
+msgid "iCal feed for upcoming shows"
+msgstr ""
+
+#: models.py:87
 msgid "Archived Episode"
 msgstr "Archivierte Folge"
 
-#: models.py:75
+#: models.py:88
 msgid "Running Episode"
 msgstr "Laufende Folge"
 
-#: models.py:76
+#: models.py:89
 msgid "Upcoming Episode"
 msgstr "Geplante Folge"
 
-#: models.py:78
+#: models.py:91
 msgid "Show"
 msgstr "Sendung"
 
-#: models.py:80
+#: models.py:93
 msgid "Short Name"
 msgstr "Abgekürzter Name"
 
-#: models.py:133
+#: models.py:149
 msgid "Topic"
 msgstr "Thema"
 
-#: models.py:136
+#: models.py:152
 msgid "Begin"
 msgstr "Anfang"
 
-#: models.py:137
+#: models.py:153
 msgid "End"
 msgstr "Ende"
 
-#: models.py:139
+#: models.py:155
 msgid "Page of the Episode"
 msgstr "Webseite zur Folge"
 
-#: models.py:140
+#: models.py:156
 msgid "URL"
 msgstr "URL"
 
-#: models.py:179
+#: models.py:195
 msgid "Stream identifier from backend"
 msgstr "Kennung des Streams (für internen Gebrauch)"
 
-#: models.py:182
+#: models.py:198
 msgid "Property »current_song« from stream meta data"
 msgstr ""
 
-#: models.py:184
+#: models.py:200
 msgid "Property »genre« from stream meta data"
 msgstr ""
 
-#: models.py:186
+#: models.py:202
 msgid "Property »show« from stream meta data"
 msgstr ""
 
-#: models.py:189
+#: models.py:205
 msgid "Property »description« from stream meta data"
 msgstr ""
 
-#: models.py:191
+#: models.py:207
 msgid "Property »url« from stream meta data"
 msgstr ""
 
-#: models.py:194
-msgid "show which is assigned to this setup"
-msgstr "Sendungen, die diesem Setup zugeordnet sind"
+#: models.py:210
+msgid "show which is assigned to this channel"
+msgstr "Sendungen, die diesem Channel zugeordnet sind"
 
-#: models.py:195
+#: models.py:211
 msgid "Associated shows"
 msgstr "Zugeordnete Sendungen"
 
 #: models.py:214
-#, python-format
-msgid "Setup for %(cluster)s"
-msgstr "Setup für %(cluster)s"
+msgid "Method for mapping between streams and episodes"
+msgstr "Algorithmus zur Zuordnung von Folgen zu Streams"
 
-#: models.py:234
-msgid "MP3"
-msgstr ""
-
-#: models.py:235
-msgid "AAC"
+#: models.py:215
+msgid ""
+"Configure order for mapping methods. Use drop-down box for adding new items, "
+"[x] for removing items and drag&drop for changing order."
 msgstr ""
 
 #: models.py:236
+#, python-format
+msgid "Channel for %(cluster)s"
+msgstr "Channel für %(cluster)s"
+
+#: models.py:256
+msgid "MP3"
+msgstr ""
+
+#: models.py:257
+msgid "AAC"
+msgstr ""
+
+#: models.py:258
 msgid "Ogg/Vorbis"
 msgstr ""
 
-#: models.py:237
+#: models.py:259
 msgid "Ogg/Theora"
 msgstr ""
 
-#: models.py:245
+#: models.py:298
 msgid "UTF-8"
 msgstr ""
 
-#: models.py:246
+#: models.py:299
 msgid "ISO8859-15"
 msgstr ""
 
-#: models.py:263
+#: models.py:316
+msgid "No Fallback"
+msgstr ""
+
+#: models.py:317
 msgid "Sine"
 msgstr ""
 
-#: models.py:264
+#: models.py:318
 msgid "Square"
 msgstr ""
 
-#: models.py:265
+#: models.py:319
 msgid "Saw"
 msgstr ""
 
-#: models.py:266
+#: models.py:320
 msgid "Triangle"
 msgstr ""
 
-#: models.py:267
+#: models.py:321
 msgid "Silence"
 msgstr ""
 
-#: models.py:268
+#: models.py:322
 msgid "White uniform noise"
 msgstr ""
 
-#: models.py:269
+#: models.py:323
 msgid "Pink noise"
 msgstr ""
 
-#: models.py:270
+#: models.py:324
 msgid "Sine table"
 msgstr ""
 
-#: models.py:271
+#: models.py:325
 msgid "Periodic Ticks"
 msgstr ""
 
-#: models.py:272
+#: models.py:326
 msgid "White Gaussian noise"
 msgstr ""
 
-#: dashboard/forms.py:310
+#: dashboard/forms.py:159
+msgid "Duration"
+msgstr "Dauer"
+
+#: dashboard/forms.py:217
+msgid ""
+"Create new episode, get episode number by adding one to last episode number"
+msgstr ""
+
+#: dashboard/forms.py:218
+msgid "Append new episode part to generic episode \"live\""
+msgstr ""
+
+#: dashboard/forms.py:220
+msgid "Default"
+msgstr ""
+
+#: dashboard/forms.py:354
 msgid "Associated"
 msgstr ""
 
-#: feeds/feeds.py:37 templates/radioportal/episodes/episode_list_now.html:2
+#: feeds/feeds.py:53 templates/radioportal/episodes/episode_list_now.html:2
 #: templates/radioportal/episodes/episode_list_now.html:3
 msgid "Running episodes"
 msgstr "Laufende Folgen"
 
-#: feeds/feeds.py:38
+#: feeds/feeds.py:54
 msgid "Currently streamed episodes on xenim streaming network"
 msgstr "Momentan über das xenim streaming network gesendete Folgen"
 
-#: feeds/feeds.py:41
+#: feeds/feeds.py:57
 msgid "Upcoming episodes"
 msgstr "Geplante Folgen"
 
-#: feeds/feeds.py:42
+#: feeds/feeds.py:58
 msgid "Episodes which are scheduled to be aired in the future"
 msgstr "Folgen deren Ausstrahlung geplant ist."
 
-#: feeds/feeds.py:45
+#: feeds/feeds.py:61
 msgid "Archived episodes"
 msgstr "Archivierte Folgen"
 
-#: feeds/feeds.py:46
+#: feeds/feeds.py:62
 msgid "Recently aired episodes"
 msgstr "Kürzlich gesendete Folgen"
 
-#: feeds/feeds.py:51
+#: feeds/feeds.py:81
 #, python-format
 msgid "xsn Archive for %s"
 msgstr "xsn Archiv für %s"
-
-#: feeds/feeds.py:68
-#, python-format
-msgid "xsn archive entry %(slug)s: %(title)s"
-msgstr "xsn Archiv Eintrag %(slug)s: %(title)s"
 
 #: templates/radioportal/base.html:6
 msgid "Live"
@@ -306,9 +369,77 @@ msgstr ""
 msgid "Start"
 msgstr "Start"
 
-#: templates/radioportal/dashboard/base.html:21
+#: templates/radioportal/dashboard/base.html:29
 msgid "Overview"
 msgstr "Übersicht"
+
+#: templates/radioportal/dashboard/channel_delete.html:2
+#: templates/radioportal/dashboard/channel_delete.html:4
+msgid "Delete Channel"
+msgstr "Channel löschen"
+
+#: templates/radioportal/dashboard/channel_delete.html:7
+#: templates/radioportal/dashboard/episode_delete.html:9
+#: templates/radioportal/dashboard/show_delete.html:7
+msgid "Should the object"
+msgstr "Soll das Objekt"
+
+#: templates/radioportal/dashboard/channel_delete.html:7
+#: templates/radioportal/dashboard/episode_delete.html:9
+#: templates/radioportal/dashboard/show_delete.html:7
+msgid "really be deleted"
+msgstr "wirklich gelöscht werden?"
+
+#: templates/radioportal/dashboard/channel_edit.html:4
+#: templates/radioportal/dashboard/channel_edit.html:50
+#: templates/radioportal/dashboard/landing.html:48
+msgid "Create new Channel"
+msgstr "Erstelle neuen Channel"
+
+#: templates/radioportal/dashboard/channel_edit.html:39
+msgid "[x]"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:40
+msgid "Added"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:41
+msgid "Removed"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:42
+msgid "Add another item"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:50
+msgid "Edit Channel"
+msgstr "Channel bearbeiten"
+
+#: templates/radioportal/dashboard/channel_edit.html:56
+msgid "Sourced Streams"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:58
+#: templates/radioportal/dashboard/channel_edit.html:66
+msgid "Stream"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:58
+msgid "New Sourced Stream"
+msgstr "Neuer Sourced Stream"
+
+#: templates/radioportal/dashboard/channel_edit.html:63
+msgid "Recoded Streams"
+msgstr ""
+
+#: templates/radioportal/dashboard/channel_edit.html:66
+msgid "New Recoded Stream"
+msgstr "Neuer Recoded Stream"
+
+#: templates/radioportal/dashboard/channel_edit.html:70
+msgid "Save Channel"
+msgstr "Speichere Channel"
 
 #: templates/radioportal/dashboard/episode_create.html:5
 #: templates/radioportal/dashboard/episode_edit.html:5
@@ -364,7 +495,7 @@ msgstr "Öffentliche URL"
 #: templates/radioportal/dashboard/episodepart_edit.html:15
 #: templates/radioportal/dashboard/group_edit.html:16
 #: templates/radioportal/dashboard/show_edit.html:25
-#: templates/radioportal/dashboard/showfeed_edit.html:24
+#: templates/radioportal/dashboard/showfeed_edit.html:28
 #: templates/radioportal/dashboard/user_edit.html:17
 msgid "Apply"
 msgstr "Anwenden"
@@ -373,18 +504,6 @@ msgstr "Anwenden"
 #: templates/radioportal/dashboard/episode_delete.html:6
 msgid "Delete Episode"
 msgstr "Folge löschen"
-
-#: templates/radioportal/dashboard/episode_delete.html:9
-#: templates/radioportal/dashboard/show_delete.html:7
-#: templates/radioportal/dashboard/streamsetup_delete.html:7
-msgid "Should the object"
-msgstr "Soll das Objekt"
-
-#: templates/radioportal/dashboard/episode_delete.html:9
-#: templates/radioportal/dashboard/show_delete.html:7
-#: templates/radioportal/dashboard/streamsetup_delete.html:7
-msgid "really be deleted"
-msgstr "wirklich gelöscht werden?"
 
 #: templates/radioportal/dashboard/episode_edit.html:8
 msgid "Edit episode"
@@ -445,7 +564,7 @@ msgstr "Erstelle Gruppe"
 
 #: templates/radioportal/dashboard/group_edit.html:9
 #: templates/radioportal/dashboard/show_edit.html:11
-#: templates/radioportal/dashboard/showfeed_edit.html:11
+#: templates/radioportal/dashboard/showfeed_edit.html:15
 #: templates/radioportal/dashboard/user_edit.html:9
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -487,8 +606,8 @@ msgstr ""
 #: templates/radioportal/dashboard/landing.html:34
 msgid ""
 "\n"
-"For every show there is usually a setup of streams. Such a setup of streams "
-"combines various streams which differ in bitrates or formats. \n"
+"For every show there is usually a channel of streams. Such a channel of "
+"streams combines various streams which differ in bitrates or formats. \n"
 "This is the place to view or change the credentials for your streams.\n"
 msgstr ""
 "\n"
@@ -496,12 +615,6 @@ msgstr ""
 "Sammlung vereint verschiedene Streams, die sich in Format und Bitrate "
 "unterscheiden. Hier können neben den üblichen Einstellungen auch die "
 "Zugangsdaten für die Streams eingesehen und geändert werden.\n"
-
-#: templates/radioportal/dashboard/landing.html:48
-#: templates/radioportal/dashboard/streamsetup_edit.html:4
-#: templates/radioportal/dashboard/streamsetup_edit.html:38
-msgid "Create new StreamSetup"
-msgstr "Erstelle neues StreamSetup"
 
 #: templates/radioportal/dashboard/landing.html:52
 msgid "Account Settings"
@@ -526,9 +639,8 @@ msgid "on"
 msgstr "auf"
 
 #: templates/radioportal/dashboard/perm.html:8
-#, fuzzy
 msgid "Change Permissions for"
-msgstr "Passwort ändern"
+msgstr "Zugriffsrechte ändern für"
 
 #: templates/radioportal/dashboard/show_delete.html:2
 #: templates/radioportal/dashboard/show_delete.html:4
@@ -543,7 +655,7 @@ msgstr "Sendung bearbeiten"
 #: templates/radioportal/dashboard/show_edit.html:7
 #: templates/radioportal/dashboard/show_edit.html:12
 #: templates/radioportal/dashboard/showfeed_edit.html:7
-#: templates/radioportal/dashboard/showfeed_edit.html:12
+#: templates/radioportal/dashboard/showfeed_edit.html:16
 msgid "Create Show"
 msgstr "Sendung erstellen"
 
@@ -565,7 +677,7 @@ msgstr ""
 msgid "here"
 msgstr "Deaktivieren"
 
-#: templates/radioportal/dashboard/showfeed_edit.html:14
+#: templates/radioportal/dashboard/showfeed_edit.html:18
 msgid ""
 "It is possible to update the show and episode from the podcast feed of your "
 "show. \n"
@@ -589,40 +701,6 @@ msgstr ""
 "\"topic\" enthalten. Wenn der Titel im Feed beispielsweise \"MM073 Creepy\" "
 "lautet, ist ein passender Ausdruck \"(?P<id>\\w*) (?P<topic>.*)\"."
 
-#: templates/radioportal/dashboard/streamsetup_delete.html:2
-#: templates/radioportal/dashboard/streamsetup_delete.html:4
-msgid "Delete StreamSetup"
-msgstr "StreamSetup löschen"
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:38
-msgid "Edit StreamSetup"
-msgstr "StreamSetup bearbeiten"
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:44
-msgid "Sourced Streams"
-msgstr ""
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:46
-#: templates/radioportal/dashboard/streamsetup_edit.html:54
-msgid "Stream"
-msgstr ""
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:46
-msgid "New Sourced Stream"
-msgstr "Neuer Sourced Stream"
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:51
-msgid "Recoded Streams"
-msgstr ""
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:54
-msgid "New Recoded Stream"
-msgstr "Neuer Recoded Stream"
-
-#: templates/radioportal/dashboard/streamsetup_edit.html:58
-msgid "Save StreamSetup"
-msgstr "Speichere Stream Setup"
-
 #: templates/radioportal/dashboard/user_edit.html:5
 #: templates/radioportal/dashboard/user_edit.html:11
 #: templates/radioportal/dashboard/user_list.html:9
@@ -638,7 +716,7 @@ msgid "show perm"
 msgstr ""
 
 #: templates/radioportal/dashboard/user_list.html:14
-msgid "setup perm"
+msgid "channel perm"
 msgstr ""
 
 #: templates/radioportal/dashboard/user_list.html:18
@@ -653,7 +731,7 @@ msgstr "Archiv"
 
 #: templates/radioportal/episodes/episode_detail.html:22
 #: templates/radioportal/episodes/episode_list.html:5
-#: templates/radioportal/episodes/episode_streams.html:23
+#: templates/radioportal/episodes/episode_streams.html:27
 #: templates/radioportal/episodes/landing.html:3
 msgid "Short URL"
 msgstr "KurzURL"
@@ -676,7 +754,7 @@ msgstr "Seit"
 msgid "until"
 msgstr "bis"
 
-#: templates/radioportal/episodes/episode_detail.html:58
+#: templates/radioportal/episodes/episode_detail.html:61
 msgid "visualization of listener counts"
 msgstr "Visualisierung der Hörerzahlen"
 
@@ -777,15 +855,15 @@ msgstr ""
 msgid "Listen"
 msgstr "Hören"
 
-#: templates/radioportal/episodes/episode_streams.html:22
+#: templates/radioportal/episodes/episode_streams.html:26
 msgid "direct"
 msgstr "direkt"
 
-#: templates/radioportal/episodes/episode_streams.html:27
+#: templates/radioportal/episodes/episode_streams.html:31
 msgid "Streams are upcoming, please wait."
 msgstr "Streams werden vorbereitet, bitte warten."
 
-#: templates/radioportal/episodes/episode_streams.html:31
+#: templates/radioportal/episodes/episode_streams.html:35
 msgid "No streams available currently"
 msgstr "Momentan keine Streams verfügbar."
 
@@ -980,6 +1058,9 @@ msgstr ""
 msgid "Reset my password"
 msgstr ""
 
-#: views/stream.py:28
+#: views/stream.py:44
 msgid "This URL should be mapped to the backend."
 msgstr ""
+
+#~ msgid "xsn archive entry %(slug)s: %(title)s"
+#~ msgstr "xsn Archiv Eintrag %(slug)s: %(title)s"
