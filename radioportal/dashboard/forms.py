@@ -222,7 +222,7 @@ class ChannelForm(forms.ModelForm):
         model = models.Channel
         exclude = ('running', 'streamCurrentSong', 'streamGenre', 'streamShow',
                    'streamDescription', 'streamURL', 'currentEpisode', 'feed',
-                   'graphic_differ_by', 'graphic_title')
+                   'graphic_differ_by', 'graphic_title', 'listener')
         widgets = {
             'mapping_method': OrderedSelectMultiple(choices=messages.episode_finder_list()),
         }

@@ -217,6 +217,8 @@ class Channel(models.Model):
 
     currentEpisode = models.OneToOneField(Episode, blank=True, null=True)
 
+    listener = models.IntegerField(default=0)
+
     graphic_differ_by = models.CharField(max_length=255, blank=True)
 
     graphic_title = models.CharField(max_length=255, blank=True)

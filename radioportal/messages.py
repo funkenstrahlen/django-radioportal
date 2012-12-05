@@ -387,6 +387,13 @@ class BackendInterpreter(object):
             stream.running = False
             stream.save()
 
+    def show_listener(self, data):
+        data = simplejson.loads(data)
+
+        channel = Channel.objects.get(cluster=data['id'])
+        channel.listener = data['listener']
+        channel.save()
+
     def show_metadata(self, data):
         """
             value={'name': mount, 'key': key, 'val': val}

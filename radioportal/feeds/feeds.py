@@ -46,9 +46,22 @@ class StreamAtom1Feed(Atom1Feed):
             handler.addQuickElement('xsn:end', rfc3339_date(item['end']))
         if 'icon' in item and item['icon']:
             handler.addQuickElement('xsn:icon', item['icon'])
+        # soon obsolete
+        if 'listener' in item:
+            handler.addQuickElement('xsn:listener', item['listener'])
         if 'streams' in item:
             for stream in item['streams']:
                 handler.addQuickElement('xsn:stream', stream)
+        # obsolete end
+        if 'channel' in item:
+            handler.startElement("xsn:channel", {'id': item['channel']})
+            if 'listener' in item:
+                handler.addQuickElement('xsn:listener', item['listener'])
+            if 'streams' in item:
+                for stream in item['streams']:
+                    handler.addQuickElement('xsn:stream', stream)
+            handler.endElement("xsn:channel")
+            
 
 
 class ShowFeed(Feed):
@@ -91,8 +104,12 @@ class ShowFeed(Feed):
             try:
                 extra_dict['streams'] = []
                 for stream in item.channel.stream_set.all():
+                    if not stream.running:
+                        continue
                     url = reverse_full("www", "mount", view_kwargs={'stream':stream.mount})
                     extra_dict['streams'].append("http:%s" % url)
+                extra_dict['listener'] = str(item.channel.listener)
+                extra_dict['channel'] = item.channel.cluster
             except Channel.DoesNotExist:
                 pass
         if item.show.icon:
