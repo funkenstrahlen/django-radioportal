@@ -9,6 +9,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.db.models.aggregates import Max, Sum, Min
 
+import datetime
+
 class RobotsTxtView(TemplateResponseMixin, View):
     
     template_name = "radioportal/robots.txt"
@@ -100,5 +102,5 @@ class LandingView(ListView):
     def get_context_data(self, **kwargs):
         ctx = super(LandingView, self).get_context_data(**kwargs)
         ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).annotate(begin=Min('parts__begin')).order_by('-begin')[:5]
-        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).order_by('begin')[:5]
+        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
         return ctx
