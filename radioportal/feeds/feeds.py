@@ -2,15 +2,18 @@ from django.contrib.syndication.views import Feed
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-from django.utils.feedgenerator import Atom1Feed, rfc3339_date
+from django.utils.feedgenerator import Atom1Feed, rfc3339_date, SyndicationFeed
+from django.core.serializers.json import DjangoJSONEncoder
 
 from django.db.models.aggregates import Max, Sum, Min
 
 import vobject
 import datetime
 import pytz
+import json
 
 from django_hosts.reverse import reverse_full
+
 
 from radioportal.models import Show, Episode, Channel
 from django.conf import settings
@@ -188,3 +191,18 @@ def ical_feed(request, show_name=None):
     #response['Filename'] = 'filename.ics'  # IE needs this
     #response['Content-Disposition'] = 'attachment; filename=filename.ics'
     return response
+
+class JSONFeed(SyndicationFeed):
+    mime_type = "application/json"
+
+    def write(self, outfile, encoding):
+        data={}
+        data.update(self.feed)
+        data['items'] = self.items
+        json.dump(data, outfile, cls=DjangoJSONEncoder)
+        # outfile is a HttpResponse
+        if isinstance(outfile, HttpResponse):
+            outfile['Access-Control-Allow-Origin'] = '*'
+
+class JsonShowFeed(ShowFeed):
+    feed_type = JSONFeed

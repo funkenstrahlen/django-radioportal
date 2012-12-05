@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.views.generic.simple import direct_to_template
-from radioportal.feeds.feeds import ical_feed, ShowFeed
+from radioportal.feeds.feeds import ical_feed, ShowFeed, JsonShowFeed
 from radioportal.models import Show
 from django.conf.urls.defaults import url, patterns
 
@@ -14,4 +14,9 @@ urlpatterns = patterns('',
     url(r'^upcoming/(?P<show_name>[\w-]+)/ical/$', ical_feed, name="upcoming-show-ical"),
     url(r'^(?P<status>(recent|live|upcoming))/(?P<show_name>[\w-]+)/feed/$', ShowFeed(), name="shows-feed"),
     url(r'^(?P<show_name>[\w-]+)/feed/$', ShowFeed(), name="show-feed"),
+
+    url(r'^(?P<status>(recent|live|upcoming))/json/$', JsonShowFeed(), name="all-json"),
+    url(r'^(?P<status>(recent|live|upcoming))/(?P<show_name>[\w-]+)/json/$', JsonShowFeed(), name="shows-json"),
+    url(r'^(?P<show_name>[\w-]+)/json/$', JsonShowFeed(), name="show-json"),
+
 )
