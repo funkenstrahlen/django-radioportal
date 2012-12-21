@@ -30,7 +30,7 @@ import easy_thumbnails.files
 from radioportal.models import RecodedStream, SourcedStream, Channel, ShowFeed, UserProfile,\
         Episode, EpisodePart, Stream, Graphic, Recording, Show
 
-from radioportal_auphonic.models import AuphonicSettings
+#from radioportal_auphonic.models import AuphonicSettings
 
 from url_normalize import url_normalize
 
@@ -89,7 +89,7 @@ dto_map = {
     "sourcedstream": DTOSourcedStream,
     "showfeed": DTOShowFeed,
     "userprofile": DTOUserProfile,
-    "auphonicsettings": DTOAuphonic,
+    #"auphonicsettings": DTOAuphonic,
 }
 
 class DTOSerializer(object):
@@ -620,7 +620,7 @@ class AMQPInitMiddleware(object):
         #post_save.connect(object_changed, Channel, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_save.connect(object_changed, UserProfile, dispatch_uid="my_dispatch_uid")
-        post_save.connect(object_changed, AuphonicSettings, dispatch_uid="my_dispatch_uid")
+        #post_save.connect(object_changed, AuphonicSettings, dispatch_uid="my_dispatch_uid")
 
         
         post_delete.connect(object_deleted, RecodedStream, dispatch_uid="my_dispatch_uid")
@@ -628,7 +628,7 @@ class AMQPInitMiddleware(object):
         #post_delete.connect(object_deleted, Channel, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, ShowFeed, dispatch_uid="my_dispatch_uid")
         post_delete.connect(object_deleted, UserProfile, dispatch_uid="my_dispatch_uid")
-        post_delete.connect(object_deleted, AuphonicSettings, dispatch_uid="my_dispatch_uid")
+        #post_delete.connect(object_deleted, AuphonicSettings, dispatch_uid="my_dispatch_uid")
 
 
     def receive_messages(self):

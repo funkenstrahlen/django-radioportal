@@ -10,7 +10,7 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    url(r'^auphonic/', include('radioportal_auphonic.urls')),
+    #url(r'^auphonic/', include('radioportal_auphonic.urls')),
     url(r'^control/', include('radioportal_control.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
