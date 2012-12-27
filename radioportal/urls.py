@@ -3,7 +3,7 @@
 from django.conf.urls.defaults import patterns, url, include
 from django.views.decorators.cache import cache_page
 from django.views.generic import base
-from radioportal.views import stream, episodes
+from radioportal.views import stream, episodes, graphs
 
 
 urlpatterns = patterns('',
@@ -73,4 +73,14 @@ urlpatterns = patterns('',
         name="playlist"),
     url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac))$',
         stream.stream, name="mount"),
+
+    # graphs
+    url(r'^graphs/weekday/(?P<show_name>[\w-]+)/$', graphs.weekday_graph,
+        name="weekday_graph"),
+    url(r'^graphs/hours/(?P<show_name>[\w-]+)/$', graphs.hours_graph,
+        name="hours_graph"),
+    url(r'^graphs/weekday_hours/(?P<show_name>[\w-]+)/$', graphs.weekday_hours_graph,
+        name="weekday_hours_graph"),
+    url(r'^graphs/time_per_episode/(?P<show_name>[\w-]+)/$', graphs.time_per_episode_graph,
+        name="time_per_episode_graph"),
 )
