@@ -1,3 +1,4 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n guardian_tags hosts %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -25,7 +26,6 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-{% extends 'radioportal/dashboard/base.html' %}{% load i18n guardian_tags hosts %}
 {% block breadcrumb %}{{ block.super }} » {{ show.name }}{% endblock %}
 {% block content %}
 <h2>{{ show }}</h2>
