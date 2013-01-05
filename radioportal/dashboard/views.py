@@ -33,7 +33,7 @@ Created on 28.05.2011
 '''
 from django.views.generic.list import ListView
 from django.contrib.auth.models import User, Group
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, BaseUpdateView
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
