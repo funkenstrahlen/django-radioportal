@@ -52,7 +52,7 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import force_unicode
 from itertools import chain
 
-from radioportal import messages
+from radioportal.messages import episode_finder
 
 class CheckboxSelectMultipleTable(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
@@ -252,7 +252,7 @@ class ChannelForm(forms.ModelForm):
                    'streamDescription', 'streamURL', 'currentEpisode', 'feed',
                    'graphic_differ_by', 'graphic_title', 'listener')
         widgets = {
-            'mapping_method': OrderedSelectMultiple(choices=messages.episode_finder_list()),
+            'mapping_method': OrderedSelectMultiple(choices=episode_finder.episode_finder_list()),
         }
 
 
