@@ -61,6 +61,7 @@ class DTOSourcedStream(DTO):
         self.password = instance.password
         self.encoding = instance.encoding
         self.cluster = instance.channel.cluster
+        self.recording = instance.channel.recording
         self.fallback = instance.fallback
         self.id = instance.pk
 
