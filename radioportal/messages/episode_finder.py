@@ -41,7 +41,7 @@ import re
 import inspect
 import sys
 
-from radioportal.models import Episode
+from radioportal.models import Episode, Show
 
 
 class EpisodeFinder(object):
@@ -53,29 +53,6 @@ class EpisodeFinder(object):
 
     def get_episode(self, channel, metadata):
         return None
-
-
-class EpisodeSlugFromTitle(EpisodeFinder):
-    def get_name(self):
-        return "find-from-title"
-
-    def get_description(self):
-        return _("Try to find an existing episode with a slug," +
-                 " which is the same as the first word of the stream name")
-
-    def get_episode(self, channel, metadata):
-        episode_slug = metadata['name'].split(" ")[0]
-        episode_slug = re.sub(r'[^a-zA-Z0-9]+', '', episode_slug)
-        print "episode_slug: ", episode_slug
-        try:
-            episode = Episode.objects.get(
-                show__in=channel.show.all(),
-                slug__iexact=episode_slug)
-            return episode
-        except Episode.MultipleObjectsReturned:
-            logger.error("more than one episode found")
-        except Episode.DoesNotExist:
-            pass
 
 
 class LatestPlannedEpisode(EpisodeFinder):
@@ -103,6 +80,50 @@ class MakeEpisodeMixin(object):
         episode = Episode(show=show, slug=slug, status=Episode.STATUS[1][0])
         episode.save()
         return episode
+
+
+class IdExtractor(object):
+    """ Abstract base class for extracting the id from the title """
+    def get_id(self, title):
+        pass
+
+
+class FirstWordIdExtractor(IdExtractor):
+    """ use the first word in the title to get the id """
+    def get_id(self, title):
+        episode_slug = title.split(" ")[0]
+        episode_slug = re.sub(r'[^a-zA-Z0-9]+', '', episode_slug)
+        return episode_slug
+
+
+class FullTitleIdExtractor(IdExtractor):
+    """ use the full title as id """
+    def get_id(self, title):
+        episode_slug = title
+        episode_slug = re.sub(r'[^a-zA-Z0-9]+', '', episode_slug)
+        return episode_slug
+
+
+class EpisodeSlugFromTitle(FirstWordIdExtractor, EpisodeFinder):
+    def get_name(self):
+        return "find-from-title"
+
+    def get_description(self):
+        return _("Try to find an existing episode with a slug," +
+                 " which is the same as the first word of the stream name")
+
+    def get_episode(self, channel, metadata):
+        episode_slug = self.get_id(metadata['name'])
+        print "episode_slug: ", episode_slug
+        try:
+            episode = Episode.objects.get(
+                show__in=channel.show.all(),
+                slug__iexact=episode_slug)
+            return episode
+        except Episode.MultipleObjectsReturned:
+            logger.error("more than one episode found")
+        except Episode.DoesNotExist:
+            pass
 
 
 class MakeEpisodeFromNumberInShow(EpisodeFinder, MakeEpisodeMixin):
@@ -138,6 +159,48 @@ class MakeEpisodeFromLastEpisode(EpisodeFinder, MakeEpisodeMixin):
         id = int(id_str) + 1
         return self._make_episode(last_episode.show, id)
 
+
+class ShowFinder(object):
+    def get_show(self, channel, slug): 
+        showslug = re.sub(r'[^a-zA-Z]+', '', slug)
+        print "showslug: ", showslug
+        return channel.show.get(defaultShortName__iexact=showslug)
+
+
+class FallbackShowFinder(ShowFinder):
+    def get_show(self, channel, slug):
+        show = None
+        try:
+            show = super(FallbackShowFinder, self).get_show(channel, slug)
+        except Show.DoesNotExist:
+            show = channel.show.all()[0]
+        return show
+
+class MakeEpisodeFromTitle(MakeEpisodeMixin, FallbackShowFinder):
+    def get_name(self):
+        return "make-from-title"
+
+    def get_description(self):
+        return _("Create new episode using the first word of the title as episode id")
+
+    def get_episode(self, channel, metadata):
+        slug = self.get_id(metadata["name"])
+        print "Got Slug: ", slug
+        show = self.get_show(channel, slug)
+        print "Found Show: ", show
+        return self._make_episode_slug(show, slug)
+
+
+class MakeEpisodeFromFirstWordTitle(MakeEpisodeFromTitle, FirstWordIdExtractor, EpisodeFinder):
+    pass
+
+
+class MakeEpisodeFromFullTitle(MakeEpisodeFromTitle, FullTitleIdExtractor, EpisodeFinder):
+    def get_name(self):
+        return "make-from-full-title"
+
+    def get_description(self):
+        return _("Create new episode using the full title as ID")
 
 class FindLiveEpisode(EpisodeFinder, MakeEpisodeMixin):
     name = "live"
