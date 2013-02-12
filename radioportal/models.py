@@ -39,8 +39,6 @@ from django_hosts.reverse import reverse_full
 
 from easy_thumbnails.fields import ThumbnailerImageField
 
-import hashlib
-
 import jsonfield
 
 class Show(models.Model):
@@ -384,17 +382,6 @@ class SourcedStream(Stream):
 class RecodedStream(Stream):
     source = models.ForeignKey(Stream, related_name='recoded')
     
-class UserProfile(models.Model):
-    user = models.ForeignKey(User, unique=True, related_name="profile")
-    htdigest = models.CharField(max_length=255, blank=True)
-
-    def set_htdigest(self, password, realm="Default Realm"):
-        string = "%s:%s:%s" % (self.user.username, realm, password)
-        hash = hashlib.md5(string).hexdigest()
-        self.htdigest = "%s:%s:%s" % (self.user.username, realm, hash)
-        self.save()
-
-
 class Status(models.Model):
     name = models.CharField(max_length=100)
     status = models.PositiveSmallIntegerField()
@@ -428,5 +415,4 @@ class Status(models.Model):
 # post_save.connect(saved, Stream)
 # post_save.connect(saved, SourcedStream)
 # post_save.connect(saved, RecodedStream)
-# post_save.connect(saved, UserProfile)
 # post_save.connect(saved, Status)

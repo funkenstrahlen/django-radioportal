@@ -54,28 +54,3 @@ class UserForm(forms.ModelForm):
         model = User
         exclude = ('password', 'is_staff', 'is_superuser',
                    'last_login', 'date_joined', 'user_permissions', 'groups')
-
-from django.contrib.auth import forms as authforms
-
-
-def save(self, commit=True):
-    if hasattr(settings, "REALM"):
-        realm = settings.REALM
-    else:
-        realm = "Default Realm"
-    try:
-        profile = self.user.get_profile()
-        profile.set_htdigest(self.cleaned_data['new_password1'], realm)
-    except models.UserProfile.DoesNotExist:
-        profile = models.UserProfile(user=self.user)
-        profile.save()
-        profile.set_htdigest(self.cleaned_data['new_password1'], realm)
-    except SiteProfileNotAvailable:
-        pass
-    self.user.set_password(self.cleaned_data['new_password1'])
-    if commit:
-        self.user.save()
-    return self.user
-
-authforms.SetPasswordForm.save = save
-

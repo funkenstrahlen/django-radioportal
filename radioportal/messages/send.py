@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 from django.db.models.signals import post_save, post_delete
 from django.core.serializers import json
 
-from radioportal.models import SourcedStream, ShowFeed, UserProfile, RecodedStream
+from radioportal.models import SourcedStream, ShowFeed, RecodedStream
 
 import simplejson
 
@@ -76,12 +76,6 @@ class DTOShowFeed(DTO):
         self.id = instance.pk
 
 
-class DTOUserProfile(DTO):
-    def __init__(self, instance):
-        self.id = instance.pk
-        self.htdigest = instance.htdigest
-
-
 class DTOShow(DTO):
     def __init__(self, instance):
         self.slug = instance.slug
@@ -105,7 +99,6 @@ class DTOAuphonic(DTO):
 dto_map = {
     "sourcedstream": DTOSourcedStream,
     "showfeed": DTOShowFeed,
-    "userprofile": DTOUserProfile,
     #"auphonicsettings": DTOAuphonic,
 }
 
@@ -120,7 +113,7 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed, UserProfile):
+        for m in (RecodedStream, SourcedStream, ShowFeed):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             post_delete.connect(
