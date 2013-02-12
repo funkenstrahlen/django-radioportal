@@ -61,6 +61,8 @@ import dateutil.parser
 from .send import dto_map
 from .episode_finder import get_episode_finder
 
+import reversion
+
 #### Part two: receiving updates ####
 
 
@@ -370,6 +372,8 @@ class BackendInterpreter(object):
                     show.icon = content
                     show.save()
 
+
+    @reversion.create_revision()
     def dispatch_message(self, routing_key, data):
         keys = routing_key.split(".", 1)
         if len(keys) != 2:

@@ -400,6 +400,22 @@ class Status(models.Model):
         return u"<Status for %s>" % self.name
 
 
+import reversion
+
+reversion.register(Show)
+reversion.register(ShowFeed)
+reversion.register(Episode)
+reversion.register(EpisodePart)
+reversion.register(Marker)
+reversion.register(Graphic)
+reversion.register(Recording)
+reversion.register(Channel)
+reversion.register(Stream)
+reversion.register(SourcedStream)
+reversion.register(RecodedStream)
+reversion.register(Status)
+
+
 # from django.db.models.signals import post_save
 # def saved(sender, instance, created, **kwargs):
 #     print "Saved (models.py:314): ", sender, repr(instance)

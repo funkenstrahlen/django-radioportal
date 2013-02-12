@@ -36,12 +36,13 @@ from radioportal import models
 from django.contrib import admin
 
 from guardian.admin import GuardedModelAdmin
+import reversion
 
 class InlineStream(admin.TabularInline):
     model = models.Stream
 
 
-class ChannelAdmin(GuardedModelAdmin):
+class ChannelAdmin(reversion.VersionAdmin, GuardedModelAdmin):
     inlines = [
         InlineStream,
     ]
@@ -59,14 +60,14 @@ class InlineRecording(admin.TabularInline):
     model = models.Recording
 
 
-class EpisodeAdmin(admin.ModelAdmin):
+class EpisodeAdmin(reversion.VersionAdmin, admin.ModelAdmin):
     inlines = [
         InlineEpisodePart,
 #        InlineGraphic,
 #        InlineRecording,
     ]
 
-class ShowAdmin(GuardedModelAdmin):
+class ShowAdmin(reversion.VersionAdmin, GuardedModelAdmin):
     pass
 
 admin.site.register(models.Show, ShowAdmin)
