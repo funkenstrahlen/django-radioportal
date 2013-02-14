@@ -31,7 +31,9 @@
 from django.conf.urls.defaults import patterns, url, include
 
 from radioportal.dashboard import views
+
 import django.contrib.auth.views
+django.contrib.auth.views.is_safe_url=views.is_safe_url
 
 from django.contrib import admin
 admin.autodiscover()
