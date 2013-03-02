@@ -72,18 +72,12 @@ class StreamAtom1Feed(Atom1Feed):
 
     def add_item_elements(self, handler, item):
         super(StreamAtom1Feed, self).add_item_elements(handler, item)
-        handler.addQuickElement('xsn:begin', rfc3339_date(item['begin']))
-        if item['end']:
+        if 'begin' in item and item['begin']:
+            handler.addQuickElement('xsn:begin', rfc3339_date(item['begin']))
+        if 'end' in item and item['end']:
             handler.addQuickElement('xsn:end', rfc3339_date(item['end']))
         if 'icon' in item and item['icon']:
             handler.addQuickElement('xsn:icon', item['icon'])
-        # soon obsolete
-        if 'listener' in item:
-            handler.addQuickElement('xsn:listener', item['listener'])
-        if 'streams' in item:
-            for stream in item['streams']:
-                handler.addQuickElement('xsn:stream', stream)
-        # obsolete end
         if 'channel' in item:
             handler.startElement("xsn:channel", {'id': item['channel']})
             if 'listener' in item:
@@ -92,6 +86,8 @@ class StreamAtom1Feed(Atom1Feed):
                 for stream in item['streams']:
                     handler.addQuickElement('xsn:stream', stream)
             handler.endElement("xsn:channel")
+        if 'website' in item:
+            handler.addQuickElement('xsn:website', item['website'])
             
 
 
@@ -145,6 +141,8 @@ class ShowFeed(Feed):
                 pass
         if item.show.icon:
             extra_dict['icon'] = "http:%s" % item.show.icon.url
+        if item.url:
+            extra_dict['website'] = item.url()
         return extra_dict
 
     def feed_extra_kwargs(self, obj):
@@ -220,17 +218,58 @@ def ical_feed(request, show_name=None):
     #response['Content-Disposition'] = 'attachment; filename=filename.ics'
     return response
 
+def remove_null(d):
+    return dict([(k, v) for k, v in d.iteritems() if v])
+
 class JSONFeed(SyndicationFeed):
     mime_type = "application/json"
 
     def write(self, outfile, encoding):
         data={}
         data.update(self.feed)
+        data = remove_null(data)
         data['items'] = self.items
+        for i in range(0, len(data['items'])):
+            data['items'][i] = remove_null(data['items'][i])
         json.dump(data, outfile, cls=DjangoJSONEncoder)
         # outfile is a HttpResponse
         if isinstance(outfile, HttpResponse):
             outfile['Access-Control-Allow-Origin'] = '*'
 
+
 class JsonShowFeed(ShowFeed):
     feed_type = JSONFeed
+
+
+class ShowListFeed(Feed):
+    feed_type = StreamAtom1Feed
+    link = "/"
+
+    def items(self):
+        return Show.objects.all()
+
+    def item_guid(self, item):
+        return unicode(item.slug)
+
+    def item_title(self, item):
+        return item.name
+
+    def item_description(self, item):
+        if item.abstract and item.description:
+            return "%s %s" % (item.abstract, item.description)
+        elif item.abstract:
+            return item.abstract
+        else:
+            return item.description
+
+    def item_extra_kwargs(self, item):
+        extra_dict = {}
+        if item.icon:
+            extra_dict['icon'] = "http:%s" % item.icon.url
+        if item.url:
+            extra_dict['website'] = item.url
+        return extra_dict
+
+class JsonShowListFeed(ShowListFeed):
+    feed_type = JSONFeed
+
