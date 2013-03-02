@@ -37,12 +37,13 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from radioportal import forms
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker
+from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message
 from guardian.shortcuts import get_objects_for_user
 from guardian.decorators import permission_required
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db.models import Q
 
 from radioportal.dashboard import forms as dforms
 
@@ -78,6 +79,28 @@ class PermissionChangeView(FormView):
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(PermissionChangeView, self).dispatch(*args, **kwargs)
+
+
+class MessageListView(ListView):
+    template_name = "radioportal/dashboard/message_list.html"
+    model = Message
+    context_object_name = "xsn_msgs"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(MessageListView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(MessageListView, self).get_queryset()
+        channel_type = ContentType.objects.get_for_model(Channel)
+        channel_ids = get_objects_for_user(self.request.user, 
+               'change_channel', klass=Channel).values_list('id', flat=True)
+        channel_q = Q(content_type__pk=channel_type.id, object_id__in=channel_ids)
+        show_type = ContentType.objects.get_for_model(Show)
+        show_ids = get_objects_for_user(self.request.user,
+               'change_show', klass=Show).values_list('id', flat=True)
+        show_q = Q(content_type__pk=show_type.id, object_id__in=show_ids)
+        return qs.filter(channel_q | show_q)
 
 
 class UserGroupListView(ListView):

@@ -399,6 +399,21 @@ class Status(models.Model):
     def __unicode__(self):
         return u"<Status for %s>" % self.name
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+
+class Message(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    message_object = generic.GenericForeignKey('content_type', 'object_id')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    origin = models.CharField(max_length=50)
+    message = models.CharField(max_length=255)
+    severity = models.PositiveIntegerField(default=3)
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['read','-timestamp']
 
 import reversion
 

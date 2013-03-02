@@ -50,7 +50,7 @@ import os.path
 import urllib2
 import easy_thumbnails.files
 
-from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show
+from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message
 
 # from radioportal_auphonic.models import AuphonicSettings
 
@@ -81,9 +81,38 @@ def reply(routing_key, data):
     conn.close()
 
 
+def error_handler(msg, channel):
+    logger.error(msg)
+    m=Message(message_object=channel, origin="BackendInterpreter", message=msg,
+                       severity=3)
+    m.save()
+
 class BackendInterpreter(object):
     def __init__(self, reply_callback):
         self.reply = reply_callback
+
+    def message_send(self, data):
+        """
+            value={
+               'channel': 'nsfw',
+               'show': 'not-safe-for-work',
+               'origin': 'feedupdater',
+               'message': 'error parsing feed',
+               'severity': '3',
+               'stamp': '2013-02-25T20:35:29'
+            }
+        """
+        if "channel" in data:
+            obj = Channel.objects.get(cluster=data["channel"])
+        else:
+            obj = Channel.objects.get(slug=data["show"])
+        if "stamp" in data:
+            d = dateutil.parser.parse(data['stamp'])
+        else:
+            d = None
+        m=Message(message_object=obj, origin=data["origin"], message=data["message"],
+                       severity=data["severity"], timestamp=d)
+        m.save()
 
     def show_startmaster(self, data):
         """
@@ -98,7 +127,7 @@ class BackendInterpreter(object):
         for method in channel.mapping_method:
             # print "trying method", method
             if method not in available_methods:
-                logger.warning("Mapping method %s not found" % method)
+                error_handler("Mapping method %s not found" % method, channel)
                 continue
             finder = available_methods[method]()
             try:
@@ -106,13 +135,13 @@ class BackendInterpreter(object):
             except Exception, e:
                 print "method", method, "failed"
                 print traceback.format_exc()
-                logger.warning("Mapping method %s failed: %s" % (method, e))
+                error_handler("Mapping method %s failed: %s" % (method, e), channel)
                 connection._rollback()
             if episode:
                 break
 
         if not episode:
-            logger.error("No episode found for cluster %s" % data['name'])
+            error_handler("No episode found for cluster %s" % data['name'], channel)
             return
 
         part = None
@@ -149,8 +178,8 @@ class BackendInterpreter(object):
             channel.currentEpisode = None
             channel.save()
         else:
-            logger.error("show_stop: no current episode found for cluster %s" %
-                         data['name'])
+            error_handler("show_stop: no current episode found for cluster %s" %
+                         data['name'], channel)
             # FIXME
 
     def stream_start(self, data):
@@ -205,8 +234,8 @@ class BackendInterpreter(object):
             setattr(channel, map2channel[data['key']], data['val'])
             channel.save()
         else:
-            logger.debug(
-                "show_metadata: key %s not in channel map" % data['key'])
+            error_handler(
+                "show_metadata: key %s not in channel map" % data['key'], channel)
 
         # mapping between internal keys and episode fields
         map2eps = {'name': 'title', 'description': 'description', 'url': 'url'}
@@ -222,8 +251,8 @@ class BackendInterpreter(object):
                 setattr(part, map2eps[data['key']], data['val'])
                 part.save()
         else:
-            logger.error(
-                "show_metadata: no current episode for %s" % channel.cluster)
+            error_handler(
+                "show_metadata: no current episode for %s" % channel.cluster, channel)
 
     def graphic_created(self, data):
         """
@@ -237,8 +266,8 @@ class BackendInterpreter(object):
         if channel.currentEpisode:
             g.episode = channel.currentEpisode.current_part
         else:
-            logger.error(
-                "graphic_create: no current episode for %s" % channel.cluster)
+            error_handler(
+                "graphic_create: no current episode for %s" % channel.cluster, channel)
 
         g.save()
 
@@ -249,8 +278,8 @@ class BackendInterpreter(object):
         if channel.currentEpisode:
             part = channel.currentEpisode.current_part
         else:
-            logger.error("recording_start: no current episode for %s" %
-                         channel.cluster)
+            error_handler("recording_start: no current episode for %s" %
+                         channel.cluster, channel)
             return
 
         r = Recording(episode=part)
