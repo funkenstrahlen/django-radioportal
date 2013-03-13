@@ -152,6 +152,8 @@ class EpisodeForm(forms.ModelForm):
 
 class EpisodePartForm(forms.ModelForm):
     required_css_class = "required"
+    begin = forms.SplitDateTimeField
+    end = forms.SplitDateTimeField
     class Meta:
         model = models.EpisodePart
         widgets = {
@@ -159,6 +161,13 @@ class EpisodePartForm(forms.ModelForm):
             'end': adminwidgets.AdminSplitDateTime(),
             'episode': widgets.HiddenInput(),
         }
+    class Media:
+        js = (
+            'admin/js/core.js',
+            'admin/js/admin/RelatedObjectLookups.js',
+            'admin/js/jquery.min.js',
+            'admin/js/jquery.init.js',
+        )
 
 class CreateEpisodeForm(forms.ModelForm):
     required_css_class = "required"
@@ -203,6 +212,13 @@ class CreateEpisodeForm(forms.ModelForm):
             #'episode': HiddenInput(),
         }
 
+    class Media:
+        js = (
+            'admin/js/core.js',
+            'admin/js/admin/RelatedObjectLookups.js',
+            'admin/js/jquery.min.js',
+            'admin/js/jquery.init.js',
+        )
 
 class OrderedSelectMultiple(SelectMultiple):
 

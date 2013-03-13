@@ -33,6 +33,7 @@ OF SUCH DAMAGE.
 	{{ form.instance.title }}
 {% endblock %}
 {% block content %}
+{{ form.media }}
 <h2>{% trans "Edit Part of Episode" %}</h2>
 <form action="" method="POST">
 {% csrf_token %}
