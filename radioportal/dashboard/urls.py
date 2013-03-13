@@ -30,7 +30,7 @@
 
 from django.conf.urls.defaults import patterns, url, include
 
-from radioportal.dashboard import views
+from radioportal.dashboard import views, forms
 
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
@@ -38,6 +38,8 @@ django.contrib.auth.views.is_safe_url=views.is_safe_url
 from django.contrib import admin
 admin.autodiscover()
 
+
+wizard_forms = [forms.UserWizardForm, forms.ShowWizardForm, forms.ChannelWizardForm, forms.StreamWizardForm]
 
 urlpatterns = patterns('',
     #url(r'^auphonic/', include('radioportal_auphonic.urls')),
@@ -50,6 +52,9 @@ urlpatterns = patterns('',
     url(r'^$', views.LandingView.as_view(), name="dashboard"),
 
     url(r'^perm/(?P<model>[\w]+)/(?P<user_name>[\w]+)/$', views.PermissionChangeView.as_view(), name="admin-perm"),
+
+    url(r'^wizard/(?P<id>[0-9]+)/$', views.UserChannelStreamAddView.as_view(wizard_forms), name="admin-wizard-id"),
+    url(r'^wizard/$', views.UserChannelStreamAddView.as_view(wizard_forms), name="admin-wizard"),
 
     url(r'^user/$', views.UserGroupListView.as_view(), name="admin-list-users"),
     url(r'^user/create/$', views.UserCreateView.as_view() , name="admin-user-create"),

@@ -32,27 +32,28 @@ Created on 14.09.2011
 @author: robert
 '''
 
-from django import forms
-from django.contrib.admin import widgets as adminwidgets
-from django.forms import widgets
-from django.utils.translation import ugettext as _
 
 from datetime import timedelta
-from django.forms.util import ErrorList
+from itertools import chain
 
-from radioportal import models
-from django.utils.safestring import mark_safe
+from django import forms
+from django.contrib.admin import widgets as adminwidgets
+from django.contrib.auth.models import User
+from django.forms import widgets
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
+from django.forms.util import ErrorList
 from django.forms.widgets import Media, HiddenInput, SelectMultiple
-from radioportal.models import Channel, RecodedStream, SourcedStream, Stream
+from django.utils.encoding import force_unicode
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 
 import jsonfield.forms
 
-from django.utils.html import conditional_escape
-from django.utils.encoding import force_unicode
-from itertools import chain
-
+from radioportal import models
 from radioportal.messages import episode_finder
+from radioportal.models import Channel, RecodedStream, SourcedStream, Stream
+
 
 class CheckboxSelectMultipleTable(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
@@ -421,3 +422,77 @@ class ChannelCompoundForm(CompoundModelForm):
         SourcedStreamFormSet,
         RecodedStreamFormSet,
     ]
+
+
+class UserWizardForm(forms.ModelForm):
+    required_css_class = "required"
+
+    def __init__(self, *args, **kwargs):
+        disabled = "disabled" in kwargs
+        if disabled:
+            del kwargs["disabled"]
+        super(UserWizardForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.iteritems():
+            if disabled:
+                field.widget.attrs['disabled'] = 'disabled'
+            if name in self.Meta.fields:
+                field.required = True
+    def clean(self):
+        res = super(UserWizardForm, self).clean()
+        if 'first_name' in self.cleaned_data and 'last_name' in self.cleaned_data:
+            if User.objects.filter(username='%s%s' % (
+                          self.cleaned_data['first_name'].lower(),
+                          self.cleaned_data['last_name'].lower()) ).exists():
+                raise forms.ValidationError(_('The username constructed from this name already exists, please use another one.'))
+        return res
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
+
+class ShowWizardForm(ShowForm):
+    required_css_class = "required"
+
+    def __init__(self, *args, **kwargs):
+        disabled = "disabled" in kwargs
+        if disabled:
+            del kwargs["disabled"]
+        super(ShowWizardForm, self).__init__(*args, **kwargs)
+        if disabled:
+            for field in self.fields.values():
+                field.widget.attrs['disabled'] = 'disabled'
+
+    class Meta(ShowForm.Meta):
+        fields = ('name', 'url')
+
+
+class ChannelWizardForm(ChannelForm):
+    required_css_class = "required"
+
+    def __init__(self, *args, **kwargs):
+        disabled = "disabled" in kwargs
+        if disabled:
+            del kwargs["disabled"]
+        super(ChannelWizardForm, self).__init__(*args, **kwargs)
+        if disabled:
+            for field in self.fields.values():
+                field.widget.attrs['disabled'] = 'disabled'
+
+    class Meta(ChannelForm.Meta):
+        fields = ('cluster',)
+
+
+class StreamWizardForm(SourcedStreamForm):
+
+    def __init__(self, *args, **kwargs):
+        disabled = "disabled" in kwargs
+        if disabled:
+            del kwargs["disabled"]
+        super(StreamWizardForm, self).__init__(*args, **kwargs)
+        if disabled:
+            for field in self.fields.values():
+                field.widget.attrs['disabled'] = 'disabled'
+
+    class Meta(SourcedStreamForm.Meta):
+        fields = ('mount',)

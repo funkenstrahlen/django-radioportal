@@ -1,0 +1,75 @@
+{% extends "radioportal/dashboard/base.html" %}
+{% load i18n %}
+
+{% block head %}
+{{ wizard.form.media }}
+<style type="text/css">
+table {
+    width: 100%;
+}
+table th {
+    width: 12em;
+}
+tr.buttons th {
+    text-align: center;
+}
+tr td {
+    text-align: right;
+}
+table td input[type="text"] {
+    width: 90%;
+}
+.current {
+    border: 2px solid #6887BB;
+}
+
+form {
+    padding: 0.5em;
+}
+h2 {
+    padding: 0;
+    margin: 0.25em 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% if initial_error %}<div class="no_tos">{{ initial_error }}</div>{% endif %}
+{% for current_step, current_form in wizard_forms.items %}
+<h2>Step {{ current_step }} of {{ wizard.steps.count }}</h2>
+<form action="" method="post"{% if wizard.steps.step1 == current_step %} class="current"{% endif %}>{% csrf_token %}
+<table>
+{% if wizard.steps.step1 == current_step %}
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+    {{ wizard.form }}
+{% endif %}
+<tr class="buttons">
+<th>
+{% if wizard.steps.prev %}
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+</th>
+<td><input type="submit" value="{% trans "submit" %}"/></td>
+</tr>
+{% else %}
+{{ wizard.management_form }}
+{% if current_form.forms %}
+    {{ current_form.management_form }}
+    {% for form in current_form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+    {{ current_form }}
+{% endif %}
+{% endif %}
+</table>
+</form>
+{% endfor %}
+{% endblock %}

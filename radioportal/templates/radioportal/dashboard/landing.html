@@ -81,6 +81,7 @@ This is the place to view or change the credentials for your streams.
     <li><a href="{% host_url account-change-pass on dashboard %}">{% trans "Change Password" %}</a></li>
 {% if request.user.is_superuser %}
     <li><a href="{% host_url admin-list-users on dashboard %}">{% trans "List of Users" %}</a></li>
+    <li><a href="{% host_url admin-wizard on dashboard %}">{% trans "Create new User, Show, Channel and Stream" %}</a></li>
 {% endif %}
 </ul>
 <h3>{% trans "Recordings" %}</h3>

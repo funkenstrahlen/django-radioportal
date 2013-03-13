@@ -31,26 +31,160 @@ Created on 28.05.2011
 
 @author: robert
 '''
-from django.views.generic.list import ListView
-from django.contrib.auth.models import User, Group
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, BaseUpdateView
-from radioportal import forms
-from django.utils.decorators import method_decorator
-from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message
-from guardian.shortcuts import get_objects_for_user
-from guardian.decorators import permission_required
-from django.http import HttpResponse
+
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db.models import Q
-
-from radioportal.dashboard import forms as dforms
-
+from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db.models import Q, signals
+from django.http import HttpResponse, Http404
+from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
+try:
+    from django.utils.text import slugify
+except ImportError:
+    from django.template.defaultfilters import slugify
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, BaseUpdateView
+from django.views.generic.list import ListView
 
+from django_hosts.reverse import reverse_full
 
+from guardian.decorators import permission_required
+from guardian.shortcuts import get_objects_for_user, assign
+
+from radioportal import forms
+from radioportal.dashboard import forms as dforms
 from radioportal.dashboard.decorators import superuser_only
+from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message, AgbAcception
+
+from django.core.mail import send_mail
+from django.contrib.formtools.wizard.views import SessionWizardView
+
+import datetime
+import requests
+
+class UserChannelStreamAddView(SessionWizardView):
+    template_name = "radioportal/dashboard/create_wizard.html"
+    forms_for_context = False
+    initial_error = None
+
+    def fetch_initial(self):
+        id = self.kwargs.get('id', None)
+        if not id:
+            return
+        kwargs = {'api_name': 'v1', 'resource_name': 'application', 'pk': id}
+        url = "http:%s" % reverse_full('review', 'api_dispatch_detail', view_kwargs=kwargs)
+        header = {'Authorization': 'ApiKey %s:%s' % (self.request.user.username, self.request.user.api_key.key)}
+        r = requests.get(url,  params={'format':'json'}, headers=header)
+        if not r.status_code == 200:
+            return
+        return r.json()
+
+    def get_form_initial(self, step):
+        """ Affected by Django Bug #18026 """
+        if not "initial" in self.storage.extra_data:
+            application = self.fetch_initial()
+
+            if not application:
+                self.initial_error = _("Could not fetch matching application")
+                self.storage.extra_data['initial'] = {}
+                return {}
+            elif not application['status'] == "2_ACCEPTED":
+                self.initial_error = _("Application is in wrong state. Ignoring it.")
+                self.storage.extra_data['initial'] = {}
+                return {}
+            
+            initial = {}
+
+            initial[0] = {}
+            name = application['contact_name']
+            if " " in name:
+                initial[0]['first_name'], initial[0]['last_name'] = name.split(" ", 1)
+            else:
+                initial[0]['first_name'] = name
+                initial[0]['last_name'] = ""
+            initial[0]['email'] = application['contact_email']
+            
+            initial[1] = {}
+            initial[1]['name'] = application['name']
+            initial[1]['url'] = application['homepage']
+
+            self.storage.extra_data['initial'] = initial
+        if int(step) in self.storage.extra_data['initial']:
+            return self.storage.extra_data['initial'][int(step)]
+        elif step in ('2', '3'):
+            data = self.get_cleaned_data_for_step('1')
+            print data
+            if data:
+                name = slugify(data['name']).replace("-","")
+                if step == '2':
+                    return {'cluster': name}
+                else:
+                    return {'mount': "%s.mp3" % name}
+
+    def done(self, form_list, **kwargs):
+        user_pw = User.objects.make_random_password()
+        user = form_list[0].save(commit=False)
+        user.set_password(user_pw)
+        user.username = ("%s%s" % (user.first_name, user.last_name)).lower()
+        user.save()
+
+        show = form_list[1].save()
+        
+        channel = form_list[2].save(commit=False)
+        channel.mapping_method = '["find-from-title","make-from-title","find-or-make-live"]'
+        channel.save()
+        channel.show.add(show)
+
+        stream = form_list[3].save(commit=False)
+        stream.user = "source"
+        stream_pw = User.objects.make_random_password()
+        stream.password = stream_pw
+        stream.channel = channel
+        stream.save()
+
+        assign('change_channel', user, channel)
+        assign('change_stream', user, channel)
+
+        assign('change_episodes', user, show)
+        assign('change_show', user, show)
+
+        mail_data = {'username': user.username, 'password': user_pw}
+        mail_text = _("USERCREATEDMAIL with %(username)s %(password)s" % mail_data)
+        mail_subject = _("[xenim] Neuer Nutzer erstellt")
+        send_mail(mail_subject, mail_text, "noreply@streams.xenim.de", [user.email,])
+
+        return HttpResponseRedirect(reverse_full('dashboard', 'dashboard'))
+
+    def get_form_kwargs(self, step=None):
+        kwargs = super(UserChannelStreamAddView, self).get_form_kwargs(step)
+        if self.forms_for_context and step and step != self.steps.current:
+            kwargs['disabled'] = 'disabled'
+        return kwargs
+
+    def get_context_data(self, form, **kwargs):
+        ctx = super(UserChannelStreamAddView, self).get_context_data(form, **kwargs)
+        form_list = self.get_form_list()
+        wizard_forms = {}
+        self.forms_for_context = True
+        for step in form_list.keys():
+            if step != self.steps.current:
+                form = self.get_form(
+                      step=step,
+                      data=self.storage.get_step_data(step))
+            else:
+                form = None
+            wizard_forms[int(step)+1] = form
+            ctx['wizard_forms'] = wizard_forms
+        self.forms_for_context = False
+        ctx['initial_error'] = self.initial_error
+        return ctx
+
+    @method_decorator(superuser_only)
+    def dispatch(self, *args, **kwargs):
+        return super(UserChannelStreamAddView, self).dispatch(*args, **kwargs)
 
 class PermissionChangeView(FormView):
     template_name = "radioportal/dashboard/perm.html"
