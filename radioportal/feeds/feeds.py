@@ -254,6 +254,9 @@ class ShowListFeed(Feed):
     def item_title(self, item):
         return item.name
 
+    def item_author_name(self, item):
+        return item.name
+
     def item_description(self, item):
         if item.abstract and item.description:
             return "%s %s" % (item.abstract, item.description)
