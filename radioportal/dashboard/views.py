@@ -61,9 +61,30 @@ from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Ma
 
 from django.core.mail import send_mail
 from django.contrib.formtools.wizard.views import SessionWizardView
+from django.views.decorators.csrf import csrf_exempt
 
 import datetime
 import requests
+
+@csrf_exempt
+def icecast_source_auth(request):
+    response = HttpResponse()
+    for k in ("user", "pass", "mount", "server"):
+        if not k in request.REQUEST:
+            response.status_code = 400
+            return response
+    user = request.REQUEST["user"]
+    passwd = request.REQUEST["pass"]
+    mount = request.REQUEST["mount"]
+    server = request.REQEST["server"]
+
+    if not server.endswith("xenim.de"):
+        response.status_code = 403
+        return response
+    stream = SourcedStream.objects.get(mount=mount[1:])
+    if stream.user == user and stream.password == passwd:
+        response["icecast-auth-user"] = 1
+    return response
 
 class UserChannelStreamAddView(SessionWizardView):
     template_name = "radioportal/dashboard/create_wizard.html"
