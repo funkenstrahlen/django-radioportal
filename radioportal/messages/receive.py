@@ -124,7 +124,10 @@ class BackendInterpreter(object):
         available_methods = get_episode_finder()
         episode = None
 
-        for method in channel.mapping_method:
+        methods = channel.mapping_method
+        methods.append("make-live")
+
+        for method in methods:
             # print "trying method", method
             if method not in available_methods:
                 error_handler("Mapping method %s not found" % method, channel)

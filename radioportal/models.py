@@ -215,6 +215,9 @@ class Recording(models.Model):
     
     running = models.BooleanField()
 
+    def __unicode__(self):
+        return self.path
+
 
 class Channel(models.Model):
     # Status
@@ -381,7 +384,10 @@ class SourcedStream(Stream):
 
 class RecodedStream(Stream):
     source = models.ForeignKey(Stream, related_name='recoded')
-    
+
+class HLSStream(RecodedStream):
+    pass
+ 
 class Status(models.Model):
     name = models.CharField(max_length=100)
     status = models.PositiveSmallIntegerField()

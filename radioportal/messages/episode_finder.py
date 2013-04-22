@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 import re
 import inspect
 import sys
+import datetime
 
 from radioportal.models import Episode, Show
 
@@ -77,6 +78,8 @@ class MakeEpisodeMixin(object):
         return self._make_episode_slug(show, episode_slug)
 
     def _make_episode_slug(self, show, slug):
+        if slug == "":
+            raise Exception()
         episode = Episode(show=show, slug=slug, status=Episode.STATUS[1][0])
         episode.save()
         return episode
@@ -201,6 +204,21 @@ class MakeEpisodeFromFullTitle(MakeEpisodeFromTitle, FullTitleIdExtractor, Episo
 
     def get_description(self):
         return _("Create new episode using the full title as ID")
+
+
+class MakeLiveEpisode(EpisodeFinder, MakeEpisodeMixin):
+    def get_name(self):
+        return "make-live"
+
+    def get_description(self):
+        return _("Create an episode named live with current date suffix")
+
+    def get_episode(self, channel, metadata):
+        for show in channel.show.all():
+            name = "live%s" % datetime.datetime.now().strftime("%Y%m%d%H%M")
+            live = self._make_episode_slug(show, name)
+            return live
+
 
 class FindLiveEpisode(EpisodeFinder, MakeEpisodeMixin):
     name = "live"

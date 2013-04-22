@@ -25,12 +25,19 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-{% load hosts %}
+{% load hosts i18n %}
 <html>
    <head>
       <title>Feeds for xsn</title>
    </head>
    <body>
+      <h1>{% trans "xenim streams feeds and api" %}</h1>
+      <p>{% blocktrans %}
+        If you are writing some kind of application which is accessing this data and you are missing some data, which is available
+        on the website, write a mail to info -at- streams -dot- xenim -dot- de. In any case please write if you are finished and have
+        published your application so we can add a link to it.
+      {% endblocktrans %}
+      </p>
       <ul>
         <li><a href="{% host_url upcoming-all-ical on feeds %}">{% host_url upcoming-all-ical on feeds %}</a></li>
         <li>

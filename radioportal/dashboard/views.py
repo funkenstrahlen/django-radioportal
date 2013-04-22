@@ -57,7 +57,7 @@ from guardian.shortcuts import get_objects_for_user, assign
 from radioportal import forms
 from radioportal.dashboard import forms as dforms
 from radioportal.dashboard.decorators import superuser_only
-from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message, AgbAcception
+from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message, SourcedStream
 
 from django.core.mail import send_mail
 from django.contrib.formtools.wizard.views import SessionWizardView
@@ -71,19 +71,25 @@ def icecast_source_auth(request):
     response = HttpResponse()
     for k in ("user", "pass", "mount", "server"):
         if not k in request.REQUEST:
+            response["icecast-auth-message"] = "Parameter is missing"
             response.status_code = 400
             return response
     user = request.REQUEST["user"]
     passwd = request.REQUEST["pass"]
     mount = request.REQUEST["mount"]
-    server = request.REQEST["server"]
+    server = request.REQUEST["server"]
 
     if not server.endswith("xenim.de"):
+        response["icecast-auth-message"] = "Server is not permitted to use this"
         response.status_code = 403
         return response
+    print mount, user, passwd
     stream = SourcedStream.objects.get(mount=mount[1:])
     if stream.user == user and stream.password == passwd:
         response["icecast-auth-user"] = 1
+        response["icecast-auth-timelimit"] = 10*60
+    else:
+        response["icecast-auth-message"] = "Username or password wrong"
     return response
 
 class UserChannelStreamAddView(SessionWizardView):
@@ -98,7 +104,7 @@ class UserChannelStreamAddView(SessionWizardView):
         kwargs = {'api_name': 'v1', 'resource_name': 'application', 'pk': id}
         url = "http:%s" % reverse_full('review', 'api_dispatch_detail', view_kwargs=kwargs)
         header = {'Authorization': 'ApiKey %s:%s' % (self.request.user.username, self.request.user.api_key.key)}
-        r = requests.get(url,  params={'format':'json'}, headers=header)
+        r = requests.get(url,  params={'format':'json'}, headers=header, verify=False)
         if not r.status_code == 200:
             return
         return r.json()
@@ -173,7 +179,7 @@ class UserChannelStreamAddView(SessionWizardView):
         assign('change_show', user, show)
 
         mail_data = {'username': user.username, 'password': user_pw}
-        mail_text = _("USERCREATEDMAIL with %(username)s %(password)s" % mail_data)
+        mail_text = _("USERCREATEDMAIL with %(username)s %(password)s") % mail_data
         mail_subject = _("[xenim] Neuer Nutzer erstellt")
         send_mail(mail_subject, mail_text, "noreply@streams.xenim.de", [user.email,])
 
