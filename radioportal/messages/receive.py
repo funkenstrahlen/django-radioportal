@@ -300,8 +300,11 @@ class BackendInterpreter(object):
         rec.save()
 
     def objects_get(self, data):
-        type = ContentType.objects.get(
-            app_label="radioportal", model=data['model'])
+        try:
+            type = ContentType.objects.get(
+                app_label="radioportal", model=data['model'])
+        except ContentType.DoesNotExist:
+            return
         model = type.model_class()
         name = model._meta.object_name.lower()
         if name not in dto_map:
@@ -311,7 +314,8 @@ class BackendInterpreter(object):
         plain_dict = []
         for o in objects:
             so = Serializer(o)
-            plain_dict.append(so.__dict__)
+            if so:
+                plain_dict.append(so.__dict__)
         routing_key = "%s.%s.%s" % (
             model._meta.app_label, model._meta.module_name, "changed")
 

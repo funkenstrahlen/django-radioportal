@@ -96,10 +96,10 @@ urlpatterns = patterns('',
 
     url(r'^live\.m3u$', stream.StreamListTemplateView.as_view(), name="playlist_list"),
 
-    url(r'^(?P<slug>.*\..{3})\.m3u$',
+    url(r'^(?P<slug>.*\..{3,4})\.m3u$',
         cache_page(stream.StreamTemplateView.as_view(), 60 * 60 * 3),
         name="playlist"),
-    url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac))$',
+    url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac|m3u8))$',
         stream.stream, name="mount"),
 
     # graphs
