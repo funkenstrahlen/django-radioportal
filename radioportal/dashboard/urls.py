@@ -51,7 +51,7 @@ urlpatterns = patterns('',
 
     url(r'^$', views.LandingView.as_view(), name="dashboard"),
 
-    url(r'^perm/(?P<model>[\w]+)/(?P<user_name>[\w]+)/$', views.PermissionChangeView.as_view(), name="admin-perm"),
+    url(r'^perm/(?P<model>[\w]+)/(?P<user_name>[\w-]+)/$', views.PermissionChangeView.as_view(), name="admin-perm"),
 
     url(r'^wizard/(?P<id>[0-9]+)/$', views.UserChannelStreamAddView.as_view(wizard_forms), name="admin-wizard-id"),
     url(r'^wizard/$', views.UserChannelStreamAddView.as_view(wizard_forms), name="admin-wizard"),
