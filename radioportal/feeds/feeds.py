@@ -82,6 +82,8 @@ class StreamAtom1Feed(Atom1Feed):
             handler.startElement("xsn:channel", {'id': item['channel']})
             if 'listener' in item:
                 handler.addQuickElement('xsn:listener', item['listener'])
+            if 'current_song' in item:
+                handler.addQuickElement('xsn:current_song', item['current_song'])
             if 'streams' in item:
                 for stream in item['streams']:
                     handler.addQuickElement('xsn:stream', stream)
@@ -137,6 +139,7 @@ class ShowFeed(Feed):
                     extra_dict['streams'].append("http:%s" % url)
                 extra_dict['listener'] = str(item.channel.listener)
                 extra_dict['channel'] = item.channel.cluster
+                extra_dict['current_song'] = item.channel.streamCurrentSong
             except Channel.DoesNotExist:
                 pass
         if item.show.icon:
