@@ -81,7 +81,12 @@ class MakeEpisodeMixin(object):
         if slug == "":
             raise Exception()
         episode = Episode(show=show, slug=slug, status=Episode.STATUS[1][0])
-        episode.save()
+        try:
+            episode.save()
+        except:
+            from django.db import connection
+            connection._rollback()
+            raise
         return episode
 
 
