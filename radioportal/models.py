@@ -109,6 +109,12 @@ class Episode(models.Model):
         a single Episode of a show, which should be relayed or was relayed in
         the past
     """
+
+    #this is used for the dashboard only
+    PUBLIC_STATUS = (
+        ('ARCHIVED', _("Archived Episode")),
+        ('UPCOMING', _("Upcoming Episode")),
+    )
     STATUS = (
         ('ARCHIVED', _("Archived Episode")),
         ('RUNNING', _("Running Episode")),
