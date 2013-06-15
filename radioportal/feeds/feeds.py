@@ -176,7 +176,7 @@ class ShowFeed(Feed):
             eps = eps.filter(show=obj[0])
         if obj[1] is not None:
             eps = eps.filter(status=_mapping[obj[1]])
-        return eps.annotate(end=Min('parts__end')).order_by('-end')[:30]
+        return eps.annotate(end=Max('parts__end')).order_by('-end')[:30]
 
     def item_title(self, item):
         return item.title()
