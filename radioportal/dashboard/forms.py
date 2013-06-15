@@ -146,7 +146,7 @@ class PermissionForm(forms.Form):
 
 class EpisodeForm(forms.ModelForm):
     required_css_class = "required"
-    status = forms.CharField(max_length=10, widget=forms.Select(choices=models.Episode.PUBLIC_STATUS))
+    status = forms.ChoiceField(choices=models.Episode.PUBLIC_STATUS)
     class Meta:
         model = models.Episode
         fields = ('slug', 'status')

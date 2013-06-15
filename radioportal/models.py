@@ -110,7 +110,7 @@ class Episode(models.Model):
         the past
     """
 
-    #this is used for the dashboard only
+    #available options for dashboard users
     PUBLIC_STATUS = (
         ('ARCHIVED', _("Archived Episode")),
         ('UPCOMING', _("Upcoming Episode")),
