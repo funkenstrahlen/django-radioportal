@@ -37,6 +37,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q, signals
+from django.db.models.aggregates import Max, Sum, Min
 from django.http import HttpResponse, Http404
 from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
@@ -57,6 +58,7 @@ from guardian.shortcuts import get_objects_for_user, assign
 from radioportal import forms
 from radioportal.dashboard import forms as dforms
 from radioportal.dashboard.decorators import superuser_only
+from radioportal.messages.send import send_msg
 from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message, SourcedStream
 
 from django.core.mail import send_mail
@@ -65,6 +67,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import datetime
 import requests
+import simplejson
 
 @csrf_exempt
 def icecast_source_auth(request):
@@ -143,7 +146,6 @@ class UserChannelStreamAddView(SessionWizardView):
             return self.storage.extra_data['initial'][int(step)]
         elif step in ('2', '3'):
             data = self.get_cleaned_data_for_step('1')
-            print data
             if data:
                 name = slugify(data['name']).replace("-","")
                 if step == '2':
@@ -566,6 +568,69 @@ class ChannelCreateView(CreateView):
     def dispatch(self, *args, **kwargs):
         return super(ChannelCreateView, self).dispatch(*args, **kwargs)
 
+class ChannelChangeCurrentEpisode(UpdateView):
+    template_name = "radioportal/dashboard/channel_change_c_episode.html"
+    success_url = '/dashboard/channel/%(id)s/'
+    form_class = dforms.ChannelChangeEpisodeForm
+    model = Channel
+
+    def form_valid(self, form):
+        ch = Channel.objects.get(pk=self.kwargs['pk'])
+        old_episode = ch.currentEpisode
+        part = old_episode.current_part
+        new_episode = form.cleaned_data['currentEpisode']
+
+        part.episode = new_episode
+        part.save()
+
+        old_episode.status = Episode.STATUS[0][0]
+        old_episode.current_part = None
+        old_episode.save()
+
+        new_episode.current_part = part
+        new_episode.status = Episode.STATUS[1][0]
+        new_episode.save()
+
+        data = {
+            'channel': ch.cluster,
+            'episode': new_episode.get_id(),
+            'publish': {
+                'twitter': new_episode.show.twitter,
+                'chat': new_episode.show.chat,
+            },
+            'old': { 'episode': old_episode.get_id() },
+        }
+
+        send_msg("channel.update", simplejson.dumps(data))
+
+        return super(ChannelChangeCurrentEpisode, self).form_valid(form)
+
+    def get_form_class(self):
+        form_class = super(ChannelChangeCurrentEpisode, self).get_form_class()
+        show_qs = get_objects_for_user(self.request.user, "change_show", Show)
+        show_qs = show_qs.filter(channel__in=(self.object,))
+        qs = Episode.objects.filter(show__in=show_qs).annotate(begin=Min('parts__begin')).order_by('-begin')
+        form_class.base_fields['currentEpisode'].queryset = qs
+        return form_class
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.currentEpisode:
+            context = self.get_context_data(**kwargs)
+            return self.render_to_response(context)
+        else:
+            return super(ChannelChangeCurrentEpisode, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.currentEpisode:
+            return self.get(request, *args, **kwargs)
+        else:
+            return super(ChannelChangeCurrentEpisode, self).post(request, *args, **kwargs)
+
+    @method_decorator(permission_required('change_channel', (Channel, 'pk', 'pk')))
+    def dispatch(self, *args, **kwargs):
+        return super(ChannelChangeCurrentEpisode, self).dispatch(*args, **kwargs)
 
 class ChannelEditView(UpdateView):
     template_name = "radioportal/dashboard/channel_edit.html"

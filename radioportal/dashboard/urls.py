@@ -79,6 +79,7 @@ urlpatterns = patterns('',
     url(r'^channel/(?P<pk>[\w-]+)/$', views.ChannelEditView.as_view(), name="admin-channel-edit"),
     url(r'^cluster/(?P<slug>[\w-]+)/$', views.ChannelClusterEditView.as_view(), name="admin-channel-edit-cluster"),
     url(r'^channel/(?P<pk>[\w-]+)/delete/$', views.ChannelDeleteView.as_view(), name="admin-channel-delete"),
+    url(r'^channel/(?P<pk>[\w-]+)/cce/$', views.ChannelChangeCurrentEpisode.as_view(), name="admin-channel-cce"),
     
     url(r'^accounts/login/$', django.contrib.auth.views.login, {}, name="login"),
     url(r'^accounts/logout/$', django.contrib.auth.views.logout_then_login, {}, name="logout"),

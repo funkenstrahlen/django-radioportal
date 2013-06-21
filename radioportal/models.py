@@ -145,6 +145,9 @@ class Episode(models.Model):
             return self.parts.all()[0].url
         return None        
     
+    def get_id(self):
+        return unicode("%s-%s") % (self.show.slug, self.slug)
+
     status = models.CharField(max_length=10,
         choices=STATUS, default=STATUS[2][0])
 

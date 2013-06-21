@@ -188,8 +188,8 @@ class ShowFeed(Feed):
         return 'http:%s' % url
 
     def item_guid(self, item):
-        return unicode("%s-%s") % (item.show.slug, item.slug)
-
+        return item.get_id()
+ 
     def item_description(self, item):
         return item.description()
 

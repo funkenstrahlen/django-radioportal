@@ -255,6 +255,14 @@ class OrderedSelectMultiple(SelectMultiple):
         }
 
 
+
+class ChannelChangeEpisodeForm(forms.ModelForm):
+    required_css_class = "required"
+    class Meta:
+        model = models.Channel
+        fields = ('currentEpisode',)
+
+
 class ChannelForm(forms.ModelForm):
     required_css_class = "required"
     mapping_method = jsonfield.forms.JSONFormField #widget=OrderedSelectMultiple(choices=MAPPINGS))

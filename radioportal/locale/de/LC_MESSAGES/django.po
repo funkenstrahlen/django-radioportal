@@ -418,6 +418,28 @@ msgstr "Start"
 msgid "Overview"
 msgstr "Übersicht"
 
+
+#: templates/radioportal/dashboard/channel_change_c_episode.html:30
+#, fuzzy
+msgid "Edit current episode"
+msgstr "Aktuelle Folge ändern"
+
+#: templates/radioportal/dashboard/channel_change_c_episode.html:34
+#, fuzzy
+msgid "Change current episode for"
+msgstr "Ändere aktuelle Folge für"
+
+#: templates/radioportal/dashboard/channel_change_c_episode.html:40
+#, fuzzy
+msgid "Change Episode"
+msgstr "Ändere Folge"
+
+#: templates/radioportal/dashboard/channel_change_c_episode.html:44
+msgid ""
+"The current episode can only be changed for channel with a running stream."
+msgstr ""
+"Die aktuelle Folge kann nur geändert werden, wenn ein Stream für diesen Channel läuft."
+
 #: templates/radioportal/dashboard/channel_delete.html:29
 #: templates/radioportal/dashboard/channel_delete.html:31
 msgid "Delete Channel"
@@ -457,7 +479,17 @@ msgstr ""
 msgid "Add another item"
 msgstr ""
 
+#: templates/radioportal/dashboard/channel_edit.html:78
 #: templates/radioportal/dashboard/channel_edit.html:80
+#, fuzzy
+msgid "Additional Settings"
+msgstr "Einstellungen für Account"
+
+#: templates/radioportal/dashboard/channel_edit.html:89
+#, fuzzy
+msgid "Change current episode"
+msgstr "Ändere aktuelle Folge"
+
 msgid "Edit Channel"
 msgstr "Channel bearbeiten"
 

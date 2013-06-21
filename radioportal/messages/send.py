@@ -38,12 +38,13 @@ logger = logging.getLogger(__name__)
 
 from django.db.models.signals import post_save, post_delete
 from django.core.serializers import json
+from django.conf import settings
 
 from radioportal.models import SourcedStream, ShowFeed, RecodedStream
 
 import simplejson
 
-from carrot.connection import DjangoBrokerConnection
+from carrot.connection import DjangoBrokerConnection, BrokerConnection
 from carrot.messaging import Publisher
 
 #### Part one: sending notifications for changed objects ####
@@ -103,6 +104,23 @@ dto_map = {
 }
 
 
+
+def send_msg(routing_key, data):
+    conn = BrokerConnection(
+                hostname=settings.BROKER_HOST,
+                port=settings.BROKER_PORT,
+                userid=settings.BROKER_USER,
+                password=settings.BROKER_PASSWORD,
+                virtual_host=settings.BROKER_VHOST)
+    publisher = Publisher(connection=conn,
+                          exchange="django_send",
+                          routing_key=routing_key,
+                          exchange_type="topic",
+                          )
+    publisher.send(data)
+    publisher.close()
+    conn.close()
+
 class AMQPInitMiddleware(object):
 
     sender_callback = None
@@ -127,15 +145,7 @@ class AMQPInitMiddleware(object):
             return json.Serializer().serialize((instance,))
 
     def sender_callback(self, routing_key, data):
-        conn = DjangoBrokerConnection()
-        publisher = Publisher(connection=conn,
-                              exchange="django_send",
-                              routing_key=routing_key,
-                              exchange_type="topic",
-                              )
-        publisher.send(data)
-        publisher.close()
-        conn.close()
+        send_msg(routing_key, data)
         print "Sent object change/delete message for %s" % routing_key
 
     def object_changed(self, sender, instance, created, **kwargs):
