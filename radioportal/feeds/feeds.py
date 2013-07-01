@@ -210,7 +210,8 @@ def ical_feed(request, show_name=None):
         vevent.add('summary').value = val
         vevent.add('description').value = episode.description()
         vevent.add('dtstart').value = episode.begin()
-        vevent.add('dtend').value = episode.end()
+        if episode.end():
+            vevent.add('dtend').value = episode.end()
         vevent.add('uid').value = '%s' % episode.pk
         kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
         url = reverse_full("www", "episode", view_kwargs=kwargs)
