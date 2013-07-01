@@ -33,7 +33,7 @@ OF SUCH DAMAGE.
 	{% if episode.begin or episode.end %}
 	<small>{% if episode.begin %}{% trans "from" %} {{ episode.begin|date:"d. F Y H:i" }} {% endif %}{% if episode.end %}{% trans "until" %} {% if episode.begin|sameday:episode.end %}{{ episode.end|date:"H:i" }}{% else %}{{ episode.end|date:"d. F Y H:i" }}{% endif %}{% endif %}</small>
 	{% endif %}
-	<p>{{ episode.description|safe }} <a href="{% url episode show_name=episode.show.slug,slug=episode.slug %}"> {% trans "Read more" %} »</a></p>
+	<p>{{ episode.description|safe }} <a href="{% url episode show_name=episode.show.slug,slug=episode.slug %}">{% trans "Read more" %}&nbsp;»</a></p>
 	{% endcache %}
 	{% include "radioportal/episodes/episode_streams.html" %}
 </div>{% endspaceless %}
