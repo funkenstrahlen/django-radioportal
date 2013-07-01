@@ -49,6 +49,7 @@ import urllib
 import os.path
 import urllib2
 import easy_thumbnails.files
+import copy
 
 from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message
 
@@ -124,7 +125,7 @@ class BackendInterpreter(object):
         available_methods = get_episode_finder()
         episode = None
 
-        methods = channel.mapping_method
+        methods = copy.copy(channel.mapping_method)
         methods.append("make-live")
 
         for method in methods:
