@@ -142,6 +142,8 @@ class UserChannelStreamAddView(SessionWizardView):
             initial[1]['url'] = application['homepage']
 
             self.storage.extra_data['initial'] = initial
+            self.storage.extra_data['rt_id'] = application['rt_id']
+
         if int(step) in self.storage.extra_data['initial']:
             return self.storage.extra_data['initial'][int(step)]
         elif step in ('2', '3'):
@@ -184,6 +186,11 @@ class UserChannelStreamAddView(SessionWizardView):
         mail_text = _("USERCREATEDMAIL with %(username)s %(password)s") % mail_data
         mail_subject = _("[xenim] Neuer Nutzer erstellt")
         send_mail(mail_subject, mail_text, "noreply@streams.xenim.de", [user.email,])
+
+        mail_data_rt = {'username': user.username, 'showname': show.name, 'channel': channel.cluster, 'streamname': stream.mount}
+        mail_text_rt = _("The following objects have been created:\n\n\tUser:\t%(username)s\n\tShow:\t%(showname)s\n\tChannel:\t%(channel)s\n\tStream:\t%(streamname)s\n") % mail_data_rt
+        mail_subject_rt = _("[xsn #%i] Neuer Nutzer") % self.storage.extra_data['rt_id']
+        send_mail(mail_subject_rt, mail_text_rt, "noreply@streams.xenim.de", ["info-comment@streams.xenim.de",])
 
         return HttpResponseRedirect(reverse_full('dashboard', 'dashboard'))
 
