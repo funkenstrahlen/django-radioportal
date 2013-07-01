@@ -284,7 +284,7 @@ class ChannelForm(forms.ModelForm):
 
 class StreamForm(forms.ModelForm):
     required_css_class = "required"
-    mount = forms.RegexField(regex='^[a-zA-Z0-9_-]+\.(mp3|ogg|ogm|oga|aac)$')
+    mount = forms.RegexField(regex='^[a-zA-Z0-9_/-]+\.(mp3|ogg|ogm|oga|aac|m3u8)$')
 
 
 class SourcedStreamForm(StreamForm):
