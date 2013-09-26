@@ -198,7 +198,8 @@ def ical_feed(request, show_name=None):
     cal.add('method').value = 'PUBLISH'  # IE/Outlook needs this
     str = ""
     if show_name:
-        str= " for %s" % Show.objects.get(slug=show_name).name
+        show = get_object_or_404(Show, slug=show_name)
+        str= " for %s" % show.name
     cal.add('X-WR-CALNAME').value = "Upcoming episodes%s on xsn" % str
     cal.add('X-WR-TIMEZONE').value = settings.TIME_ZONE
     ep = Episode.objects.filter(status='UPCOMING')
