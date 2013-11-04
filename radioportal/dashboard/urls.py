@@ -94,6 +94,6 @@ urlpatterns = patterns('',
     url(r'^accounts/reset-password/done/$', django.contrib.auth.views.password_reset_complete),
 
     url(r'^icecast/source-auth/$', views.icecast_source_auth),
-
+    url(r'^icecast/sandbox-lauth/$', views.icecast_sandbox_lauth),
     url(r'^messages/$', views.MessageListView.as_view(), name="admin-messages-list"),
 )

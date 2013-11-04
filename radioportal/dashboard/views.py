@@ -64,6 +64,7 @@ from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Ma
 from django.core.mail import send_mail
 from django.contrib.formtools.wizard.views import SessionWizardView
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 import datetime
 import requests
@@ -87,13 +88,44 @@ def icecast_source_auth(request):
         response.status_code = 403
         return response
     print mount, user, passwd
-    stream = SourcedStream.objects.get(mount=mount[1:])
+    stream = get_object_or_404(SourcedStream, mount=mount[1:])
     if stream.user == user and stream.password == passwd:
         response["icecast-auth-user"] = 1
         response["icecast-auth-timelimit"] = 10*60
     else:
         response["icecast-auth-message"] = "Username or password wrong"
     return response
+
+@csrf_exempt
+def icecast_sandbox_lauth(request):
+    response = HttpResponse()
+    for k in ("mount", "server"):
+        if not k in request.REQUEST:
+            response["icecast-auth-message"] = "Parameter is missing"
+            response.status_code = 400
+            return response
+    user = None
+    passwd = None
+    if "user" in request.REQUEST:
+        user = request.REQUEST["user"]
+    if "pass" in request.REQUEST:
+        passwd = request.REQUEST["pass"]
+    mount = request.REQUEST["mount"]
+    server = request.REQUEST["server"]
+
+    if not server.endswith("xenim.de"):
+        response["icecast-auth-message"] = "Server is not permitted to use this"
+        response.status_code = 403
+        return response
+    stream = get_object_or_404(SourcedStream, mount=mount[1:])
+    if stream.user == user and stream.password == passwd:
+        response["icecast-auth-user"] = 1
+        response["icecast-auth-timelimit"] = 30*60
+    else:
+        response["icecast-auth-user"] = 1
+        response["icecast-auth-timelimit"] = 3*60
+    return response
+
 
 class UserChannelStreamAddView(SessionWizardView):
     template_name = "radioportal/dashboard/create_wizard.html"
