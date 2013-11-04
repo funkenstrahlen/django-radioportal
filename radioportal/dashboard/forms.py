@@ -35,6 +35,7 @@ Created on 14.09.2011
 
 from datetime import timedelta
 from itertools import chain
+from urlparse import urlparse, urlunparse
 
 from django import forms
 from django.contrib.admin import widgets as adminwidgets
@@ -54,6 +55,37 @@ from radioportal import models
 from radioportal.messages import episode_finder
 from radioportal.models import Channel, RecodedStream, SourcedStream, Stream
 
+
+class IRCWidget(widgets.MultiWidget):
+    def __init__(self, attrs=None, choices=None):
+        """ pass all these parameters to their respective widget constructors..."""
+        _widgets = (widgets.Select(attrs=attrs, choices=choices), widgets.TextInput(attrs=attrs))
+        super(IRCWidget, self).__init__(_widgets, attrs)
+
+    def value_from_datadict(self, data, files, name):
+        val = super(IRCWidget, self).value_from_datadict(data, files, name)
+        if val[0] == u"None":
+            return ""
+        if val[1][0] not in "#!?":
+            val[1] = "#%s" % val[1]
+        url = urlunparse(("irc", val[0], val[1], None, None, None))
+        return url
+
+    def decompress(self, value):
+        if value:
+            u = urlparse(value)
+            return [u.hostname, u.path.split("/")[-1]]
+        return [None, None]
+
+    def format_output(self, rendered_widgets):
+        """
+        Given a list of rendered widgets (as strings), it inserts an HTML
+        linebreak between them.
+        
+        Returns a Unicode string representing the HTML for the whole lot.
+        """
+        rendered_widgets.insert(-1, ' ')
+        return u''.join(rendered_widgets)
 
 class CheckboxSelectMultipleTable(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
@@ -303,10 +335,20 @@ class RecodedStreamForm(StreamForm):
         fields = ('mount', 'bitrate', 'format', 'source')
 
 
+IRCNETWORKS=(
+    (None, "---"),
+    ("irc.freenode.net", "FreeNode"),
+    ("irc.hackint.org", "HackInt"),
+)
+
+
 class ShowForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
         model = models.Show
+        widgets = {
+            'chat': IRCWidget(choices=IRCNETWORKS),
+        }
 
 
 class ShowReducedForm(forms.ModelForm):
@@ -314,7 +356,9 @@ class ShowReducedForm(forms.ModelForm):
     class Meta:
         model = models.Show
         exclude = ('name', 'url', 'abstract', 'description', 'icon')
-
+        widgets = {
+            'chat': IRCWidget(choices=IRCNETWORKS),
+        }
 
 class ShowFeedForm(forms.ModelForm):
     required_css_class = "required"
