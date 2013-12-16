@@ -261,7 +261,7 @@ class PermissionChangeView(FormView):
     
     form_class = dforms.PermissionForm
     
-    success_url = '/dashboard/user/'
+    success_url = '/user/'
     
     def get_form_kwargs(self):
         kwargs = super(PermissionChangeView, self).get_form_kwargs()
@@ -326,7 +326,7 @@ class UserCreateView(CreateView):
     template_name = "radioportal/dashboard/user_edit.html"
     model = User
     form_class = forms.UserForm
-    success_url = '/dashboard/user/%(username)s/'
+    success_url = '/user/%(username)s/'
 
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
@@ -338,7 +338,7 @@ class UserEditView(UpdateView):
     model = User
     slug_field = 'username'
     form_class = forms.UserForm
-    success_url = '/dashboard/user/%(username)s/'
+    success_url = '/user/%(username)s/'
 
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
@@ -348,7 +348,7 @@ class UserEditView(UpdateView):
 class GroupCreateView(CreateView):
     template_name = "radioportal/dashboard/group_edit.html"
     model = Group
-    success_url = '/dashboard/group/%(id)s/'
+    success_url = '/group/%(id)s/'
     form_class = forms.GroupForm
     
     @method_decorator(superuser_only)
@@ -360,7 +360,7 @@ class GroupEditView(UpdateView):
     template_name = "radioportal/dashboard/group_edit.html"
     model = Group
     slug_field = 'id'
-    success_url = '/dashboard/group/%(id)s/'
+    success_url = '/group/%(id)s/'
     form_class = forms.GroupForm
     
     @method_decorator(superuser_only)
@@ -385,7 +385,7 @@ class LandingView(TemplateResponseMixin, View):
 
 class ShowCreateView(CreateView):
     template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/dashboard/show/%(slug)s/'
+    success_url = '/show/%(slug)s/'
     form_class = dforms.ShowForm
     model = Show
 
@@ -396,7 +396,7 @@ class ShowCreateView(CreateView):
 
 class ShowEditView(UpdateView):
     template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/dashboard/show/%(slug)s/'
+    success_url = '/show/%(slug)s/'
     form_class = dforms.ShowForm
     slug_field = 'slug'
     model = Show
@@ -416,7 +416,7 @@ class ShowEditView(UpdateView):
 
 class ShowDeleteView(DeleteView):
     template_name = "radioportal/dashboard/show_delete.html"
-    success_url = "/dashboard/"
+    success_url = "/"
     slug_field = 'slug'
     model = Show
 
@@ -426,7 +426,7 @@ class ShowDeleteView(DeleteView):
 
 class ShowFeedEditView(UpdateView):
     template_name = "radioportal/dashboard/showfeed_edit.html"
-    success_url = '/dashboard/show/%(slug)s/'
+    success_url = '/show/%(slug)s/'
     slug_field = 'show__slug'
     model = ShowFeed
     form_class = dforms.ShowFeedForm
@@ -502,7 +502,7 @@ class EpisodeListView(ListView):
 
 class EpisodeCreateView(CreateView):
     template_name = "radioportal/dashboard/episode_create.html"
-    success_url = '/dashboard/episodepart/%(id)s/'
+    success_url = '/episodepart/%(id)s/'
     form_class = dforms.CreateEpisodeForm
     model = Episode
 
@@ -546,7 +546,7 @@ class EpisodeCreateView(CreateView):
 
 class EpisodeEditView(UpdateView):
     template_name = "radioportal/dashboard/episode_edit.html"
-    success_url = '/dashboard/episode/%(id)s/'
+    success_url = '/episode/%(id)s/'
     form_class = dforms.EpisodeForm
     model = Episode
 
@@ -579,7 +579,7 @@ class EpisodeDeleteView(DeleteView):
 
 class EpisodePartEditView(UpdateView):
     template_name = "radioportal/dashboard/episodepart_edit.html"
-    success_url = '/dashboard/episodepart/%(id)s/'
+    success_url = '/episodepart/%(id)s/'
     form_class = dforms.EpisodePartForm
     model = EpisodePart
 
@@ -595,7 +595,7 @@ class EpisodePartEditView(UpdateView):
 
 class ChannelCreateView(CreateView):
     template_name = "radioportal/dashboard/channel_edit.html"
-    success_url = '/dashboard/channel/%(id)s/'
+    success_url = '/channel/%(id)s/'
     form_class = dforms.ChannelPlainCompoundForm
     model = Channel
 
@@ -611,7 +611,7 @@ class ChannelCreateView(CreateView):
 
 class ChannelChangeCurrentEpisode(UpdateView):
     template_name = "radioportal/dashboard/channel_change_c_episode.html"
-    success_url = '/dashboard/channel/%(id)s/'
+    success_url = '/channel/%(id)s/'
     form_class = dforms.ChannelChangeEpisodeForm
     model = Channel
 
@@ -675,7 +675,7 @@ class ChannelChangeCurrentEpisode(UpdateView):
 
 class ChannelEditView(UpdateView):
     template_name = "radioportal/dashboard/channel_edit.html"
-    success_url = '/dashboard/channel/%(id)s/'
+    success_url = '/channel/%(id)s/'
     form_class = dforms.ChannelCompoundForm
     model = Channel
 
@@ -716,7 +716,7 @@ class ChannelClusterEditView(ChannelEditView):
 
 class ChannelDeleteView(DeleteView):
     template_name = "radioportal/dashboard/channel_delete.html"
-    success_url = "/dashboard/"
+    success_url = "/"
     model = Channel
 
     @method_decorator(permission_required('delete_channel', (Channel, 'pk', 'pk')))
