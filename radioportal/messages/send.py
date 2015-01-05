@@ -40,7 +40,7 @@ from django.db.models.signals import post_save, post_delete
 from django.core.serializers import json
 from django.conf import settings
 
-from radioportal.models import SourcedStream, ShowFeed, ShowTwitter, Show, Channel, RecodedStream
+from radioportal.models import SourcedStream, ShowFeed, Show, Channel, RecodedStream
 
 from extshorturls.utils import ShortURLResolver
 
@@ -193,7 +193,7 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed, ShowTwitter, Show, Channel):
+        for m in (RecodedStream, SourcedStream, ShowFeed, Show, Channel):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             post_delete.connect(
