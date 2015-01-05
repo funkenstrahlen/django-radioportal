@@ -196,6 +196,7 @@ class EpisodePart(models.Model):
     class Meta:
         ordering = ['-id']
 
+
 class Marker(models.Model):
     episode = models.ForeignKey(EpisodePart)
     pointoftime = models.DateTimeField(auto_now_add=True)
@@ -203,8 +204,25 @@ class Marker(models.Model):
     link = models.URLField(blank=True)
     delete = models.BooleanField(default=True)
 
+
+GTYPES = (
+    ('server', _("Listener Statistics Grouped by Server")),
+    ('mount', _("Listener Statistics Grouped by Mount Point")),
+)
+
 class Graphic(models.Model):
-    file = models.ImageField(upload_to='archiv', blank=True)
+
+    def get_graphic_path(instance, filename):
+        dn = "/".join(["graphics", 
+                  instance.episode.episode.show.slug])
+        fn = "%s.png" % uuid.uuid4()
+        fdn = os.path.join(settings.MEDIA_ROOT, dn)
+        if not os.path.exists(fdn):
+            os.makedirs(fdn)
+        return "/".join([dn, fn])
+
+    file = models.ImageField(upload_to=get_graphic_path, blank=True)
+    type = models.CharField(max_length=10, choices=GTYPES)
     episode = models.ForeignKey('EpisodePart', related_name='graphics')
 
     def __unicode__(self):

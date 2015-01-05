@@ -40,7 +40,9 @@ from django.db.models.signals import post_save, post_delete
 from django.core.serializers import json
 from django.conf import settings
 
-from radioportal.models import SourcedStream, ShowFeed, RecodedStream
+from radioportal.models import SourcedStream, ShowFeed, ShowTwitter, Show, Channel, RecodedStream
+
+from extshorturls.utils import ShortURLResolver
 
 import simplejson
 
@@ -49,63 +51,110 @@ from carrot.messaging import Publisher
 
 #### Part one: sending notifications for changed objects ####
 
+shorturls = ShortURLResolver()
 
 class DTO(object):
+    def name():
+        return None
+
     def serialize(self):
         return simplejson.dumps((self.__dict__,))
 
 
+class DTOChannel(DTO):
+    def name(self):
+        return "channel"
+
+    def __init__(self, instance):
+        self.id = instance.cluster
+        self.recording = instance.recording
+        self.public_recording = instance.public_recording
+        if hasattr(instance, "auphonic"):
+            self.auphonic= {}
+            self.auphonic['enabled'] = instance.auphonic.enabled
+            self.auphonic['oauth_token'] = instance.auphonic.oauth_token
+            self.auphonic['update_metadata'] = instance.auphonic.update_metadata
+            self.auphonic['preset'] = instance.auphonic.preset
+        self.episode = {}
+        if instance.currentEpisode:
+            self.episode = DTOEpisode(instance.currentEpisode).serialize()
+
+
 class DTOSourcedStream(DTO):
+    def name(self):
+        return "sourcedstream"
+
     def __init__(self, instance):
         self.mount = instance.mount
         self.user = instance.user
         self.password = instance.password
         self.encoding = instance.encoding
-        self.cluster = instance.channel.cluster
-        self.recording = instance.channel.recording
+        self.channel = instance.channel.cluster
         self.fallback = instance.fallback
-        self.id = instance.pk
+        self.id = instance.mount
+        self.recode = []
+        for rs in instance.recoded.all():
+            self.recode.append({'mount': rs.mount, 'format': rs.format, 'bitrate': rs.bitrate})
 
 
-class DTOShowFeed(DTO):
+class DTORecodedStream(DTOSourcedStream):
     def __init__(self, instance):
-        self.enabled = instance.enabled
-        self.feed = instance.feed
-        self.ical = instance.icalfeed
-        self.title_regex = instance.titlePattern
-        self.show = instance.show.slug
-        self.id = instance.pk
+        super(DTORecodedStream, self).__init__(instance.source)
 
 
 class DTOShow(DTO):
+    def name(self):
+        return "show"
+
     def __init__(self, instance):
-        self.slug = instance.slug
-        self.cluster = instance.channel.cluster
+        self.id = instance.slug
         self.twitter = instance.twitter
         self.chat = instance.chat
+        if hasattr(instance, "showtwitter"):
+            self.twitter_token = instance.showtwitter.token
+            self.twitter_secret = instance.showtwitter.secret
+        if hasattr(instance, "showfeed"):
+            self.feed = {}
+            self.feed['enabled'] = instance.showfeed.enabled
+            self.feed['feed'] = instance.showfeed.feed
+            self.feed['icalfeed'] = instance.showfeed.icalfeed
+            self.feed['titlePattern'] = instance.showfeed.titlePattern
 
 
-class DTOAuphonic(DTO):
+class DTOShowTwitter(DTOShow):
     def __init__(self, instance):
-        self.channel = instance.channel.cluster
-        if instance.preset:
-            self.preset = instance.preset.uuid
-        else:
-            self.preset = ""
-        self.update_md = instance.update_metadata
-        self.enabled = instance.enabled
-        self.oauth_token = instance.oauth_token
-        self.id = self.channel
+        super(DTOShowTwitter, self).__init__(instance.show)
+
+class DTOShowFeed(DTOShow):
+    def __init__(self, instance):
+        super(DTOShowFeed, self).__init__(instance.show)
+
+class DTOEpisode(DTO):
+    def name(self):
+        return "episode"
+
+    def __init__(self, instance):
+        self._id = instance.id
+        if instance.current_part:
+            self._part_id = instance.current_part.id
+        self.slug = instance.get_id()
+        self.show = instance.show.slug
+        self.url = instance.get_absolute_url()
+        self.url_s = shorturls.get_shorturl(instance)
 
 dto_map = {
     "sourcedstream": DTOSourcedStream,
+    "recodedstream": DTORecodedStream,
+    "show": DTOShow,
     "showfeed": DTOShowFeed,
-    #"auphonicsettings": DTOAuphonic,
+    "showtwitter": DTOShowTwitter,
+    "episode": DTOEpisode,
+    "channel": DTOChannel,
 }
 
 
 
-def send_msg(routing_key, data):
+def send_msg(routing_key, data, exchange="django_send"):
     conn = BrokerConnection(
                 hostname=settings.BROKER_HOST,
                 port=settings.BROKER_PORT,
@@ -113,13 +162,26 @@ def send_msg(routing_key, data):
                 password=settings.BROKER_PASSWORD,
                 virtual_host=settings.BROKER_VHOST)
     publisher = Publisher(connection=conn,
-                          exchange="django_send",
+                          exchange=exchange,
                           routing_key=routing_key,
                           exchange_type="topic",
                           )
     publisher.send(data)
     publisher.close()
     conn.close()
+
+
+def serialize_object(instance, return_name=False):
+    name = instance._meta.object_name.lower()
+    if name in dto_map:
+        dto = dto_map[name](instance)
+        if return_name:
+            return (dto.serialize(), dto.name())
+        else:
+            return dto.serialize()
+    else:
+        return json.Serializer().serialize((instance,))
+
 
 class AMQPInitMiddleware(object):
 
@@ -131,18 +193,11 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed):
+        for m in (RecodedStream, SourcedStream, ShowFeed, ShowTwitter, Show, Channel):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             post_delete.connect(
                 self.object_deleted, m, dispatch_uid="my_dispatch_uid")
-
-    def serialize(self, instance):
-        name = instance._meta.object_name.lower()
-        if name in dto_map:
-            return dto_map[name](instance).serialize()
-        else:
-            return json.Serializer().serialize((instance,))
 
     def sender_callback(self, routing_key, data):
         send_msg(routing_key, data)
@@ -150,16 +205,15 @@ class AMQPInitMiddleware(object):
 
     def object_changed(self, sender, instance, created, **kwargs):
         action = "created" if created else "changed"
-        routing_key = "%s.%s.%s" % (
-            sender._meta.app_label, sender._meta.module_name, action)
-        data = self.serialize(instance)
+        data, name = serialize_object(instance, True)
+        routing_key = "%s.%s.%s" % (sender._meta.app_label, name, action)
         self.sender_callback(routing_key, data)
         logger.debug("Object change message for %s sent" % unicode(instance))
 
     def object_deleted(self, sender, instance, **kwargs):
         routing_key = "%s.%s.deleted" % (
             sender._meta.app_label, sender._meta.module_name)
-        data = self.serialize(instance)
+        data = serialize_object(instance)
         self.sender_callback(routing_key, data)
         logger.debug("Object delete message for %s sent" % unicode(instance))
 

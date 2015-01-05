@@ -38,18 +38,21 @@ from django.contrib.contenttypes.models import ContentType
 
 from django.db import connection
 from django.conf import settings
+from django.core.files.base import ContentFile
 
 import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-import re
-import urlparse
-import urllib
-import os.path
-import urllib2
-import easy_thumbnails.files
+import base64
 import copy
+import easy_thumbnails.files
+import os.path
+import re
+import urllib
+import urllib2
+import urlparse
+import uuid
 
 from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message
 
@@ -59,7 +62,7 @@ from radioportal.url_normalize import url_normalize
 
 import dateutil.parser
 
-from .send import dto_map
+from .send import dto_map, send_msg, serialize_object
 from .episode_finder import get_episode_finder
 
 import reversion
@@ -115,9 +118,10 @@ class BackendInterpreter(object):
                        severity=data["severity"], timestamp=d)
         m.save()
 
-    def show_startmaster(self, data):
+    def channel_startmaster(self, data):
         """
             value={'name': cpwd, 'time': int, 'show' : {'name': 'CR001 Titel der Sendung'}}
+            data={"name": "event", "metadata": {"url": "", "genre": "various", "description": "Unspecified description", "name": "event139 Stream mit Uml\u00e4ut \u00fc\u00f6\u00e4\u00dc\u00d6\u00c4\u00df\u00f8\u00d8"}}
             FIXME: need show
         """
         channel = Channel.objects.get(cluster=data['name'])
@@ -135,7 +139,7 @@ class BackendInterpreter(object):
                 continue
             finder = available_methods[method]()
             try:
-                episode = finder.get_episode(channel, data['show'])
+                episode = finder.get_episode(channel, data['metadata'])
             except Exception, e:
                 print "method", method, "failed"
                 print traceback.format_exc()
@@ -164,82 +168,104 @@ class BackendInterpreter(object):
         episode.save()
 
         channel.currentEpisode = episode
+
+        self._update_metadata(channel, data["metadata"])
+
         channel.save()
 
-    def show_stop(self, data):
+        episode_serialized = serialize_object(episode)
+        episode_ser = simplejson.loads(episode_serialized)[0]
+
+        data = {'name': data['name'], 'metadata': {'episode': episode_ser} } 
+
+        print "Sending msg channel.update", data        
+        send_msg("channel.update", simplejson.dumps(data), exchange="backenddata")
+        print "sent msg"
+
+    def channel_stop(self, data):
         """
             value={'name': cpwd}
+            data={"name": "event"}
         """
         channel = Channel.objects.get(cluster=data['name'])
         if channel.currentEpisode:
             episode = channel.currentEpisode
             part = episode.current_part
-            part.end = datetime.now()
-            part.save()
+            if part:
+                part.end = datetime.now()
+                part.save()
+            else:
+                error_handler("channel_stop: no current part found for cluster %s" %
+                         data['name'], channel)
             episode.current_part = None
             episode.status = Episode.STATUS[0][0]
             episode.save()
             channel.currentEpisode = None
             channel.save()
         else:
-            error_handler("show_stop: no current episode found for cluster %s" %
+            error_handler("channel_stop: no current episode found for cluster %s" %
                          data['name'], channel)
             # FIXME
 
     def stream_start(self, data):
         """
             value={'name': mount, 'id': id, 'stream': {'mountpoint': 'mount.mp4', 'bitrate': 128, 'type': 'mp3'}}
+            data={"url": "http://streams.xenim.de/event.mp3", "type": "http", "quality": 0, "name": "/event.mp3", "format": "mp3"}
             FIXME: Stream object
         """
 
-        mp = data['stream']['mountpoint']
+        mp = data['name'][1:]
 
-        stream = Stream.objects.filter(mount=mp)
-        if len(stream) == 1:
-            stream = stream[0]
-        else:
-            channel = Channel.objects.get(cluster=data['name'].split("-")[0])
-            stream = Stream(mount=mp, channel=channel)
+        stream = Stream.objects.get(mount=mp)
+
         stream.running = True
-        stream.bitrate = data['stream']['bitrate']
-        stream.format = data['stream']['type'].lower()
+        stream.bitrate = data['quality']
+        stream.format = data['format']
         stream.save()
         # stream.channel.updateRunning()
 
     def stream_stop(self, data):
         """
             value={'name': mount}
+            value={"name": "/event.mp3"}
         """
-        mount = data['name'].split("-")
+        mount = data['name'][1:]
 
-        stream = Stream.objects.filter(channel__cluster=mount[0], format=mount[
-                                       2].lower(), bitrate=int(mount[1]))
-        if len(stream) == 1:
-            stream = stream[0]
-            stream.running = False
-            stream.save()
+        stream = Stream.objects.get(mount=mount)
 
-    def show_listener(self, data):
-        channel = Channel.objects.get(cluster=data['id'])
-        channel.listener = data['listener']
+        stream.running = False
+        stream.save()
+
+    def channel_listeners(self, data):
+        """
+            data={"listeners": 1, "name": "event"}
+        """
+        channel = Channel.objects.get(cluster=data['name'])
+        channel.listener = data['listeners']
         channel.save()
 
-    def show_metadata(self, data):
+    def channel_metadata(self, data):
         """
             value={'name': mount, 'key': key, 'val': val}
         """
         channel = Channel.objects.get(cluster=data['name'].split("-")[0])
 
+        self._update_metadata(channel, {data['key']: data['val']})
+
+
+    def _update_metadata(self, channel, metadata):
+
         # mapping internal keys to attributes of stream channel
         map2channel = {'name': 'streamShow', 'genre': 'streamGenre',
                        'current_song': 'streamCurrentSong',
                        'description': 'streamDescription', 'url': 'streamURL'}
-        if data['key'] in map2channel:
-            setattr(channel, map2channel[data['key']], data['val'])
-            channel.save()
-        else:
-            error_handler(
-                "show_metadata: key %s not in channel map" % data['key'], channel)
+        for key, value in metadata.iteritems():
+            if key in map2channel:
+                setattr(channel, map2channel[key], value)
+            else:
+                error_handler(
+                    "show_metadata: key %s not in channel map" % key, channel)
+        channel.save()
 
         # mapping between internal keys and episode fields
         map2eps = {'name': 'title', 'description': 'description', 'url': 'url'}
@@ -247,16 +273,34 @@ class BackendInterpreter(object):
         if channel.currentEpisode:
             episode = channel.currentEpisode
             part = episode.current_part
-            if data['key'] == 'name' and data['val'].lower().startswith(episode.slug):
-                data['val'] = data['val'][len(episode.slug):].strip()
-            if data['key'] == 'url' and data['val'] != '':
-                data['val'] = url_normalize(data['val'])
-            if data['key'] in map2eps:
-                setattr(part, map2eps[data['key']], data['val'])
-                part.save()
+            for key, value in metadata.iteritems():
+                if key == 'name' and value.lower().startswith(episode.slug):
+                    value = value[len(episode.slug):].strip()
+                if key == 'url' and value != '':
+                    value = url_normalize(value)
+                if key in map2eps:
+                    setattr(part, map2eps[key], value)
+                    part.save()
         else:
             error_handler(
                 "show_metadata: no current episode for %s" % channel.cluster, channel)
+
+    def graphic_updated(self, data):
+        channel = Channel.objects.get(cluster=data["channel"])
+
+        if not channel.currentEpisode and not channel.currentEpisode.current_part:
+            error_handler("graphic_update: no current episode for %s" % channel.cluster, channel)
+            return
+
+        part = channel.currentEpisode.current_part
+
+        g, created = Graphic.objects.get_or_create(type=data["type"], episode=part)
+        if created:
+            g.file.save("", ContentFile(base64.b64decode(data["image"])))
+        else:
+            f = open(g.file.path, "w")
+            f.write(base64.b64decode(data["image"]))
+            f.close()
 
     def graphic_created(self, data):
         """
@@ -288,8 +332,8 @@ class BackendInterpreter(object):
 
         r = Recording(episode=part)
         r.path = data['file']
-        r.format = data['format']
-        r.bitrate = data['bitrate']
+        #r.format = data['format']
+        #r.bitrate = data['bitrate']
         r.size = 0
         r.running = True
         r.save()
