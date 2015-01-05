@@ -42,6 +42,7 @@ OF SUCH DAMAGE.
 {% if object %}{% trans "Edit" %} {{ object|object_name }}
 {% else %}{% trans "Create Show" %}{% endif %}
 </h2>
+<div style="padding: 1em; border: solid 2px red; background-color: #FFCCCC; font-weight: bold; text-align: center; margin-bottom: 1em;">Diese Funktion ist momentan aufgrund eines Bugs deaktiviert!</div>
 <p>{% blocktrans %}It is possible to update the show and episode from the podcast feed of your show. 
 To use this feature enable it below and enter the URL to your feed. Additionally it is necessary to 
 specify a regular expression to separate the title of a feed entry into a id for an episode and the 
