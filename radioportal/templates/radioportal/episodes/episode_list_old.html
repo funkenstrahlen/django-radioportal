@@ -52,7 +52,7 @@ OF SUCH DAMAGE.
 <ul>
 {% for episode in future %}
 	<li>
-		<a href="{% url episode show_name=episode.show.slug episode_id=episode.slug %}">
+		<a href="{% url 'episode' show_name=episode.show.slug episode_id=episode.slug %}">
 			{{ episode.slug|upper }}
 		</a>
 	</li>

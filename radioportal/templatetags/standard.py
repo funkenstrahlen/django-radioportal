@@ -98,66 +98,6 @@ def formataudio(number, format):
     else:
         return number
 
-from django.template import Node
-from django.utils.encoding import smart_str
-
-
-# copied from django.template.defaulttags to support custom urlconf
-class URLNode(Node):
-    def __init__(self, view_name, args, kwargs, asvar, legacy_view_name=True):
-        self.view_name = view_name
-        self.legacy_view_name = legacy_view_name
-        self.args = args
-        self.kwargs = kwargs
-        self.asvar = asvar
-
-    def render(self, context):
-        from django.core.urlresolvers import reverse, NoReverseMatch
-        args = [arg.resolve(context) for arg in self.args]
-        urlconf = None
-        if "urlconf" in self.kwargs:
-            urlconf = str(self.kwargs["urlconf"])
-            del self.kwargs["urlconf"]
-        kwargs = dict([(smart_str(k, 'ascii'), v.resolve(context))
-                       for k, v in self.kwargs.items()])
-
-        view_name = self.view_name
-        if not self.legacy_view_name:
-            view_name = view_name.resolve(context)
-
-        # Try to look up the URL twice: once given the view name, and again
-        # relative to what we guess is the "main" app. If they both fail,
-        # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which cause return nothing.
-        url = ''
-        try:
-            url = reverse(view_name, urlconf=urlconf, args=args,
-                          kwargs=kwargs, current_app=context.current_app)
-        except NoReverseMatch, e:
-            if settings.SETTINGS_MODULE:
-                project_name = settings.SETTINGS_MODULE.split('.')[0]
-                try:
-                    url = reverse(project_name + '.' + view_name,
-                              args=args, kwargs=kwargs,
-                              current_app=context.current_app)
-                except NoReverseMatch:
-                    if self.asvar is None:
-                        # Re-raise the original exception, not the one with
-                        # the path relative to the project. This makes a
-                        # better error message.
-                        raise e
-            else:
-                if self.asvar is None:
-                    raise e
-
-        if self.asvar:
-            context[self.asvar] = url
-            return ''
-        else:
-            return url
-
-from django.template import defaulttags
-defaulttags.URLNode = URLNode
 
 import time, hashlib
 

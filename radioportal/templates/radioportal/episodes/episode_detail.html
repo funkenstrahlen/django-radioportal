@@ -28,7 +28,7 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block breadcrumb %}
 {{ block.super }} 
-» <a href="{% url show show_name=episode.show.slug %}">{{ episode.show.name }}</a>
+» <a href="{% url 'show' show_name=episode.show.slug %}">{{ episode.show.name }}</a>
 » {{ episode.title }}{% endblock %}
 {% block title %} 
 	&middot; {% trans "Archive" %}
@@ -53,10 +53,10 @@ OF SUCH DAMAGE.
 {% block navi_shows %}
 {% comment %}
 <ul>
-	<li><a class="collapsed" href="{% url show show_name=episode.show.slug %}">{{ episode.show.name }}</a>
+	<li><a class="collapsed" href="{% url 'show' show_name=episode.show.slug %}">{{ episode.show.name }}</a>
 		<ul>
 			<li class="active">
-				<a href="{% url episode show_name=episode.show.slug,episode_id=episode.slug %}">
+				<a href="{% url 'episode' show_name=episode.show.slug episode_id=episode.slug %}">
 					{{ episode.slug|upper }}
 				</a>
 			</li>

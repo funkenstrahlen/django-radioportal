@@ -46,7 +46,7 @@ disconnected due to network problems. The parts can also be transferred to other
 This is currently not possible with the webinterface, so ask the administrator.{% endblocktrans %}</p>
 <ul>
 {% for part in form.instance.parts.all %}
-<li><a href="{% url admin-episodepart-edit part.id %}">{{ part }}</a></li>
+<li><a href="{% url 'admin-episodepart-edit' part.id %}">{{ part }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

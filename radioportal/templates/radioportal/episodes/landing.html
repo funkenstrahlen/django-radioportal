@@ -46,10 +46,6 @@ OF SUCH DAMAGE.
 {% endblock %}
 
 {% block content %}
-{% url all-feed status="upcoming",urlconf=radioportal.feeds.urls as upcoming_feed_url %}
-{% url all-feed status="live",urlconf=radioportal.feeds.urls as live_feed_url %}
-{% url all-feed status="recent",urlconf=radioportal.feeds.urls as recent_feed_url %}
-{% url upcoming-all-ical urlconf=radioportal.feeds.urls as ical_url %}
 {% if running %}
 <h2>{% trans "Running Episodes" %}&nbsp;<a href="http:{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
 {% for episode in running %}
@@ -76,7 +72,7 @@ OF SUCH DAMAGE.
 	{% ifchanged %}
 		<h2>
 		{% ifequal episode.status "RUNNING" %}
-			{% if show_name %}<a href="{% url live_show show_name=show.slug %}">{% endif %}
+			{% if show_name %}<a href="{% url 'live_show' show_name=show.slug %}">{% endif %}
 				{% trans "Running Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
@@ -84,7 +80,7 @@ OF SUCH DAMAGE.
 			{% trans "Archived Episodes" %}
 		{% endifequal %}
 		{% ifequal episode.status "UPCOMING" %}
-			{% if show_name %}<a href="{% url upcoming_show show_name=show.slug %}">{% endif %}
+			{% if show_name %}<a href="{% url 'upcoming_show' show_name=show.slug %}">{% endif %}
 				{% trans "Upcoming Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}

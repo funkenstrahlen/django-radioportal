@@ -28,7 +28,7 @@
 # 
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 from django.views.decorators.cache import cache_page
 from django.views.generic import base
 from radioportal.views import stream, episodes, graphs
@@ -37,7 +37,7 @@ from radioportal.views import stream, episodes, graphs
 urlpatterns = patterns('',
 
     url(r'^robots.txt$',
-        cache_page(episodes.RobotsTxtView.as_view(), 60 * 60 * 3),
+        cache_page(60 * 60 * 3)(episodes.RobotsTxtView.as_view()),
         name="robots"),
         
     #url(r'^dashboard/', include('radioportal.dashboard.urls')),
@@ -97,7 +97,7 @@ urlpatterns = patterns('',
     url(r'^live\.m3u$', stream.StreamListTemplateView.as_view(), name="playlist_list"),
 
     url(r'^(?P<slug>.*\..{3,4})\.m3u$',
-        cache_page(stream.StreamTemplateView.as_view(), 60 * 60 * 3),
+        cache_page(60 * 60 * 3)(stream.StreamTemplateView.as_view()),
         name="playlist"),
     url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac|m3u8))$',
         stream.stream, name="mount"),

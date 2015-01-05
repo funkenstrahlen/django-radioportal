@@ -34,7 +34,7 @@ OF SUCH DAMAGE.
 {% if object_list %}
 <ul>
 {% for show in object_list %}
-	<li><a class="collapsed" href="{% url show show_name=show.slug %}">{{ show.name }}</a></li>
+	<li><a class="collapsed" href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></li>
 {% endfor %}
 </ul>
 {% endif %}
@@ -50,9 +50,9 @@ OF SUCH DAMAGE.
 {% for show in object_list %}
 	<div class="showslug {% if show.icon %}showicon{% endif %}">
 	{% if show.icon %}<img src="{{ show.icon.url }}" alt="{{ show.name }} logo" />{% endif %}
-	<h3><a href="{% url show show_name=show.slug %}">{{ show.name }}</a></h3>
+	<h3><a href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></h3>
 	{% if show.description %}<small>{{ show.description }}</small>{% endif %}
-	<p>{{ show.abstract|truncatewords:50 }} <a href="{% url show show_name=show.slug %}">{% trans "Read more" %} »</a></p>
+	<p>{{ show.abstract|truncatewords:50 }} <a href="{% url 'show' show_name=show.slug %}">{% trans "Read more" %} »</a></p>
 	<span style="clear: both;"></span>
 	</div>
 {% endfor %}

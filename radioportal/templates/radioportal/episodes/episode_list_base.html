@@ -27,7 +27,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
 {% block title %} &middot; {{ show.name }}{% endblock %}
-{% block breadcrumb %}{{ block.super }} » <a href="{% url shows %}">{% trans "Shows" %}</a>{% if show %} » {{ show.name }}{% endif %}{% endblock %}
+{% block breadcrumb %}{{ block.super }} » <a href="{% url 'shows' %}">{% trans "Shows" %}</a>{% if show %} » {{ show.name }}{% endif %}{% endblock %}
 {% block head_css %}
 	{{ block.super }}
 	{% include "radioportal/episodes/episode_streams_head_css.html" %}
@@ -50,14 +50,14 @@ OF SUCH DAMAGE.
 <ul>
 {% for s in shows %}
         <li{% ifequal s show %} class="active"{% endifequal %}>
-		<a class="{% ifequal s show %}un{% endifequal %}collapsed" href="{% url show show_name=s.slug %}">{{ s.name }}</a>
+		<a class="{% ifequal s show %}un{% endifequal %}collapsed" href="{% url 'show' show_name=s.slug %}">{{ s.name }}</a>
 	{% ifequal s show %}
                 <ul>
 		{% if is_paginated and page_obj.has_previous %}
 			<li><a href="?page={{ page_obj.previous_page_number }}">...</a></li>
 		{% endif %}
 		{% for episode in object_list %}
-			<li><a href="{% url episode show_name=episode.show.slug,episode_id=episode.slug %}">
+			<li><a href="{% url 'episode' show_name=episode.show.slug episode_id=episode.slug %}">
 				{{ episode.slug|upper }}
 			</a></li>
 		{% endfor %}
@@ -76,7 +76,7 @@ OF SUCH DAMAGE.
 {% cache 900 episode_list_head show.slug %}
 <div class="showheader">
 {% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" alt="{{ show.name }} logo" />{% endif %}
-<h1><a href="{% url show show_name=show.slug %}">{{ show.name }}</a></h1>
+<h1><a href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></h1>
 <small>{{ show.description }} (<a href="{{ show.url }}">{% trans "Homepage" %}</a>)</small>
 <p>{{ show.abstract }}</p>
 </div>
@@ -88,7 +88,7 @@ OF SUCH DAMAGE.
 	{% ifchanged %}
 		<h2>
 		{% ifequal episode.status "RUNNING" %}
-			{% if show_name %}<a href="{% url live_show show_name=show.slug %}">{% endif %}
+			{% if show_name %}<a href="{% url 'live_show' show_name=show.slug %}">{% endif %}
 				{% trans "Running Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
@@ -96,7 +96,7 @@ OF SUCH DAMAGE.
 			{% trans "Archived Episodes" %}
 		{% endifequal %}
 		{% ifequal episode.status "UPCOMING" %}
-			{% if show_name %}<a href="{% url upcoming_show show_name=show.slug %}">{% endif %}
+			{% if show_name %}<a href="{% url 'upcoming_show' show_name=show.slug %}">{% endif %}
 				{% trans "Upcoming Episodes" %}
 			{% if show_name %}</a>{% endif %}
 		{% endifequal %}
