@@ -46,7 +46,7 @@ class Show(models.Model):
         verbose_name=_('Name of the show'),
     )
     slug = AutoSlugField(populate_from='name', always_update=True)
-    url = models.URLField(verify_exists=False, blank=True, default='',
+    url = models.URLField(blank=True, default='',
         verbose_name=_('Homepage of the Show'))
     twitter = models.CharField(max_length=100, blank=True, default='',
         help_text='Name of the associated Twitter account')
@@ -186,7 +186,7 @@ class EpisodePart(models.Model):
         default='', verbose_name=_("Description"))    
     begin = models.DateTimeField(verbose_name=_("Begin"))
     end = models.DateTimeField(blank=True, null=True, verbose_name=_("End"))
-    url = models.URLField(blank=True, verify_exists=False,
+    url = models.URLField(blank=True,
         help_text=_('Page of the Episode'),
         verbose_name=_("URL"))
 
@@ -200,7 +200,7 @@ class Marker(models.Model):
     episode = models.ForeignKey(EpisodePart)
     pointoftime = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255)
-    link = models.URLField(blank=True, verify_exists=False)
+    link = models.URLField(blank=True)
     delete = models.BooleanField(default=True)
 
 class Graphic(models.Model):
@@ -218,8 +218,8 @@ class Recording(models.Model):
     format = models.CharField(max_length=50)
     bitrate = models.CharField(max_length=50)
 
-    publicURL = models.URLField(verify_exists=False, default='')
-    isPublic = models.BooleanField()
+    publicURL = models.URLField(default='')
+    isPublic = models.BooleanField(default=False)
     size = models.PositiveIntegerField()
     
     running = models.BooleanField()
@@ -248,7 +248,7 @@ class Channel(models.Model):
     streamDescription = models.CharField(max_length=250,
         blank=True, default='',
         help_text=_(u"Property »description« from stream meta data"))
-    streamURL = models.URLField(verify_exists=False, blank=True, default='',
+    streamURL = models.URLField(blank=True, default='',
         help_text=_(u"Property »url« from stream meta data"))
 
     show = models.ManyToManyField(Show, blank=True, null=True,
@@ -388,11 +388,11 @@ class Stream(models.Model):
 #        super(Stream, self).save(force_insert, force_update)
 
 class SourcedStream(Stream):
-    user = models.CharField(max_length=255, blank=True)
+    user = models.CharField(max_length=255, blank=True, default="source")
     password = models.CharField(max_length=255, blank=True)
 
 class RecodedStream(Stream):
-    source = models.ForeignKey(Stream, related_name='recoded')
+    source = models.ForeignKey(SourcedStream, related_name='recoded')
 
 class HLSStream(RecodedStream):
     pass

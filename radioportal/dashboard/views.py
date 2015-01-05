@@ -87,13 +87,15 @@ def icecast_source_auth(request):
         response["icecast-auth-message"] = "Server is not permitted to use this"
         response.status_code = 403
         return response
-    print mount, user, passwd
+    print mount, user, passwd,
     stream = get_object_or_404(SourcedStream, mount=mount[1:])
     if stream.user == user and stream.password == passwd:
         response["icecast-auth-user"] = 1
         response["icecast-auth-timelimit"] = 10*60
+        print "auth successfull"
     else:
         response["icecast-auth-message"] = "Username or password wrong"
+        print "sth failed", repr(stream.user), repr(user), repr(stream.password), repr(passwd)
     return response
 
 @csrf_exempt
@@ -146,7 +148,7 @@ class UserChannelStreamAddView(SessionWizardView):
 
     def get_form_initial(self, step):
         """ Affected by Django Bug #18026 """
-        if not "initial" in self.storage.extra_data:
+        if not 'initial' in self.storage.extra_data:
             application = self.fetch_initial()
 
             if not application:

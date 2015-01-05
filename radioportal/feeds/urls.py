@@ -28,15 +28,23 @@
 # 
 # -*- coding: utf-8 -*-
 
-from django.views.generic.simple import direct_to_template
 from radioportal.feeds.feeds import ical_feed, ShowFeed, JsonShowFeed, ShowListFeed, JsonShowListFeed
 from radioportal.models import Show
-from django.conf.urls.defaults import url, patterns
+from django.conf.urls import url, patterns
+from django.views.generic.base import TemplateView
+
+class OverView(TemplateView):
+    template_name = 'radioportal/feeds/overview.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['shows'] = Show.objects.all()
+        kwargs['p'] = 'upcoming'
+        kwargs['l'] = 'live'
+        kwargs['la'] = 'recent'
+        return kwargs
 
 urlpatterns = patterns('',
-    url(r'^$', direct_to_template, 
-         {'template': 'radioportal/feeds/overview.html', 
-          'extra_context': {'shows': Show.objects.all(), 'p': 'upcoming', 'l': 'live', 'la': 'recent' } }),
+    url(r'^$', OverView.as_view()),
     url(r'^upcoming/ical/$', ical_feed, name="upcoming-all-ical"),
     url(r'^feed/$', ShowListFeed(), name="index-feed"),
     url(r'^json/$', JsonShowListFeed(), name="index-json"),
