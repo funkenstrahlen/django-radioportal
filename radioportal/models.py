@@ -265,16 +265,17 @@ class Channel(models.Model):
     listener = models.IntegerField(default=0)
 
     recording = models.BooleanField(default=True, editable=False)
+    public_recording = models.BooleanField(default=True, editable=False)
 
-    agb_accepted = models.BooleanField(default=False, editable=False)
-    agb_accepted_date = models.DateTimeField(auto_now_add=True, editable=False)
+#    agb_accepted = models.BooleanField(default=False, editable=False)
+#    agb_accepted_date = models.DateTimeField(auto_now_add=True, editable=False)
 
     graphic_differ_by = models.CharField(max_length=255, blank=True)
 
     graphic_title = models.CharField(max_length=255, blank=True)
 
     def running_streams(self):
-        return self.stream_set.filter(running=True)
+        return self.stream_set.filter(running=True).exclude(format="aac")
 
     def updateRunning(self):
         self.running = False

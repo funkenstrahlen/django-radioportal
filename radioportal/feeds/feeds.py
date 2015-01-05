@@ -121,7 +121,8 @@ class ShowFeed(Feed):
         #print type(item), type(item.begin), type(item.end)
         tz = pytz.timezone(settings.TIME_ZONE)
         begin = item.begin()
-        begin = tz.localize(begin)
+        if begin:
+            begin = tz.localize(begin)
         end = item.end
         if end:
             end = tz.localize(end)
@@ -149,10 +150,10 @@ class ShowFeed(Feed):
         return extra_dict
 
     def feed_extra_kwargs(self, obj):
-        extra_dict = {}
+        kwargs = super(ShowBaseFeed, self).feed_extra_kwargs(obj)
         if hasattr(obj[0], 'icon') and obj[0].icon:
-            extra_dict['icon'] = "http:%s" % obj[0].icon.url
-        return extra_dict
+            kwargs['icon'] = "http:%s" % obj[0].icon.url
+        return kwargs
 
     def item_author_name(self, item):
         return item.show.name

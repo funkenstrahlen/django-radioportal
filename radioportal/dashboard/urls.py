@@ -28,7 +28,7 @@
 # 
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 
 from radioportal.dashboard import views, forms
 
@@ -80,6 +80,7 @@ urlpatterns = patterns('',
     url(r'^cluster/(?P<slug>[\w-]+)/$', views.ChannelClusterEditView.as_view(), name="admin-channel-edit-cluster"),
     url(r'^channel/(?P<pk>[\w-]+)/delete/$', views.ChannelDeleteView.as_view(), name="admin-channel-delete"),
     url(r'^channel/(?P<pk>[\w-]+)/cce/$', views.ChannelChangeCurrentEpisode.as_view(), name="admin-channel-cce"),
+
     
     url(r'^accounts/login/$', django.contrib.auth.views.login, {}, name="login"),
     url(r'^accounts/logout/$', django.contrib.auth.views.logout_then_login, {}, name="logout"),

@@ -190,11 +190,18 @@ class UserChannelStreamAddView(SessionWizardView):
                     return {'mount': "%s.mp3" % name}
 
     def done(self, form_list, **kwargs):
-        user_pw = User.objects.make_random_password()
-        user = form_list[0].save(commit=False)
-        user.set_password(user_pw)
-        user.username = ("%s%s" % (user.first_name, user.last_name)).lower()
-        user.save()
+        new_user = form_list[0].save(commit=False)
+        new_username = ("%s%s" % (new_user.first_name, new_user.last_name)).lower()
+        user_pw = None
+
+        if User.objects.filter(username=new_username, email=new_user.email).exists():
+            user = User.objects.get(username=new_username, email=new_user.email)
+        else:
+            user = new_user
+            user_pw = User.objects.make_random_password()
+            user.set_password(user_pw)
+            user.username = new_username
+            user.save()
 
         show = form_list[1].save()
         
@@ -613,38 +620,55 @@ class ChannelCreateView(CreateView):
 
 class ChannelChangeCurrentEpisode(UpdateView):
     template_name = "radioportal/dashboard/channel_change_c_episode.html"
-    success_url = '/channel/%(id)s/'
+    success_url = '/dashboard/channel/%(id)s/'
     form_class = dforms.ChannelChangeEpisodeForm
     model = Channel
 
     def form_valid(self, form):
         ch = Channel.objects.get(pk=self.kwargs['pk'])
+        move = form.cleaned_data['move_part']
+
         old_episode = ch.currentEpisode
         part = old_episode.current_part
         new_episode = form.cleaned_data['currentEpisode']
 
-        part.episode = new_episode
-        part.save()
+        if move:
+            part.episode = new_episode
+            part.save()
+    
+            new_episode.current_part = part
+            new_episode.status = Episode.STATUS[1][0]
+            new_episode.save()
+        else:
+            part.end = datetime.datetime.now()
+            part.save()
+
+
+            part = new_episode.parts.all().reverse()[0]
+            part.begin = datetime.datetime.now()
+            part.save()
+
+            new_episode.current_part = part
+            new_episode.status = Episode.STATUS[1][0]
+            new_episode.save()
 
         old_episode.status = Episode.STATUS[0][0]
         old_episode.current_part = None
         old_episode.save()
 
-        new_episode.current_part = part
-        new_episode.status = Episode.STATUS[1][0]
-        new_episode.save()
-
         data = {
             'channel': ch.cluster,
             'episode': new_episode.get_id(),
-            'publish': {
-                'twitter': new_episode.show.twitter,
-                'chat': new_episode.show.chat,
-            },
             'old': { 'episode': old_episode.get_id() },
         }
 
-        send_msg("channel.update", simplejson.dumps(data))
+        if form.cleaned_data['notify']:
+            data['publish'] = {
+                'twitter': new_episode.show.twitter,
+                'chat': new_episode.show.chat,
+            }
+
+        send_msg("channel.update", simplejson.dumps(data), "backenddata")
 
         return super(ChannelChangeCurrentEpisode, self).form_valid(form)
 

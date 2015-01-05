@@ -64,7 +64,7 @@ class IRCWidget(widgets.MultiWidget):
 
     def value_from_datadict(self, data, files, name):
         val = super(IRCWidget, self).value_from_datadict(data, files, name)
-        if val[0] == u"None":
+        if val[0] == u"None" or len(val[0]) == 0 or len(val[1]) == 0:
             return ""
         if val[1][0] not in "#!?":
             val[1] = "#%s" % val[1]
@@ -73,7 +73,7 @@ class IRCWidget(widgets.MultiWidget):
 
     def decompress(self, value):
         if value:
-            u = urlparse(value)
+            u = urlparse(value, allow_fragments=False)
             return [u.hostname, u.path.split("/")[-1]]
         return [None, None]
 
@@ -290,6 +290,9 @@ class OrderedSelectMultiple(SelectMultiple):
 
 class ChannelChangeEpisodeForm(forms.ModelForm):
     required_css_class = "required"
+    move_part = forms.BooleanField(required=False, initial=False)
+    notify = forms.BooleanField(required=False, initial=False)
+
     class Meta:
         model = models.Channel
         fields = ('currentEpisode',)
@@ -323,7 +326,7 @@ class SourcedStreamForm(StreamForm):
     required_css_class = "required"
     class Meta:
         model = models.SourcedStream
-        fields = ('mount', 'user', 'password', 'encoding')
+        fields = ('mount', 'password', 'encoding')
 #    class Media:
 #        js = ('http://code.jquery.com/jquery-1.6.1.min.js', 'dashboard/stream.js',)
 
@@ -506,14 +509,15 @@ class UserWizardForm(forms.ModelForm):
                 field.widget.attrs['disabled'] = 'disabled'
             if name in self.Meta.fields:
                 field.required = True
-    def clean(self):
-        res = super(UserWizardForm, self).clean()
-        if 'first_name' in self.cleaned_data and 'last_name' in self.cleaned_data:
-            if User.objects.filter(username='%s%s' % (
-                          self.cleaned_data['first_name'].lower(),
-                          self.cleaned_data['last_name'].lower()) ).exists():
-                raise forms.ValidationError(_('The username constructed from this name already exists, please use another one.'))
-        return res
+
+#    def clean(self):
+#        res = super(UserWizardForm, self).clean()
+#        if 'first_name' in self.cleaned_data and 'last_name' in self.cleaned_data:
+#            if User.objects.filter(username='%s%s' % (
+#                          self.cleaned_data['first_name'].lower(),
+#                          self.cleaned_data['last_name'].lower()) ).exists():
+#                raise forms.ValidationError(_('The username constructed from this name already exists, please use another one.'))
+#        return res
 
     class Meta:
         model = User
