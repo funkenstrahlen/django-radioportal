@@ -265,12 +265,13 @@ class UserChannelStreamAddView(SessionWizardView):
     def dispatch(self, *args, **kwargs):
         return super(UserChannelStreamAddView, self).dispatch(*args, **kwargs)
 
+
 class PermissionChangeView(FormView):
-    template_name = "radioportal/dashboard/perm.html"
-    
     form_class = dforms.PermissionForm
-    
-    success_url = '/user/'
+    template_name = "radioportal/dashboard/perm.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-list-users')
     
     def get_form_kwargs(self):
         kwargs = super(PermissionChangeView, self).get_form_kwargs()
@@ -317,9 +318,9 @@ class MessageListView(ListView):
 
 
 class UserGroupListView(ListView):
-    template_name = "radioportal/dashboard/user_list.html"
-    model = User
     context_object_name = 'users'
+    model = User
+    template_name = "radioportal/dashboard/user_list.html"
     
     def get_context_data(self, **kwargs):
         ctx = super(UserGroupListView, self).get_context_data(**kwargs)
@@ -332,10 +333,12 @@ class UserGroupListView(ListView):
 
 
 class UserCreateView(CreateView):
-    template_name = "radioportal/dashboard/user_edit.html"
-    model = User
     form_class = forms.UserForm
-    success_url = '/user/%(username)s/'
+    model = User
+    template_name = "radioportal/dashboard/user_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-user-edit', view_kwargs={'slug': self.object.username})
 
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
@@ -343,11 +346,13 @@ class UserCreateView(CreateView):
 
 
 class UserEditView(UpdateView):
-    template_name = "radioportal/dashboard/user_edit.html"
+    form_class = forms.UserForm
     model = User
     slug_field = 'username'
-    form_class = forms.UserForm
-    success_url = '/user/%(username)s/'
+    template_name = "radioportal/dashboard/user_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-user-edit', view_kwargs={'slug': self.object.username})
 
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
@@ -355,10 +360,12 @@ class UserEditView(UpdateView):
 
 
 class GroupCreateView(CreateView):
-    template_name = "radioportal/dashboard/group_edit.html"
-    model = Group
-    success_url = '/group/%(id)s/'
     form_class = forms.GroupForm
+    model = Group
+    template_name = "radioportal/dashboard/group_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-group-edit', view_kwargs={'slug':self.object.id})
     
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
@@ -366,12 +373,14 @@ class GroupCreateView(CreateView):
 
 
 class GroupEditView(UpdateView):
-    template_name = "radioportal/dashboard/group_edit.html"
+    form_class = forms.GroupForm
     model = Group
     slug_field = 'id'
-    success_url = '/group/%(id)s/'
-    form_class = forms.GroupForm
+    template_name = "radioportal/dashboard/group_edit.html"
     
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-group-edit', view_kwargs={'slug': self.object.id})
+
     @method_decorator(superuser_only)
     def dispatch(self, *args, **kwargs):
         return super(GroupEditView, self).dispatch(*args, **kwargs)
@@ -393,10 +402,12 @@ class LandingView(TemplateResponseMixin, View):
 
 
 class ShowCreateView(CreateView):
-    template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/show/%(slug)s/'
     form_class = dforms.ShowForm
     model = Show
+    template_name = "radioportal/dashboard/show_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episode-list', view_kwargs={'slug': self.object.slug})
 
     @method_decorator(permission_required('add_show'))
     def dispatch(self, *args, **kwargs):
@@ -404,11 +415,13 @@ class ShowCreateView(CreateView):
 
 
 class ShowEditView(UpdateView):
-    template_name = "radioportal/dashboard/show_edit.html"
-    success_url = '/show/%(slug)s/'
     form_class = dforms.ShowForm
-    slug_field = 'slug'
     model = Show
+    slug_field = 'slug'
+    template_name = "radioportal/dashboard/show_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episode-list', view_kwargs={'slug': self.object.slug})
 
     def get_form_class(self):
         try:
@@ -423,22 +436,28 @@ class ShowEditView(UpdateView):
     def dispatch(self, *args, **kwargs):
         return super(ShowEditView, self).dispatch(*args, **kwargs)
 
+
 class ShowDeleteView(DeleteView):
-    template_name = "radioportal/dashboard/show_delete.html"
-    success_url = "/"
-    slug_field = 'slug'
     model = Show
+    slug_field = 'slug'
+    template_name = "radioportal/dashboard/show_delete.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'dashboard')
 
     @method_decorator(permission_required('delete_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowDeleteView, self).dispatch(*args, **kwargs)
 
+
 class ShowFeedEditView(UpdateView):
-    template_name = "radioportal/dashboard/showfeed_edit.html"
-    success_url = '/show/%(slug)s/'
-    slug_field = 'show__slug'
-    model = ShowFeed
     form_class = dforms.ShowFeedForm
+    model = ShowFeed
+    slug_field = 'show__slug'
+    template_name = "radioportal/dashboard/showfeed_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episode-list', view_kwargs={'slug': self.object.show.slug})
     
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(request=request)
@@ -482,17 +501,14 @@ class ShowFeedEditView(UpdateView):
 
         return obj
     
-    def get_success_url(self):
-        return self.success_url % self.object.show.__dict__
-    
     @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowFeedEditView, self).dispatch(*args, **kwargs)
     
 
 class EpisodeListView(ListView):
-    template_name = "radioportal/dashboard/episode_list.html"
     model = Episode
+    template_name = "radioportal/dashboard/episode_list.html"
     
     def get_queryset(self):
         qs = super(EpisodeListView, self).get_queryset()
@@ -510,10 +526,12 @@ class EpisodeListView(ListView):
         return super(EpisodeListView, self).dispatch(*args, **kwargs)
 
 class EpisodeCreateView(CreateView):
-    template_name = "radioportal/dashboard/episode_create.html"
-    success_url = '/episodepart/%(id)s/'
     form_class = dforms.CreateEpisodeForm
-    model = Episode
+    model = Episode # FIXME: form uses EpisodePart as Model
+    template_name = "radioportal/dashboard/episode_create.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episodepart-edit', view_kwargs={'pk': self.object.id})
 
     def get_initial(self):
         s = Show.objects.get(slug=self.kwargs['slug'])
@@ -554,10 +572,12 @@ class EpisodeCreateView(CreateView):
 
 
 class EpisodeEditView(UpdateView):
-    template_name = "radioportal/dashboard/episode_edit.html"
-    success_url = '/episode/%(id)s/'
     form_class = dforms.EpisodeForm
     model = Episode
+    template_name = "radioportal/dashboard/episode_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episode-edit', view_kwargs={'id': self.object.id})
 
     def get_context_data(self, **kwargs):
         ctx = super(EpisodeEditView, self).get_context_data(**kwargs)
@@ -568,12 +588,13 @@ class EpisodeEditView(UpdateView):
     def dispatch(self, *args, **kwargs):
         return super(EpisodeEditView, self).dispatch(*args, **kwargs)
 
+
 class EpisodeDeleteView(DeleteView):
-    template_name = "radioportal/dashboard/episode_delete.html"
     model = Episode
+    template_name = "radioportal/dashboard/episode_delete.html"
 
     def get_success_url(self):
-        return "/dashboard/show/%s/" % self.object.show.slug
+        return reverse_full('dashboard', 'admin-episode-list', view_kwargs={'slug': self.object.show.slug})
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -587,10 +608,12 @@ class EpisodeDeleteView(DeleteView):
 
 
 class EpisodePartEditView(UpdateView):
-    template_name = "radioportal/dashboard/episodepart_edit.html"
-    success_url = '/episodepart/%(id)s/'
     form_class = dforms.EpisodePartForm
     model = EpisodePart
+    template_name = "radioportal/dashboard/episodepart_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-episodepart-edit', view_kwargs={'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         ctx = super(EpisodePartEditView, self).get_context_data(**kwargs)
@@ -603,10 +626,12 @@ class EpisodePartEditView(UpdateView):
 
 
 class ChannelCreateView(CreateView):
-    template_name = "radioportal/dashboard/channel_edit.html"
-    success_url = '/channel/%(id)s/'
     form_class = dforms.ChannelPlainCompoundForm
     model = Channel
+    template_name = "radioportal/dashboard/channel_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-channel-edit', view_kwargs={'pk': self.object.id})
 
     def get_form_class(self):
         form_class = super(ChannelCreateView, self).get_form_class()
@@ -618,11 +643,14 @@ class ChannelCreateView(CreateView):
     def dispatch(self, *args, **kwargs):
         return super(ChannelCreateView, self).dispatch(*args, **kwargs)
 
+
 class ChannelChangeCurrentEpisode(UpdateView):
-    template_name = "radioportal/dashboard/channel_change_c_episode.html"
-    success_url = '/dashboard/channel/%(id)s/'
     form_class = dforms.ChannelChangeEpisodeForm
     model = Channel
+    template_name = "radioportal/dashboard/channel_change_c_episode.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-channel-edit', view_kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         ch = Channel.objects.get(pk=self.kwargs['pk'])
@@ -699,11 +727,14 @@ class ChannelChangeCurrentEpisode(UpdateView):
     def dispatch(self, *args, **kwargs):
         return super(ChannelChangeCurrentEpisode, self).dispatch(*args, **kwargs)
 
+
 class ChannelEditView(UpdateView):
-    template_name = "radioportal/dashboard/channel_edit.html"
-    success_url = '/channel/%(id)s/'
     form_class = dforms.ChannelCompoundForm
     model = Channel
+    template_name = "radioportal/dashboard/channel_edit.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'admin-channel-edit', view_kwargs={'pk': self.object.id})
 
     def get_form_class(self):
         form_class = super(ChannelEditView, self).get_form_class()
@@ -729,6 +760,7 @@ class ChannelEditView(UpdateView):
     def dispatch(self, *args, **kwargs):
         return super(ChannelEditView, self).dispatch(*args, **kwargs)
 
+
 class ChannelClusterEditView(ChannelEditView):
     slug_field = "cluster"
 
@@ -741,17 +773,16 @@ class ChannelClusterEditView(ChannelEditView):
 
 
 class ChannelDeleteView(DeleteView):
-    template_name = "radioportal/dashboard/channel_delete.html"
-    success_url = "/"
     model = Channel
+    template_name = "radioportal/dashboard/channel_delete.html"
+
+    def get_success_url(self):
+        return reverse_full('dashboard', 'dashboard')
 
     @method_decorator(permission_required('delete_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(ChannelDeleteView, self).dispatch(*args, **kwargs)
 
-
-import urlparse as urllib_parse
-from django.conf import settings
 
 def is_safe_url(url, host=None):
     """
