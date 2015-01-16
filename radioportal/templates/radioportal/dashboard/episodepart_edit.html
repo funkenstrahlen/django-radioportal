@@ -28,8 +28,8 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block breadcrumb %}
 {{ block.super }} » 
-	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
-	<a href="{% host_url admin-episode-edit form.instance.episode.id %}">{{ form.instance.episode.slug }}</a> »
+	<a href="{% host_url "admin-episode-list" show.slug on "dashboard" %}">{{ show }}</a> »
+	<a href="{% host_url "admin-episode-edit" form.instance.episode.id %}">{{ form.instance.episode.slug }}</a> »
 	{{ form.instance.title }}
 {% endblock %}
 {% block content %}

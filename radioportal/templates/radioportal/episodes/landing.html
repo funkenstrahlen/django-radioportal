@@ -39,29 +39,29 @@ OF SUCH DAMAGE.
 {% endblock %}
 
 {% block head %}
-<link href="http:{% host_url all-feed status='upcoming' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "upcoming episodes" %}" />
-<link href="http:{% host_url all-feed status='live' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "running episodes" %}" />
-<link href="http:{% host_url all-feed status='recent' on feeds %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "archived episodes" %}" />
-<link href="http:{% host_url upcoming-all-ical on feeds %}" type="text/calendar" rel="alternate" title="Calendar" />
+<link href="http:{% host_url "all-feed" status='upcoming' on "feeds" %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "upcoming episodes" %}" />
+<link href="http:{% host_url "all-feed" status='live' on "feeds" %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "running episodes" %}" />
+<link href="http:{% host_url "all-feed" status='recent' on "feeds" %}" type="application/atom+xml" rel="alternate" title="{% trans "feed for" %} {% trans "archived episodes" %}" />
+<link href="http:{% host_url "upcoming-all-ical" on "feeds" %}" type="text/calendar" rel="alternate" title="Calendar" />
 {% endblock %}
 
 {% block content %}
 {% if running %}
-<h2>{% trans "Running Episodes" %}&nbsp;<a href="http:{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
+<h2>{% trans "Running Episodes" %}&nbsp;<a href="http:{% host_url "all-feed" status='live' on "feeds" %}" class="feed atom"></a></h2>
 {% for episode in running %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
 {% else %}
-<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}&nbsp;<a href="http:{% host_url all-feed status='live' on feeds %}" class="feed atom"></a></h2>
+<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}&nbsp;<a href="http:{% host_url "all-feed" status='live' on "feeds" %}" class="feed atom"></a></h2>
 {% endif %}
 
 {% if upcoming %}
-<h2>{% trans "Upcoming Episodes" %}&nbsp;<a href="http:{% host_url all-feed status='upcoming' on feeds %}" class="feed atom"></a><a href="{% host_url upcoming-all-ical on feeds %}" class="feed ical"></a></h2>
+<h2>{% trans "Upcoming Episodes" %}&nbsp;<a href="http:{% host_url "all-feed" status='upcoming' on "feeds" %}" class="feed atom"></a><a href="{% host_url "upcoming-all-ical" on "feeds" %}" class="feed ical"></a></h2>
 {% for episode in upcoming %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}
 {% endfor %}
 {% endif %}
 
-<h2>{% trans "Recent Episodes" %}&nbsp;<a href="http:{% host_url all-feed status='recent' on feeds %}" class="feed atom"></a></h2>
+<h2>{% trans "Recent Episodes" %}&nbsp;<a href="http:{% host_url "all-feed" status='recent' on "feeds" %}" class="feed atom"></a></h2>
 {% for episode in archived %}
 	{% include "radioportal/episodes/episode_list_entry.html" %}
 {% empty %}

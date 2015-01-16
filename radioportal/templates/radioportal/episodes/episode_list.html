@@ -30,4 +30,4 @@ OF SUCH DAMAGE.
 {% block shorturl_head %}{% cache 36000 show.id %}<link rev="canonical" href="{% shorturl show %}" />{% endcache %}{% endblock %}
 {% block shorturl_footer %}{% cache 36000 show.id %}
 	<!-- <li><a rev="canonical" href="-->{% shorturl show %}<!--">{% trans "Short URL" %}</a></li>-->
-{% endcache %}{% get_obj_perms request.user for show as "show_perm" %}{% if "change_show" in show_perm %} <a class="dashboard" href="{% host_url admin-episode-list show.slug on dashboard %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
+{% endcache %}{% get_obj_perms request.user for show as "show_perm" %}{% if "change_show" in show_perm %} <a class="dashboard" href="{% host_url "admin-episode-list" show.slug on "dashboard" %}">{% trans "edit" %}</a>{% endif %}{% endblock %}

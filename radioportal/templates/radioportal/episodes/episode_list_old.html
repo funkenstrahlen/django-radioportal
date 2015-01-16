@@ -31,17 +31,17 @@ OF SUCH DAMAGE.
 
 {% block head %}
 {% if show %}
-	<link href="http:{% host_url show-feed status="recent" show_name=show.slug on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="http:{% host_url "show-feed" status="recent" show_name=show.slug on "feeds" %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% else %}
-	<link href="http:{% host_url all-feed status="recent" on feeds %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+	<link href="http:{% host_url "all-feed" status="recent" on "feeds" %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% endif %}
 
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="http:{% host_url show-feed status="recent" show_name=show.slug on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="http:{% host_url "show-feed" status="recent" show_name=show.slug on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
 {% else %}
-	<li><a href="http:{% host_url all-feed status="recent" on feeds %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="http:{% host_url "all-feed" status="recent" on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
 {% endif %}
 
 {% endblock %}

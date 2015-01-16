@@ -74,11 +74,11 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block content %}
 
-{% comment %}{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url admin-auphonic-settings object.id on dashboard %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}{% endcomment %}
+{% comment %}{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url "admin-auphonic-settings" object.id on "dashboard" %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}{% endcomment %}
 
 <h2>{% if object %}{% trans "Edit Channel" %}{% else %}{% trans "Create new Channel" %}{% endif %}</h2>
 
-<p><a href="{% host_url admin-channel-cce object.id on dashboard %}">{% trans "Episode ändern" %}</a><br /><br /></p>
+<p><a href="{% host_url "admin-channel-cce" object.id on "dashboard" %}">{% trans "Episode ändern" %}</a><br /><br /></p>
 
 <form action="" method="POST">
 {% csrf_token %}

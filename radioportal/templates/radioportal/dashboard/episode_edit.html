@@ -28,7 +28,7 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block breadcrumb %}
 {{ block.super }} » 
-	<a href="{% host_url admin-episode-list show.slug on dashboard %}">{{ show }}</a> »
+	<a href="{% host_url "admin-episode-list" show.slug on "dashboard" %}">{{ show }}</a> »
 	{% if episode %}{{ episode.slug }}: {{ episode.title }}{% else %}{% trans "Create new episode" %}{% endif %}
 {% endblock %}
 {% block content %}

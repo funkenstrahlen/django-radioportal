@@ -48,6 +48,6 @@ OF SUCH DAMAGE.
 <input type="submit" value="{% trans "login" %}" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
-<p><a href="{% host_url django.contrib.auth.views.password_reset on dashboard %}">{% trans "Password reset" %}</a></p>
+<p><a href="{% host_url "django.contrib.auth.views.password_reset" on "dashboard" %}">{% trans "Password reset" %}</a></p>
 {% endblock %}
 

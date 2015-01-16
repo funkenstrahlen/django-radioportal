@@ -27,7 +27,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
 {% block breadcrumb %}
-{{ block.super }} » <a href="{% host_url admin-channel-edit object.id on dashboard %}">{{ object }}</a> » {% trans "Edit current episode" %}
+{{ block.super }} » <a href="{% host_url "admin-channel-edit" object.id on "dashboard" %}">{{ object }}</a> » {% trans "Edit current episode" %}
 {% endblock %}
 {% block content %}
 

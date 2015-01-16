@@ -28,7 +28,7 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block breadcrumb %}
 {{ block.super }} » 
-	<a href="{% host_url admin-list-users on dashboard %}">{% trans "User List" %}</a> »
+	<a href="{% host_url "admin-list-users" on "dashboard" %}">{% trans "User List" %}</a> »
 	{% if object %}{{ object.username }}{% else %}{% trans "Create User" %}{% endif %}
 {% endblock %}
 {% block content %}

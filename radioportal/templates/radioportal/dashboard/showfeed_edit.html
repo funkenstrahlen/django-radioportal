@@ -29,7 +29,7 @@ OF SUCH DAMAGE.
 {% block breadcrumb %}
 {{ block.super }} » 
 	{% if object %}
-	<a href="{% host_url admin-episode-list object.show.slug on dashboard %}">{{ object.show.name }}</a> »
+	<a href="{% host_url "admin-episode-list" object.show.slug on "dashboard" %}">{{ object.show.name }}</a> »
 	{% trans "Edit Show" %}
 	{% else %}{% trans "Create Show" %}{% endif %}
 {% endblock %}

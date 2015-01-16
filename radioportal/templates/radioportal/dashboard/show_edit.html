@@ -29,7 +29,7 @@ OF SUCH DAMAGE.
 {% block breadcrumb %}
 {{ block.super }} » 
 	{% if object %}
-	<a href="{% host_url admin-episode-list object.slug on dashboard %}">{{ object.name }}</a> »
+	<a href="{% host_url "admin-episode-list" object.slug on "dashboard" %}">{{ object.name }}</a> »
 	{% trans "Edit Show" %}
 	{% else %}{% trans "Create Show" %}{% endif %}
 {% endblock %}
@@ -44,7 +44,7 @@ OF SUCH DAMAGE.
 The properties of this show are currently updated from the configured podcast feed. If you want to change
 properties of the show either update the podcast feed or disable the automatic update via the feed
 {% endblocktrans %}
-<a href="{% host_url admin-show-feed object.slug on dashboard %}">{% trans "here" %}</a> 
+<a href="{% host_url "admin-show-feed" object.slug on "dashboard" %}">{% trans "here" %}</a> 
 </p><br />
 {% endif %}
 

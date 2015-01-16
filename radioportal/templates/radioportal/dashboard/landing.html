@@ -44,13 +44,13 @@ They also contain episodes for time a stream is online.
 {% for s in shows %}
 {% get_obj_perms request.user for s as "show_perms" %}
 	<li>
-{% if "change_show" in show_perms %}<a href="{% host_url admin-episode-list s.slug on dashboard %}">{% endif %}
+{% if "change_show" in show_perms %}<a href="{% host_url "admin-episode-list" s.slug on "dashboard" %}">{% endif %}
 {{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
-{% if "delete_show" in show_perms %}(<a href="{% host_url admin-show-delete s.slug on dashboard %}">{% trans "delete" %}</a>){% endif %}
+{% if "delete_show" in show_perms %}(<a href="{% host_url "admin-show-delete" s.slug on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
 </li>
 {% endfor %}
 {% if perms.portal.add_show %}
-	<li><a href="{% host_url admin-show-create on dashboard %}">{% trans "Create new Show" %}</a></li>
+	<li><a href="{% host_url "admin-show-create" on "dashboard" %}">{% trans "Create new Show" %}</a></li>
 {% endif %}	
 </ul>
 {% endif %}
@@ -67,25 +67,25 @@ This is the place to view or change the credentials for your streams.
 {% for s in channels %}
 {% get_obj_perms request.user for s as "channel_perms" %}
 	<li>
-		<a href="{% host_url admin-channel-edit s.id on dashboard %}">{{ s }}</a>
-		{% if "delete_channel" in channel_perms %}(<a href="{% host_url admin-channel-delete s.id on dashboard %}">{% trans "delete" %}</a>){% endif %}
+		<a href="{% host_url "admin-channel-edit" s.id on "dashboard" %}">{{ s }}</a>
+		{% if "delete_channel" in channel_perms %}(<a href="{% host_url "admin-channel-delete" s.id on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
 	</li>
 {% endfor %}
 {% if perms.portal.add_channel %}
-	<li><a href="{% host_url admin-channel-create on dashboard %}">{% trans "Create new Channel" %}</a></li>
+	<li><a href="{% host_url "admin-channel-create" on "dashboard" %}">{% trans "Create new Channel" %}</a></li>
 {% endif %}
 </ul>
 {% endif %}
 <h3>{% trans "Account Settings" %}</h3>
 <ul>
-    <li><a href="{% host_url account-change-pass on dashboard %}">{% trans "Change Password" %}</a></li>
+    <li><a href="{% host_url "account-change-pass" on "dashboard" %}">{% trans "Change Password" %}</a></li>
 {% if request.user.is_superuser %}
-    <li><a href="{% host_url admin-list-users on dashboard %}">{% trans "List of Users" %}</a></li>
-    <li><a href="{% host_url admin-wizard on dashboard %}">{% trans "Create new User, Show, Channel and Stream" %}</a></li>
+    <li><a href="{% host_url "admin-list-users" on "dashboard" %}">{% trans "List of Users" %}</a></li>
+    <li><a href="{% host_url "admin-wizard" on "dashboard" %}">{% trans "Create new User, Show, Channel and Stream" %}</a></li>
 {% endif %}
 </ul>
 <h3>{% trans "Recordings" %}</h3>
 <ul>
-<li><a href="{% host_url archive-list on dashboard %}">{% trans "List of Recordings" %}</a></li>
+<li><a href="{% host_url "archive-list" on "dashboard" %}">{% trans "List of Recordings" %}</a></li>
 </ul>
 {% endblock %}
