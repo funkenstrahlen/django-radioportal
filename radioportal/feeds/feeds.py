@@ -150,7 +150,7 @@ class ShowFeed(Feed):
         return extra_dict
 
     def feed_extra_kwargs(self, obj):
-        kwargs = super(ShowBaseFeed, self).feed_extra_kwargs(obj)
+        kwargs = super(ShowFeed, self).feed_extra_kwargs(obj)
         if hasattr(obj[0], 'icon') and obj[0].icon:
             kwargs['icon'] = "http:%s" % obj[0].icon.url
         return kwargs
