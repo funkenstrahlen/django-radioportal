@@ -60,7 +60,7 @@ OF SUCH DAMAGE.
 {% if user.is_authenticated %}
 {% host_url "dashboard" on "dashboard" as profile_url %}
 <li{% if request.path|startswith:profile_url %} class="active"{% endif %}>
-	<a href="https:{% host_url "dashboard" on "dashboard" %}">{% trans "Dashboard" %}</a>
+	<a href="{% host_url "dashboard" on "dashboard" %}">{% trans "Dashboard" %}</a>
 	{% block navi_account %}{% endblock %}
 </li>
 {% endif %}

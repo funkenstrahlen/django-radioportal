@@ -41,7 +41,7 @@ OF SUCH DAMAGE.
 <span class="player">
 <audio id="player{{ episode.channel.id}}" controls="controls" preload="none" class="mejs-xsn">
 {% for stream in episode.channel.running_streams %}
-  <source src="http:{% host_url "mount" stream=stream.mount on "www" %}" type="audio/{{ stream.format }}" />
+  <source src="{% host_url "mount" stream=stream.mount on "www" %}" type="audio/{{ stream.format }}" />
 {% endfor %}
 </audio>
 </span>
@@ -49,8 +49,8 @@ OF SUCH DAMAGE.
 		{% for stream in episode.channel.running_streams %}
 		{% spaceless %}
 		<li class="stream direct">
-			<a href="http:{% host_url "playlist" slug=stream.mount on "www" %}">{{ stream.format }} {{ stream.bitrate|formataudio:stream.format }}</a>
-			(<a href="http:{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{% trans "direct" %}</a>,
+			<a href="{% host_url "playlist" slug=stream.mount on "www" %}">{{ stream.format }} {{ stream.bitrate|formataudio:stream.format }}</a>
+			(<a href="{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{% trans "direct" %}</a>,
 			<a href="{% load shorturl %}{% shorturl stream %}">{% trans "Short URL" %}</a>)
 		</li>
 		{% endspaceless %}
