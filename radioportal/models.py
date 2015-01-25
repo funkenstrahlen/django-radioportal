@@ -33,6 +33,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db.models import Min, Max
+from django.conf import settings
+
 
 from autoslug import AutoSlugField
 from django_hosts.reverse import reverse_full
@@ -40,6 +42,9 @@ from django_hosts.reverse import reverse_full
 from easy_thumbnails.fields import ThumbnailerImageField
 
 import jsonfield
+import uuid
+import os.path
+
 
 class Show(models.Model):
     name = models.CharField(max_length=50, unique=True,
@@ -222,7 +227,7 @@ class Graphic(models.Model):
         return "/".join([dn, fn])
 
     file = models.ImageField(upload_to=get_graphic_path, blank=True)
-    type = models.CharField(max_length=10, choices=GTYPES)
+    type = models.CharField(max_length=10, choices=GTYPES, default='')
     episode = models.ForeignKey('EpisodePart', related_name='graphics')
 
     def __unicode__(self):
