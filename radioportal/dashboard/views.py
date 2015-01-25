@@ -66,9 +66,13 @@ from django.contrib.formtools.wizard.views import SessionWizardView
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 
+from django.conf import settings
+
 import datetime
 import requests
 import simplejson
+import urlparse as urllib_parse
+
 
 @csrf_exempt
 def icecast_source_auth(request):
@@ -577,7 +581,7 @@ class EpisodeEditView(UpdateView):
     template_name = "radioportal/dashboard/episode_edit.html"
 
     def get_success_url(self):
-        return reverse_full('dashboard', 'admin-episode-edit', view_kwargs={'id': self.object.id})
+        return reverse_full('dashboard', 'admin-episode-edit', view_kwargs={'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         ctx = super(EpisodeEditView, self).get_context_data(**kwargs)
