@@ -35,6 +35,8 @@ from radioportal.dashboard import views, forms
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
 
+from django_hosts import reverse_lazy, reverse_host_lazy
+
 from django.contrib import admin
 admin.autodiscover()
 
@@ -84,15 +86,13 @@ urlpatterns = patterns('',
     
     url(r'^accounts/login/$', django.contrib.auth.views.login, {}, name="login"),
     url(r'^accounts/logout/$', django.contrib.auth.views.logout_then_login, {}, name="logout"),
-    url(r'^accounts/change-password/$', django.contrib.auth.views.password_change, 
-    {'template_name': 'registration/password_change.html'}, name="account-change-pass"),
-    url(r'^accounts/changed-password/$', django.contrib.auth.views.password_change_done, 
-    {'template_name': 'registration/password_changed.html'}, name="account-changed-pass"),
+    url(r'^accounts/change-password/$', django.contrib.auth.views.password_change, {'template_name': 'registration/password_change.html'}),
+    url(r'^accounts/changed-password/$', django.contrib.auth.views.password_change_done, {'template_name': 'registration/password_changed.html'}, name="password_change_done"),
 
-    url(r'^accounts/reset-password/$', django.contrib.auth.views.password_reset),
-    url(r'^accounts/reset-password/sent/$', django.contrib.auth.views.password_reset_done),
-    url(r'^accounts/reset-password/(?P<uidb36>[0-9A-Za-z]{1,13})-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', django.contrib.auth.views.password_reset_confirm),
-    url(r'^accounts/reset-password/done/$', django.contrib.auth.views.password_reset_complete),
+    url(r'^accounts/reset-password/$', django.contrib.auth.views.password_reset, {'post_reset_redirect': reverse_lazy('password_reset_done', host="dashboard")}),
+    url(r'^accounts/reset-password/sent/$', django.contrib.auth.views.password_reset_done, name="password_reset_done"),
+    url(r'^accounts/reset-password/(?P<uidb64>[0-9A-Za-z]{1,13})-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', django.contrib.auth.views.password_reset_confirm, name="password_reset_confirm"),
+    url(r'^accounts/reset-password/done/$', django.contrib.auth.views.password_reset_complete, name="password_reset_complete"),
 
     url(r'^icecast/source-auth/$', views.icecast_source_auth),
     url(r'^icecast/sandbox-lauth/$', views.icecast_sandbox_lauth),
