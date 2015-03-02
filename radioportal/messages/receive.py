@@ -92,9 +92,6 @@ def error_handler(msg, channel):
     m.save()
 
 class BackendInterpreter(object):
-    def __init__(self, reply_callback):
-        self.reply = reply_callback
-
     def message_send(self, data):
         """
             value={
@@ -364,10 +361,9 @@ class BackendInterpreter(object):
         routing_key = "%s.%s.%s" % (
             model._meta.app_label, model._meta.module_name, "changed")
 
-        self.reply(routing_key, plain_dict)
         logger.debug("Object list sent")
         # TODO: issue rpc call in backend
-        # return plain_dict
+        return (routing_key, plain_dict)
 
     def feed_updated(self, data):
         if data['global']['type'] == 'calendar':
