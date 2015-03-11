@@ -36,7 +36,7 @@ Created on 09.08.2011
 import logging
 logger = logging.getLogger(__name__)
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.core.serializers import json
 from django.conf import settings
 
@@ -196,7 +196,7 @@ class AMQPInitMiddleware(object):
         for m in (RecodedStream, SourcedStream, ShowFeed, Show, Channel):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
-            post_delete.connect(
+            pre_delete.connect(
                 self.object_deleted, m, dispatch_uid="my_dispatch_uid")
 
     def sender_callback(self, routing_key, data):

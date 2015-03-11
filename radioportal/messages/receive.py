@@ -32,7 +32,6 @@ Created on 09.08.2011
 @author: robert
 '''
 
-from django.utils import simplejson
 from django.utils.datetime_safe import datetime
 from django.contrib.contenttypes.models import ContentType
 
@@ -53,6 +52,7 @@ import urllib
 import urllib2
 import urlparse
 import uuid
+import simplejson
 
 from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message
 

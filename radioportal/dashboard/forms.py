@@ -287,7 +287,6 @@ class OrderedSelectMultiple(SelectMultiple):
         }
 
 
-
 class ChannelChangeEpisodeForm(forms.ModelForm):
     required_css_class = "required"
     move_part = forms.BooleanField(required=False, initial=False)
@@ -301,6 +300,7 @@ class ChannelChangeEpisodeForm(forms.ModelForm):
 class ChannelForm(forms.ModelForm):
     required_css_class = "required"
     mapping_method = jsonfield.forms.JSONFormField #widget=OrderedSelectMultiple(choices=MAPPINGS))
+    cluster = forms.RegexField(regex='^[a-zA-Z0-9]+$', error_messages={'invalid': _("Only alphanumeric characters allowed")})
     class Meta:
         MAPPINGS=(
           ('guess-from-last', _("Create new episode, get episode number by adding one to last episode number")),

@@ -30,11 +30,12 @@
 
 
 from django.db import models
+from django.db.models.signals import post_delete
 from django.contrib.auth.models import User
+from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.db.models import Min, Max
 from django.conf import settings
-
 
 from autoslug import AutoSlugField
 from django_hosts.reverse import reverse_full
@@ -45,6 +46,9 @@ import jsonfield
 import uuid
 import os.path
 
+
+import os.path
+import uuid
 
 class Show(models.Model):
     name = models.CharField(max_length=50, unique=True,
@@ -99,7 +103,7 @@ class Show(models.Model):
 
 class ShowFeed(models.Model):
     show = models.OneToOneField(Show)
-    enabled = models.BooleanField(verbose_name=_("Enable"))
+    enabled = models.BooleanField(verbose_name=_("Enable"), default=False)
     feed = models.URLField(max_length=240, blank=True,
         verbose_name=_("Feed of the podcast"),)
     titlePattern = models.CharField(max_length=240, blank=True,
@@ -215,17 +219,18 @@ GTYPES = (
     ('mount', _("Listener Statistics Grouped by Mount Point")),
 )
 
+
+def get_graphic_path(instance, filename):
+    dn = "/".join(["graphics", 
+              instance.episode.episode.show.slug])
+    fn = "%s.png" % uuid.uuid4()
+    fdn = os.path.join(settings.MEDIA_ROOT, dn)
+    if not os.path.exists(fdn):
+        os.makedirs(fdn)
+    return "/".join([dn, fn])
+
+
 class Graphic(models.Model):
-
-    def get_graphic_path(instance, filename):
-        dn = "/".join(["graphics", 
-                  instance.episode.episode.show.slug])
-        fn = "%s.png" % uuid.uuid4()
-        fdn = os.path.join(settings.MEDIA_ROOT, dn)
-        if not os.path.exists(fdn):
-            os.makedirs(fdn)
-        return "/".join([dn, fn])
-
     file = models.ImageField(upload_to=get_graphic_path, blank=True)
     type = models.CharField(max_length=10, choices=GTYPES, default='')
     episode = models.ForeignKey('EpisodePart', related_name='graphics')
@@ -245,7 +250,7 @@ class Recording(models.Model):
     isPublic = models.BooleanField(default=False)
     size = models.PositiveIntegerField()
     
-    running = models.BooleanField()
+    running = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.path
@@ -461,8 +466,8 @@ reversion.register(ShowFeed)
 reversion.register(Episode)
 reversion.register(EpisodePart)
 reversion.register(Marker)
-reversion.register(Graphic)
-reversion.register(Recording)
+# reversion.register(Graphic)
+# reversion.register(Recording)
 reversion.register(Channel)
 reversion.register(Stream)
 reversion.register(SourcedStream)

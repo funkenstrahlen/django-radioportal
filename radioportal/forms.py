@@ -31,7 +31,6 @@ from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.contrib.admin import widgets
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import SiteProfileNotAvailable
 from django.conf import settings
 
 from radioportal import models
