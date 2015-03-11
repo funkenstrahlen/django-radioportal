@@ -486,3 +486,89 @@ reversion.register(Status)
 # post_save.connect(saved, SourcedStream)
 # post_save.connect(saved, RecodedStream)
 # post_save.connect(saved, Status)
+
+class NotificationPath(models.Model):    
+    def get(self):
+        if hasattr(self, "twitteraccount"):
+            return self.twitteraccount
+        elif hasattr(self, "httpcallback"):
+            return self.httpcallback
+        elif hasattr(self, "ircchannel"):
+            return self.ircchannel
+
+    def name(self):
+        return self.get().name()
+
+    def __unicode__(self):
+        return self.get().__unicode__()
+
+
+class HTTPCallback(NotificationPath):
+    url = models.URLField()
+
+    def name(self):
+        return u"http"
+
+    def __unicode__(self):
+        return u"HTTP Callback "+self.url
+
+
+class IRCChannel(NotificationPath):
+    url = models.CharField(max_length=250)
+
+    def name(self):
+        return u"irc"
+
+    def __unicode__(self):
+        return u"IRC Channel "+self.url
+
+
+class TwitterAccount(NotificationPath):
+    screen_name = models.CharField(max_length=250)
+    oauth_token = models.CharField(max_length=250)
+    oauth_secret = models.CharField(max_length=250)
+
+    def name(self):
+        return u"twitter"
+
+    def __unicode__(self):
+        return u"Twitter Account "+self.screen_name
+
+class NotificationTemplate(models.Model):
+    text = models.CharField(max_length=250)
+
+    def __unicode__(self):
+        return self.text
+
+class PrimaryNotification(models.Model):
+    path = models.ForeignKey(NotificationPath)
+    show = models.ForeignKey(Show)
+    start = models.OneToOneField(NotificationTemplate, related_name="start")
+    stop = models.OneToOneField(NotificationTemplate, related_name="stop")
+    rollover = models.OneToOneField(NotificationTemplate, related_name="rollover")
+    system = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u"Notification for "+unicode(self.show)+" on "+unicode(self.path)
+
+@receiver(post_delete, sender=PrimaryNotification)
+def post_delete_user(sender, instance, *args, **kwargs):
+    if instance.start:
+        instance.start.delete()
+    if instance.stop:
+        instance.stop.delete()
+    if instance.rollover:
+        instance.rollover.delete()
+    if instance.path and not instance.path.primarynotification_set.all():
+        instance.path.delete()
+
+class SecondaryNotification(models.Model):
+    path = models.ForeignKey(NotificationPath)
+    show = models.ForeignKey(Show)
+    primary = models.ForeignKey(PrimaryNotification, blank=True, null=True)
+
+    def __unicode__(self):
+        ret = u"Retweet Notification on "+unicode(self.path)
+        if self.primary:
+            ret += " from "+unicode(self.primary.path)
+        return ret

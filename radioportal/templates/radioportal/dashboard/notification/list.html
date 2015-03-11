@@ -1,0 +1,62 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% comment %}
+Copyright © 2012 Robert Weidlich. All Rights Reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. The name of the author may not be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE LICENSOR "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
+{% endcomment %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url "admin-show-edit" slug=show.slug host "dashboard" %}">{{ show }}</a> »
+	{% trans "Show Notifications" %}
+{% endblock %}
+{% block content %}
+<h2>{% trans "Show Notifications" %}</h2>
+<ul>
+<li><a href="{% host_url "admin-show-notification-twitter" slug=show.slug path="primary" host "dashboard" %}">{% trans "Add new Twitter Posting Notification" %}</a></li>
+<li><a href="{% host_url "admin-show-notification-twitter" slug=show.slug path="secondary" host "dashboard" %}">{% trans "Add new Twitter Retweet Notification" %}</a></li>
+<li><a href="{% host_url "admin-show-notification-create" slug=show.slug path="irc" host "dashboard" %}">{% trans "Add new IRC notification" %}</a></li>
+<li><a href="{% host_url "admin-show-notification-create" slug=show.slug path="http" host "dashboard" %}">{% trans "Add new HTTP Callback notification" %}</a></li>
+</ul>
+{% for obj in object_list %}
+  <h3>{{ obj.path }} 
+{% if not obj.system %}
+    <a href="{% host_url "admin-show-notification-edit" path=obj.path.name slug=show.slug nslug=obj.id host "dashboard" %}">{% trans "edit" %}</a>
+    <a href="{% host_url "admin-show-notification-delete" slug=show.slug nslug=obj.id host "dashboard" %}">{% trans "delete" %}</a>
+{% endif %}
+  </h3>
+  <dl>
+    <dt>{% trans "Template for start" %}</dt><dd>{{ obj.start }}</dd>
+    <dt>{% trans "Template for rollover" %}</dt><dd>{{ obj.rollover }}</dd>
+    <dt>{% trans "Template for stop" %}</dt><dd>{{ obj.stop }}</dd>
+  </dl>
+{% endfor %}
+{% for obj in secondary %}
+  <h3>{{ obj.path }} 
+    <a href="{% host_url "admin-show-secondary-notification-edit" path=obj.path.name slug=show.slug nslug=obj.id host "dashboard" %}">{% trans "edit" %}</a>
+    <a href="{% host_url "admin-show-secondary-notification-delete" slug=show.slug nslug=obj.id host "dashboard" %}">{% trans "delete" %}</a>
+  </h3>
+  <p>{% trans "Retweet from " %}{{ obj.primary }}</p>
+{% endfor %}
+{% endblock %}

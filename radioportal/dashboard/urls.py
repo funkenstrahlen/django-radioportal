@@ -30,7 +30,7 @@
 
 from django.conf.urls import patterns, url, include
 
-from radioportal.dashboard import views, forms
+from radioportal.dashboard import views, forms, notification
 
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
@@ -71,6 +71,14 @@ urlpatterns = patterns('',
     url(r'^show/(?P<slug>[\w-]+)/delete/$', views.ShowDeleteView.as_view(), name="admin-show-delete"),
     url(r'^show/(?P<slug>[\w-]+)/feed/$', views.ShowFeedEditView.as_view(), name="admin-show-feed"),
     url(r'^show/(?P<slug>[\w-]+)/create-episode/$', views.EpisodeCreateView.as_view(), name="admin-episode-create"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/$', notification.NotificationListView.as_view(), name="admin-show-notification"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/twitter/(?P<path>(primary|secondary))/$', notification.twitter_gettoken, name="admin-show-notification-twitter"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/twitter/(?P<path>(primary|secondary))/cb/$', notification.twitter_callback, name="admin-show-notification-twitter-callback"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/s-(?P<nslug>[\w-]+)/delete/$', notification.DeleteSecondaryNotificationView.as_view(), name="admin-show-secondary-notification-delete"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/(?P<nslug>[\w-]+)/delete/$', notification.DeleteNotificationView.as_view(), name="admin-show-notification-delete"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/(?P<path>(irc|http))/add/$', notification.CreateNotificationView.as_view(), name="admin-show-notification-create"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/s-(?P<path>(twitter))/(?P<nslug>[\w-]+)/$', notification.UpdateSecondaryNotificationView.as_view(), name="admin-show-secondary-notification-edit"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/(?P<path>(twitter|irc|http))/(?P<nslug>[\w-]+)/$', notification.UpdateNotificationView.as_view(), name="admin-show-notification-edit"),
 
     url(r'^episode/(?P<pk>[\w-]+)/$', views.EpisodeEditView.as_view(), name="admin-episode-edit"),
     url(r'^episode/(?P<pk>[\w-]+)/delete/$', views.EpisodeDeleteView.as_view(), name="admin-episode-delete"),
