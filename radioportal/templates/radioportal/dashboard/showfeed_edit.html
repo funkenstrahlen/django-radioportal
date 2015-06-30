@@ -35,7 +35,7 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block head_js %}
         {{ block.super }}
-        <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block content %}
 <h2>
@@ -61,17 +61,18 @@ DESCRIPTION das Tag #noshow, so wird dieser Eintrag übersprungen.</p>
 <tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
 </table>
 </form>
-  <script type="text/javascript">
+<script type="text/javascript">
     function toggle() {
-          $("tr:gt(0):lt(3)").toggle();
+        $("tr:gt(0):lt(3)").toggle();
     }
-
+    
     $(document).ready(function() {
-      $('#id_enabled').bind('change', false);
-      $('#id_enabled').change(toggle);
-      if(!$('#id_enabled').is(':checked')) {
-         toggle();
-      }
+        var checkbox = $('#id_enabled');
+        checkbox.bind('change', false);
+        checkbox.change(toggle);
+        if(!checkbox.is(':checked')) {
+            toggle();
+        }
     });
   </script>
 {% endblock %}
