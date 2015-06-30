@@ -25,17 +25,10 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery/jquery-1.11.3.min.js"></script>
 <script src="{{ STATIC_URL }}mediaelement/build/mediaelement-and-player.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/slimbox2/slimbox2.js"></script>
 
 <script type="text/javascript">
-    function registerPopupClick() {
-        $("a.sharelink").click(function(event) {
-            event.preventDefault();
-            window.open(this.href, "_blank", "width=500,height=500,menubar=0,toolbar=0,", false);
-        });
-    }
     function showplayer(index, element) {
         $(element).bind('click', false);
         $(element).click(function() {
