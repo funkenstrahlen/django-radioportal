@@ -25,23 +25,32 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-        <script type="text/javascript" src="{{ STATIC_URL }}jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}slimbox2/js/slimbox2.js"></script>
-        <script src="{{ STATIC_URL }}mediaelement/build/jquery.js"></script>
-        <script src="{{ STATIC_URL }}mediaelement/build/mediaelement-and-player.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery/jquery-1.11.3.min.js"></script>
+<script src="{{ STATIC_URL }}mediaelement/build/mediaelement-and-player.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/slimbox2/slimbox2.js"></script>
 
-  <script type="text/javascript">
-    function showplayer(index, element) {
-      $(element).bind('click', false);
-      $(element).click(function() {
-          el=$(this).parent();
-          $(el).find('.player').show();
-          $(el).find('.play').hide();
-      });
+<script type="text/javascript">
+    function registerPopupClick() {
+        $("a.sharelink").click(function(event) {
+            event.preventDefault();
+            window.open(this.href, "_blank", "width=500,height=500,menubar=0,toolbar=0,", false);
+        });
     }
-
-    $(document).ready(function() {
-      $(".play").each(showplayer);
-      $('audio,video').mediaelementplayer({features: ['playpause', 'current', 'volume'], audioWidth: 160, audioHeight: "1em"});
+    function showplayer(index, element) {
+        $(element).bind('click', false);
+        $(element).click(function() {
+            el = $($(this).parent());
+            el.find('.player').show();
+            el.find('.play').hide();
+        });
+    }
+    $(function() {
+        registerPopupClick();
+        $(".play").each(showplayer);
+        $('audio,video').mediaelementplayer({
+            features    : ['playpause', 'current', 'volume'],
+            audioWidth  : 160,
+            audioHeight : "1em"
+        });
     });
-  </script>
+</script>

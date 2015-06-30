@@ -26,8 +26,14 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
+{% block head_js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/modernizr/modernizr.custom.10600.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/font/fontello.css">
+<!--[if IE 7]><link rel="stylesheet" href="{{ STATIC_URL }}css/font/fontello-ie7.css"><![endif]-->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/sharebuttons.css">
+{% endblock %}
 {% block navigation %}
-{% load i18n hosts socialshareprivacy_tags %}
+{% load i18n hosts %}
 {% host_url "live" on "www" as live_url %}
 <li{% if request.path|startswith:live_url %} class="active"{% endif %}>
   <a class="{% block collapsed_live %}{% endblock %}collapsed" href="http:{{ live_url }}">{% trans "Live" %}</a>
@@ -68,5 +74,30 @@ OF SUCH DAMAGE.
 {% block breadcrumb %}<a href="{% url 'root' %}">{% trans "Start" %}</a>{% endblock %}
 {% block content_foot %}
 <div id="socialshareprivacy"></div>
-{% socialshareprivacy %}
+<!-- Social -->
+{% spaceless %}
+<div class="icon-only">
+    <h4>{% trans "Share on:" %}</h4>
+    <ul id="sharelist">
+        <li>
+            <a target="_blank" href="https://plus.google.com/share?url={{ current_path|urlencode }}" class="sharelink">
+                <i aria-hidden="true" class="icon-gplus"></i>
+                <span>Google+</span>
+            </a>
+        </li>
+        <li>
+            <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ current_path|urlencode }}" class="sharelink">
+                <i aria-hidden="true" class="icon-facebook"></i>
+                <span>Facebook</span>
+            </a>
+        </li>
+        <li>
+            <a target="_blank" href="https://twitter.com/home?status={{ current_path|urlencode }}" class="sharelink">
+                <i aria-hidden="true" class="icon-twitter"></i>
+                <span>Twitter</span>
+            </a>
+        </li>
+    </ul>
+</div>
+{% endspaceless %}
 {% endblock %}
