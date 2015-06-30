@@ -278,12 +278,13 @@ class OrderedSelectMultiple(SelectMultiple):
      	
     class Media:
         js = (
-           'jquery-ui/js/jquery-1.6.2.min.js',
-           'jquery-ui/js/jquery-ui-1.8.17.custom.min.js',
-           'asmselect/jquery.asmselect.js',
+           'js/jquery/jquery-1.11.3.min.js',
+           'js/jquery/jquery-ui-1.11.4.min.js',
+           'js/bsmselect/jquery.bsmselect.js',
+           'js/bsmselect/jquery.bsmselect.sortable.js',
         )
         css = {
-           'all': ('asmselect/jquery.asmselect.css',),
+           'all': ('css/bsmselect/jquery.bsmselect.css',),
         }
 
 

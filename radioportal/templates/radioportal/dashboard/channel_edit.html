@@ -32,44 +32,44 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block head_js %}
 {{ block.super }}
-<script type="text/javascript">                                         
-   // we will add our javascript code here
-   function toggle(event) {
-   		//alert(event.type);
-   		//alert(event.data);
-   		var newstate = $(event.target).find('option:selected').attr('value');
-   		var number = event.data;
-   		var all = ['mount','status','user','password','format','bitrate','encoding','fallback'];
-   		var hidden = {};
-   		hidden['RECODE'] = [ all[2], all[3], all[7] ];
-   		hidden['SOURCE'] = [ all[4], all[5] ];
-   		for (var i = 0; i < all.length; i++) {
-   			$('#id_stream_set-' + number + '-' + all[i]).parent().parent().show()
-   		};
-   		for (var i = 0; i < hidden[newstate].length; i++) {
-   			$('#id_stream_set-' + number + '-' + hidden[newstate][i]).parent().parent().fadeOut('fast');
-   		};
-   }
-   
-   $(document).ready(function() {
-   		// do stuff when DOM is ready
-   		var num = $('#id_stream_set-TOTAL_FORMS').attr('value');
-   		for (var i = 0; i < num; i++) {
-   			$('#id_stream_set-' + i + '-status').bind('change', i, toggle);
-   			$('#id_stream_set-' + i + '-status').change();
-   		};
-                $('#id_mapping_method').asmSelect({
-                        addItemTarget: 'bottom',
-                        // animate: true,
-                        highlight: true,
-                        sortable: true,
-                        removeLabel: '{% trans "[x]" %}',
-                        highlightAddedLabel: '{% trans "Added" %}: ',
-                        highlightRemovedLabel: '{% trans "Removed" %}: ',
-                        addLabel: '{% trans "Add another item" %}',
-                        hideWhenAdded: true,
-                });
-   });
+<script type="text/javascript">
+    function toggle(event) {
+        //alert(event.type);
+        //alert(event.data);
+        var newstate = $(event.target).find('option:selected').attr('value');
+        var number = event.data;
+        var all = ['mount','status','user','password','format','bitrate','encoding','fallback'];
+        var hidden = {};
+        hidden['RECODE'] = [ all[2], all[3], all[7] ];
+        hidden['SOURCE'] = [ all[4], all[5] ];
+        for (var i = 0; i < all.length; i++) {
+            $('#id_stream_set-' + number + '-' + all[i]).parent().parent().show()
+        };
+        for (var i = 0; i < hidden[newstate].length; i++) {
+            $('#id_stream_set-' + number + '-' + hidden[newstate][i]).parent().parent().fadeOut('fast');
+        };
+    }
+    
+    $(document).ready(function() {
+        // do stuff when DOM is ready
+        var num = $('#id_stream_set-TOTAL_FORMS').attr('value');
+        for (var i = 0; i < num; i++) {
+            $('#id_stream_set-' + i + '-status').bind('change', i, toggle);
+            $('#id_stream_set-' + i + '-status').change();
+        };
+        $('#id_mapping_method').bsmSelect({
+            addItemTarget:          'bottom',
+            highlight:              true,
+            removeLabel:            '&times;',
+            highlightAddedLabel:    '{% trans "Added" %}: ',
+            highlightRemovedLabel:  '{% trans "Removed" %}: ',
+            addLabel:               '{% trans "Add another item" %}',
+            hideWhenAdded:          true,
+            plugins: [
+                $.bsmSelect.plugins.sortable({ axis : 'y' })
+            ]
+        });
+    });
  </script>
 {% endblock %}
 {% block content %}
