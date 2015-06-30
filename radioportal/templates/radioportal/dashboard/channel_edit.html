@@ -77,9 +77,9 @@ OF SUCH DAMAGE.
 {% comment %}{% if user.is_superuser %}<h3>Weitere Einstellungen</h3><p><a href="{% host_url "admin-auphonic-settings" object.id on "dashboard" %}">{% trans "Einstellungen für Auphonic bearbeiten" %}</a></p>{% endif %}{% endcomment %}
 
 <h2>{% if object %}{% trans "Edit Channel" %}{% else %}{% trans "Create new Channel" %}{% endif %}</h2>
-
+{% if object %}
 <p><a href="{% host_url "admin-channel-cce" object.id on "dashboard" %}">{% trans "Episode ändern" %}</a><br /><br /></p>
-
+{% endif %}
 <form action="" method="POST">
 {% csrf_token %}
 <table>
