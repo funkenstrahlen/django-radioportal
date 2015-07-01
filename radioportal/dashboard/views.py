@@ -143,7 +143,7 @@ class UserChannelStreamAddView(SessionWizardView):
         if not id:
             return
         kwargs = {'api_name': 'v1', 'resource_name': 'application', 'pk': id}
-        url = "http:%s" % reverse_full('review', 'api_dispatch_detail', view_kwargs=kwargs)
+        url = reverse_full('review', 'api_dispatch_detail', view_kwargs=kwargs)
         header = {'Authorization': 'ApiKey %s:%s' % (self.request.user.username, self.request.user.api_key.key)}
         r = requests.get(url,  params={'format':'json'}, headers=header, verify=False)
         if not r.status_code == 200:
