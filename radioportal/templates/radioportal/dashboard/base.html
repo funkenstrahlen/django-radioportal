@@ -37,7 +37,8 @@ OF SUCH DAMAGE.
 
 {% block shorturl_footer %}{% endblock %}
 {% block shorturl_head %}{% endblock %}
-{% block head %}
+{% block head_js %}
+        {{ block.super }}
 	{% load staticfiles %}
 	<script type="text/javascript" src="{% url 'jsi18n' %}"></script>
 	<script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
