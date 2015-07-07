@@ -33,6 +33,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
+from django.utils.translation import ugettext as _
 
 from django_hosts.reverse import reverse_full
 from guardian.mixins import PermissionRequiredMixin
@@ -45,9 +46,31 @@ from radioportal.models import NotificationTemplate, Show
 
 
 # Forms
-class TemplateForm(forms.ModelForm):
+class StartTemplateForm(forms.ModelForm):
     class Meta:
         model = NotificationTemplate
+        fields = ('text',)
+        labels = {
+            'text': _("Template for start"),
+        }
+
+
+class StopTemplateForm(forms.ModelForm):
+    class Meta:
+        model = NotificationTemplate
+        fields = ('text',)
+        labels = {
+            'text': _("Template for stop"),
+        }
+
+
+class RolloverTemplateForm(forms.ModelForm):
+    class Meta:
+        model = NotificationTemplate
+        fields = ('text',)
+        labels = {
+            'text': _("Template for rollover"),
+        }
 
 
 class TwitterForm(forms.ModelForm):
@@ -64,6 +87,9 @@ class IRCForm(forms.ModelForm):
         model = IRCChannel
         widgets = {
             'url': IRCWidget(choices=IRCNETWORKS),
+        }
+        labels = {
+            'url': _("IRC Network and Channel"),
         }
 
 
@@ -186,9 +212,9 @@ class NotificationMixin(PermissionRequiredMixin):
             'irc': IRCForm,
             'http': HTTPForm,
         },
-        'start': TemplateForm,
-        'stop': TemplateForm,
-        'rollover': TemplateForm,
+        'start': StartTemplateForm,
+        'stop': StopTemplateForm,
+        'rollover': RolloverTemplateForm,
     }
 
     def get_permission_object(self):
@@ -209,11 +235,15 @@ class NotificationMixin(PermissionRequiredMixin):
         ctx = super(MultipleFormMixin, self).get_context_data(**ctx)
         show = Show.objects.get(slug=self.kwargs["slug"])
         ctx["show"] = show
+        ctx["path"] = self.kwargs["path"]
+        ctx["primary"] = self.primary
         return ctx
 
 
 class CreateNotificationView(NotificationMixin, MultipleFormCreateView):
     form_class = NotificationForm
+
+    primary = True
 
     template_name = "radioportal/dashboard/notification/edit.html"
 
@@ -228,6 +258,8 @@ class UpdateNotificationView(NotificationMixin, MultipleFormUpdateView):
     model = PrimaryNotification
 
     template_name = "radioportal/dashboard/notification/edit.html"
+
+    primary = True
 
     def get_success_url(self):
         return reverse_full('dashboard', 'admin-show-notification',
@@ -255,6 +287,8 @@ class UpdateSecondaryNotificationView(NotificationMixin,
     model = SecondaryNotification
 
     template_name = "radioportal/dashboard/notification/edit.html"
+
+    primary = False
 
     def get_form_class(self):
         form_class = super(UpdateSecondaryNotificationView,

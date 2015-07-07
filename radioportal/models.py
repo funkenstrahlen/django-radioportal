@@ -515,7 +515,7 @@ class HTTPCallback(NotificationPath):
         return u"http"
 
     def __unicode__(self):
-        return u"HTTP Callback "+self.url
+        return _(u"HTTP Callback %s" % self.url)
 
 
 class IRCChannel(NotificationPath):
@@ -525,7 +525,7 @@ class IRCChannel(NotificationPath):
         return u"irc"
 
     def __unicode__(self):
-        return u"IRC Channel "+self.url
+        return _(u"IRC Channel %s" % self.url)
 
 
 class TwitterAccount(NotificationPath):
@@ -537,10 +537,10 @@ class TwitterAccount(NotificationPath):
         return u"twitter"
 
     def __unicode__(self):
-        return u"Twitter Account "+self.screen_name
+        return _(u"Twitter Account @%s" % self.screen_name)
 
 class NotificationTemplate(models.Model):
-    text = models.CharField(max_length=250)
+    text = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.text
@@ -554,10 +554,10 @@ class PrimaryNotification(models.Model):
     system = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return u"Notification for "+unicode(self.show)+" on "+unicode(self.path)
+        return _(u"Notification for %s on %s" % (unicode(self.show), unicode(self.path)))
 
 @receiver(post_delete, sender=PrimaryNotification)
-def post_delete_user(sender, instance, *args, **kwargs):
+def post_delete_primarynotification(sender, instance, *args, **kwargs):
     if instance.start:
         instance.start.delete()
     if instance.stop:
@@ -573,7 +573,12 @@ class SecondaryNotification(models.Model):
     primary = models.ForeignKey(PrimaryNotification, blank=True, null=True)
 
     def __unicode__(self):
-        ret = u"Retweet Notification on "+unicode(self.path)
+        ret = _(u"Retweet Notification on %s" % unicode(self.path))
         if self.primary:
-            ret += " from "+unicode(self.primary.path)
+            ret += _(" from %s" % unicode(self.primary.path))
         return ret
+
+@receiver(post_delete, sender=SecondaryNotification)
+def post_delete_secondarynotification(sender, instance, *args, **kwargs):
+    if instance.path and not instance.path.secondarynotification_set.all():
+        instance.path.delete()

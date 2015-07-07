@@ -117,7 +117,7 @@ class EpisodeSlugFromTitle(FirstWordIdExtractor, EpisodeFinder):
         return "find-from-title"
 
     def get_description(self):
-        return _("Try to find an existing episode with a slug," +
+        return _("Try to find an existing episode with a slug,"
                  " which is the same as the first word of the stream name")
 
     def get_episode(self, channel, metadata):
@@ -153,7 +153,7 @@ class MakeEpisodeFromLastEpisode(EpisodeFinder, MakeEpisodeMixin):
         return "make-from-number-of-last-episode"
 
     def get_description(self):
-        return _("Create a new episode by incrementing the number of" +
+        return _("Create a new episode by incrementing the number of"
                  " the last episode by one")
 
     def get_episode(self, channel, metadata):

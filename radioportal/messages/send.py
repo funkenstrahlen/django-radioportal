@@ -40,14 +40,13 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.core.serializers import json
 from django.conf import settings
 
-from radioportal.models import SourcedStream, ShowFeed, Show, Channel, RecodedStream
+from radioportal.models import SourcedStream, ShowFeed, Show, Channel, RecodedStream, PrimaryNotification, SecondaryNotification
 
 from extshorturls.utils import ShortURLResolver
 
 import simplejson
 
-from carrot.connection import DjangoBrokerConnection, BrokerConnection
-from carrot.messaging import Publisher
+import pika
 
 #### Part one: sending notifications for changed objects ####
 
@@ -119,6 +118,27 @@ class DTOShow(DTO):
             self.feed['feed'] = instance.showfeed.feed
             self.feed['icalfeed'] = instance.showfeed.icalfeed
             self.feed['titlePattern'] = instance.showfeed.titlePattern
+        self.notifications = []
+        for pn in instance.primarynotification_set.all():
+            noti = {
+                'start': pn.start.text,
+                'stop': pn.stop.text,
+                'rollover': pn.rollover.text,
+                'type': pn.path.name(),
+            }
+            if pn.path.name() == "twitter":
+                noti['token'] = pn.path.get().oauth_token
+                noti['secret'] = pn.path.get().oauth_secret
+                noti['secondary'] = []
+                for sn in pn.secondarynotification_set.all():
+                    noti['secondary'].append({
+                        'type': sn.path.name(),
+                        'token': sn.path.get().oauth_token,
+                        'secret': sn.path.get().oauth_secret,
+                    })
+            elif pn.path.name() in ("irc", "http"):
+                noti["url"] = pn.path.get().url
+            self.notifications.append(noti)
 
 
 class DTOShowTwitter(DTOShow):
@@ -128,6 +148,14 @@ class DTOShowTwitter(DTOShow):
 class DTOShowFeed(DTOShow):
     def __init__(self, instance):
         super(DTOShowFeed, self).__init__(instance.show)
+
+class DTOPrimaryNotification(DTOShow):
+    def __init__(self, instance):
+        super(DTOPrimaryNotification, self).__init__(instance.show)
+
+class DTOSecondaryNotification(DTOShow):
+    def __init__(self, instance):
+        super(DTOSecondaryNotification, self).__init__(instance.show)
 
 class DTOEpisode(DTO):
     def name(self):
@@ -148,27 +176,50 @@ dto_map = {
     "show": DTOShow,
     "showfeed": DTOShowFeed,
     "showtwitter": DTOShowTwitter,
+    "primarynotification": DTOPrimaryNotification,
+    "secondarynotification": DTOSecondaryNotification,
     "episode": DTOEpisode,
     "channel": DTOChannel,
 }
 
 
-
 def send_msg(routing_key, data, exchange="django_send"):
-    conn = BrokerConnection(
-                hostname=settings.BROKER_HOST,
+    credentials = pika.PlainCredentials(
+        username=settings.BROKER_USER,
+        password=settings.BROKER_PASSWORD)
+        
+    parameters = pika.ConnectionParameters(
+                host=settings.BROKER_HOST,
                 port=settings.BROKER_PORT,
-                userid=settings.BROKER_USER,
-                password=settings.BROKER_PASSWORD,
-                virtual_host=settings.BROKER_VHOST)
-    publisher = Publisher(connection=conn,
-                          exchange=exchange,
-                          routing_key=routing_key,
-                          exchange_type="topic",
-                          )
-    publisher.send(data)
-    publisher.close()
+                virtual_host=settings.BROKER_VHOST,
+                credentials=credentials,
+                ssl=settings.BROKER_SSL)
+
+    conn = pika.BlockingConnection(parameters)
+    channel = conn.channel()
+
+    prop = pika.BasicProperties(content_type='text/plain',
+                                delivery_mode=1)
+    channel.basic_publish(exchange, routing_key, data, prop)
     conn.close()
+
+
+
+# def send_msg_carrot(routing_key, data, exchange="django_send"):
+#     conn = BrokerConnection(
+#                 hostname=settings.BROKER_HOST,
+#                 port=settings.BROKER_PORT,
+#                 userid=settings.BROKER_USER,
+#                 password=settings.BROKER_PASSWORD,
+#                 virtual_host=settings.BROKER_VHOST)
+#     publisher = Publisher(connection=conn,
+#                           exchange=exchange,
+#                           routing_key=routing_key,
+#                           exchange_type="topic",
+#                           )
+#     publisher.send(data)
+#     publisher.close()
+#     conn.close()
 
 
 def serialize_object(instance, return_name=False):
@@ -193,7 +244,7 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed, Show, Channel):
+        for m in (RecodedStream, SourcedStream, ShowFeed, Show, Channel, PrimaryNotification, SecondaryNotification):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             pre_delete.connect(

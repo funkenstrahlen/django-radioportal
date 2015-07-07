@@ -33,6 +33,9 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block content %}
 <h2>{% trans "Show Notifications" %}</h2>
+<p>{% blocktrans %}xenim is able to send notifications to several external services when a show starts, a new part of a show starts or when a show has finished. You can
+use this page to configure this notifications.
+{% endblocktrans %}</p>
 <ul>
 <li><a href="{% host_url "admin-show-notification-twitter" slug=show.slug path="primary" host "dashboard" %}">{% trans "Add new Twitter Posting Notification" %}</a></li>
 <li><a href="{% host_url "admin-show-notification-twitter" slug=show.slug path="secondary" host "dashboard" %}">{% trans "Add new Twitter Retweet Notification" %}</a></li>

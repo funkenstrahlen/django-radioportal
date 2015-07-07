@@ -34,14 +34,109 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block content %}
 <h2>{% trans "Show Notifications" %}</h2>
+{% if primary %}
+<p>{% blocktrans %}
+For the templates the <a href="https://docs.python.org/2/library/string.html#format-string-syntax">Python format string syntax</a> is used. 
+If an empty string is supplied for the template no notification will be send to the service for the respective event. The following variables 
+are available for the templates:
+{% endblocktrans %}</p>
+<table style="border-collapse: collapse;">
+  <tr>
+    <th style="border: 2px solid grey; padding: 0.2em;">{% trans "Variable" %}</th>
+    <th style="border: 2px solid grey; padding: 0.2em;">{% trans "Available for template" %}</th>
+    <th style="border: 2px solid grey; padding: 0.2em;">{% trans "Example" %}</th>
+    <th style="border: 2px solid grey; padding: 0.2em;">{% trans "Description" %}</th>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{url}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">http://streams.xenim.de/chaosradio/cr182/</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Full URL to the current episode" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{shorturl}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">http://xsn.io/eup</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Shortened URL to the current episode" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{description}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover, stop</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">Internet</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Description as specified in icecast source client" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{url}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover, stop</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">http://chaosradio.ccc.de/</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "URL as specified in icecast source client" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{streams}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">http://streams.xenim.de/cr_128k_vbr.mp3 http://streams.xenim.de/cr_56k.ogg</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "URLs to all currently available streams. Might include HLS streams in the future." %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{genre}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover, stop</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">various</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Genre as specified in icecast source client" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{slug}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">chaosradio-cr182</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Internally used (e.g. in atom feed) slug for current episode" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{channel}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover, stop</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">cr</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Identifier of used channel" %}</td>
+  </tr>
+  <tr>
+    <td style="border: 2px solid grey; padding: 0.2em;"><tt>{name}</tt></td>
+    <td style="border: 2px solid grey; padding: 0.2em;">start, rollover, stop</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">Chaosradio</td>
+    <td style="border: 2px solid grey; padding: 0.2em;">{% trans "Name as specified in icecast source client" %}</td>
+  </tr>
+</table>
+<br />
+{% endif %}
+<p>
+{% ifequal path "http" %}{% blocktrans %}
+For the HTTP Callback Notification a HTTP POST is issued to the specified url. The evaluated content of the template is send in the
+request body without any further encoding. The requests will have the User-Agent set to "xenim notification".<br />
+If you need other request types, encodings or headers do not hesitate to contact info@streams.xenim.de.
+{% endblocktrans %}{% endifequal %}
 
+{% ifequal path "irc" %}{% blocktrans %}
+IRC Notifications are posted as regular messages by <em>xsnBot</em>, who is currently available on FreeNode and HackInt. If you need
+notifications on an other network please contact info@streams.xenim.de.
+{% endblocktrans %}{% endifequal %}
+
+{% ifequal path "twitter" %}
+{% if primary %}{% blocktrans %}
+Twitter notification will post the evaluated template to the associated account. Be aware that the evaluated template will be truncated after
+the 140th character to prevent posting errors.
+{% endblocktrans %}{% else %}
+{% blocktrans %}
+The Twitter Retweet Notification will retweet the update made by selected Twitter Update Notification.
+{% endblocktrans %}
+{% endif %}
+{% endifequal %}
+</p>
+<br />
 <h3>{% trans "Edit" %} {{ object }}</h3>
+<p>
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <table>
 {{ form.as_table }}
-{% for name, f in aux_forms.items %}<tr><td colspan="2">{{ name }}</td></tr>{{ f.as_table }}{% endfor %}
+{% for name, f in aux_forms.items %}<tr><td colspan="2"></td></tr>{{ f.as_table }}{% endfor %}
 </table>
 <input type="submit" value="{% trans "Apply" %}" />
 </form>
+</p>
 {% endblock %}
