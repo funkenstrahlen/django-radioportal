@@ -30,7 +30,7 @@
 
 
 from django.db import models
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
@@ -539,6 +539,11 @@ class TwitterAccount(NotificationPath):
     def __unicode__(self):
         return _(u"Twitter Account @%s" % self.screen_name)
 
+class AuphonicAccount(NotificationPath):
+    access_token = models.CharField(max_length=250)
+    preset = models.CharField(max_length=250, blank=True)
+    start_production = models.BooleanField(default=False)
+
 class NotificationTemplate(models.Model):
     text = models.CharField(max_length=250, blank=True)
 
@@ -582,3 +587,41 @@ class SecondaryNotification(models.Model):
 def post_delete_secondarynotification(sender, instance, *args, **kwargs):
     if instance.path and not instance.path.secondarynotification_set.all():
         instance.path.delete()
+
+@receiver(post_save, sender=Show)
+def create_default_notifications(sender, instance, created, raw, *args, **kwargs):
+    if raw or not created:
+        return
+    # Twitter
+    twitter = TwitterAccount(screen_name="xenim", oauth_token=settings.TWITTER_ACCOUNT_TOKEN, oauth_secret=settings.TWITTER_ACCOUNT_SECRET)
+    twitter.save()
+    start_tw = NotificationTemplate(text="Sendung {name} ({channel}) hat angefangen {streams}")
+    start_tw.save()
+    stop_tw = NotificationTemplate(text="")
+    stop_tw.save()
+    rollover_tw = NotificationTemplate(text="")
+    rollover_tw.save()
+    twitter_noti = PrimaryNotification(path=twitter, show=instance, start=start_tw, stop=stop_tw, rollover=rollover_tw, system=True)
+    twitter_noti.save()
+    # IRC intern
+    irc = IRCChannel(url="irc://irc.freenode.net/#xsn-intern")
+    irc.save()
+    start_irc = NotificationTemplate(text="Sendung {name} ({channel}) hat angefangen {streams}")
+    start_irc.save()
+    stop_irc = NotificationTemplate(text="Sendung {channel} ist beendet")
+    stop_irc.stop()
+    rollover_irc = NotificationTemplate(text="")
+    rollover_irc.save()
+    irc_noti = PrimaryNotification(path=irc, show=instance, start=start_irc, stop=stop_irc, rollover=rollover_irc, system=True)
+    irc_noti.save()
+    # IRC public
+    irc2 = IRCChannel(url="irc://irc.freenode.net/#xsn")
+    irc2.save()
+    start_irc2 = NotificationTemplate(text="Sendung {name} ({channel}) hat angefangen {streams}")
+    start_irc2.save()
+    stop_irc2 = NotificationTemplate(text="Sendung {channel} ist beendet")
+    stop_irc2.stop()
+    rollover_irc2 = NotificationTemplate(text="")
+    rollover_irc2.save()
+    irc2_noti = PrimaryNotification(path=irc2, show=instance, start=start_irc2, stop=stop_irc2, rollover=rollover_irc2, system=True)
+    irc2_noti.save()

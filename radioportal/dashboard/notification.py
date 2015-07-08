@@ -40,10 +40,14 @@ from guardian.mixins import PermissionRequiredMixin
 from twython import Twython, TwythonError
 
 from .forms import IRCWidget, IRCNETWORKS
-from radioportal.models import PrimaryNotification, SecondaryNotification
+from radioportal.models import PrimaryNotification, SecondaryNotification,\
+    AuphonicAccount
 from radioportal.models import TwitterAccount, IRCChannel, HTTPCallback
 from radioportal.models import NotificationTemplate, Show
+from django.forms.widgets import Select
 
+from urllib import quote_plus
+import requests
 
 # Forms
 class StartTemplateForm(forms.ModelForm):
@@ -96,6 +100,17 @@ class IRCForm(forms.ModelForm):
 class HTTPForm(forms.ModelForm):
     class Meta:
         model = HTTPCallback
+
+class AuphonicForm(forms.ModelForm):
+    class Meta:
+        model = AuphonicAccount
+        widgets = {
+            'preset': Select,
+        }
+        labels = {
+            'preset': _("Auphonic Preset"),
+            'start_production': _("Start Production after upload")
+        }
 
 
 class NotificationForm(forms.ModelForm):
@@ -211,6 +226,7 @@ class NotificationMixin(PermissionRequiredMixin):
             'twitter': TwitterForm,
             'irc': IRCForm,
             'http': HTTPForm,
+            'auphonic': AuphonicForm,
         },
         'start': StartTemplateForm,
         'stop': StopTemplateForm,
@@ -431,4 +447,61 @@ def twitter_callback(request, slug, path):
         url = reverse_full('dashboard',
                            'admin-show-secondary-notification-edit',
                            view_kwargs=kwargs)
+    return redirect(url)
+
+
+def auphonic_gettoken(request, slug):
+    show = Show.objects.get(slug=slug)
+    if not request.user.has_perm('change_show', show):
+        return HttpResponse('Unauthorized', status=401)
+
+    url = "https://auphonic.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
+    cb = reverse_full('dashboard', 'admin-show-notification-auphonic-callback', view_kwargs={'slug': slug})
+
+    cb = quote_plus(cb)
+
+    return redirect(url.format(client_id=settings.AUPHONIC_CLIENT_ID, redirect_uri=cb))
+
+def auphonic_callback(request, slug):
+    token = request.GET["code"]
+
+    show = Show.objects.get(slug=slug)
+    if not request.user.has_perm('change_show', show):
+        return HttpResponse('Unauthorized', status=401)
+
+    url = "https://auphonic.com/oauth2/token/"
+    cb = reverse_full('dashboard', 'admin-show-notification-auphonic-callback', view_kwargs={'slug': slug})
+    data = {
+        'client_id': settings.AUPHONIC_CLIENT_ID,
+        'client_secret': settings.AUPHONIC_CLIENT_SECRET,
+        'redirect_uri': cb,
+        'grant_type': "authorization_code",
+        'code': token
+    }
+
+    r = requests.post(url, data=data)
+    if r.status_code == 200:
+        res = r.json()
+
+        token = res["access_token"]
+
+        account = AuphonicAccount(access_token=token)
+        account.save()
+
+        start = NotificationTemplate()
+        start.save()
+        stop = NotificationTemplate()
+        stop.save()
+        rollover = NotificationTemplate()
+        rollover.save()
+
+        noti = PrimaryNotification(path=account, start=start, stop=stop,
+                                   rollover=rollover, show=show)
+        noti.save()
+
+        kwargs = {'slug': slug, "path": "auphonic", "nslug": noti.id}
+
+        url = reverse_full('dashboard', 'admin-show-notification-edit',
+                           view_kwargs=kwargs)
+
     return redirect(url)
