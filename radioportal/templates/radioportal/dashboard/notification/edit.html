@@ -110,12 +110,10 @@ For the HTTP Callback Notification a HTTP POST is issued to the specified url. T
 request body without any further encoding. The requests will have the User-Agent set to "xenim notification".<br />
 If you need other request types, encodings or headers do not hesitate to contact info@streams.xenim.de.
 {% endblocktrans %}{% endifequal %}
-
 {% ifequal path "irc" %}{% blocktrans %}
 IRC Notifications are posted as regular messages by <em>xsnBot</em>, who is currently available on FreeNode and HackInt. If you need
 notifications on an other network please contact info@streams.xenim.de.
 {% endblocktrans %}{% endifequal %}
-
 {% ifequal path "twitter" %}
 {% if primary %}{% blocktrans %}
 Twitter notification will post the evaluated template to the associated account. Be aware that the evaluated template will be truncated after
@@ -126,6 +124,11 @@ The Twitter Retweet Notification will retweet the update made by selected Twitte
 {% endblocktrans %}
 {% endif %}
 {% endifequal %}
+{% ifequal path "auphonic" %}{% blocktrans %}
+Auphonic notifications are used to create a production based on the selected preset, upload the currently available recording to Auphonic and start
+the production if desired.
+The start, stop and rollover templates are used for filling in the title tag of the production.
+{% endblocktrans %}{% endifequal %}
 </p>
 <br />
 <h3>{% trans "Edit" %} {{ object }}</h3>

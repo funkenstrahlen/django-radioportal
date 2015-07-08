@@ -102,12 +102,28 @@ class HTTPForm(forms.ModelForm):
         model = HTTPCallback
 
 class AuphonicForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AuphonicForm, self).__init__(*args, **kwargs)
+        url = "https://auphonic.com/api/presets.json"
+        headers = {"Authorization": "Bearer %s" % self.instance.access_token}
+        r = requests.get(url, headers=headers)
+        ch = [(None, '----'),]
+        if r.status_code == 200:
+            res = r.json()
+            for preset in res["data"]:
+                ch.append((preset["uuid"], preset["preset_name"]))
+        self.fields["preset"].choices = ch
+
+    preset = forms.ChoiceField()
+
     class Meta:
         model = AuphonicAccount
+        fields = ["username", "preset", "start_production"]
         widgets = {
-            'preset': Select,
+            'username': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
         labels = {
+            'username': _("Auphonic Login Name"),
             'preset': _("Auphonic Preset"),
             'start_production': _("Start Production after upload")
         }
@@ -485,23 +501,36 @@ def auphonic_callback(request, slug):
 
         token = res["access_token"]
 
-        account = AuphonicAccount(access_token=token)
-        account.save()
+        url = "https://auphonic.com/api/user.json"
+        headers = {"Authorization": "Bearer %s" % token}
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            res = r.json()
 
-        start = NotificationTemplate()
-        start.save()
-        stop = NotificationTemplate()
-        stop.save()
-        rollover = NotificationTemplate()
-        rollover.save()
+            account, created = AuphonicAccount.objects.get_or_create(userid=res["data"]["user_id"])
 
-        noti = PrimaryNotification(path=account, start=start, stop=stop,
-                                   rollover=rollover, show=show)
-        noti.save()
+            account.access_token = token
+            account.username = res["data"]["username"]
 
-        kwargs = {'slug': slug, "path": "auphonic", "nslug": noti.id}
+            account.save()
 
-        url = reverse_full('dashboard', 'admin-show-notification-edit',
-                           view_kwargs=kwargs)
+            if created:
+                start = NotificationTemplate()
+                start.save()
+                stop = NotificationTemplate()
+                stop.save()
+                rollover = NotificationTemplate()
+                rollover.save()
 
+                noti = PrimaryNotification(path=account, start=start, stop=stop,
+                                           rollover=rollover, show=show)
+                noti.save()
+
+            kwargs = {'slug': slug, "path": "auphonic", "nslug": noti.id}
+
+            url = reverse_full('dashboard', 'admin-show-notification-edit',
+                               view_kwargs=kwargs)
+
+    url = reverse_full('dashboard', 'admin-show-notification',
+                       view_kwargs={'slug': slug})
     return redirect(url)

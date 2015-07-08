@@ -80,7 +80,7 @@ urlpatterns = patterns('',
     url(r'^show/(?P<slug>[\w-]+)/notification/(?P<nslug>[\w-]+)/delete/$', notification.DeleteNotificationView.as_view(), name="admin-show-notification-delete"),
     url(r'^show/(?P<slug>[\w-]+)/notification/(?P<path>(irc|http))/add/$', notification.CreateNotificationView.as_view(), name="admin-show-notification-create"),
     url(r'^show/(?P<slug>[\w-]+)/notification/s-(?P<path>(twitter))/(?P<nslug>[\w-]+)/$', notification.UpdateSecondaryNotificationView.as_view(), name="admin-show-secondary-notification-edit"),
-    url(r'^show/(?P<slug>[\w-]+)/notification/(?P<path>(twitter|irc|http))/(?P<nslug>[\w-]+)/$', notification.UpdateNotificationView.as_view(), name="admin-show-notification-edit"),
+    url(r'^show/(?P<slug>[\w-]+)/notification/(?P<path>(twitter|irc|http|auphonic))/(?P<nslug>[\w-]+)/$', notification.UpdateNotificationView.as_view(), name="admin-show-notification-edit"),
 
     url(r'^episode/(?P<pk>[\w-]+)/$', views.EpisodeEditView.as_view(), name="admin-episode-edit"),
     url(r'^episode/(?P<pk>[\w-]+)/delete/$', views.EpisodeDeleteView.as_view(), name="admin-episode-delete"),

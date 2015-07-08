@@ -138,6 +138,10 @@ class DTOShow(DTO):
                     })
             elif pn.path.name() in ("irc", "http"):
                 noti["url"] = pn.path.get().url
+            elif pn.path.name() == "auphonic":
+                noti["access_token"] = pn.path.get().access_token
+                noti["preset"] = pn.path.get().preset
+                noti["start_production"] = pn.path.get().start_production
             self.notifications.append(noti)
 
 

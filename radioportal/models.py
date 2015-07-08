@@ -500,6 +500,8 @@ class NotificationPath(models.Model):
             return self.httpcallback
         elif hasattr(self, "ircchannel"):
             return self.ircchannel
+        elif hasattr(self, "auphonicaccount"):
+            return self.auphonicaccount
 
     def name(self):
         return self.get().name()
@@ -541,8 +543,16 @@ class TwitterAccount(NotificationPath):
 
 class AuphonicAccount(NotificationPath):
     access_token = models.CharField(max_length=250)
+    username = models.CharField(max_length=250)
+    userid = models.CharField(max_length=250, unique=True)
     preset = models.CharField(max_length=250, blank=True)
     start_production = models.BooleanField(default=False)
+
+    def name(self):
+        return u"auphonic"
+
+    def __unicode__(self):
+        return _(u"Auphonic Account %s" % self.username)
 
 class NotificationTemplate(models.Model):
     text = models.CharField(max_length=250, blank=True)
@@ -559,7 +569,7 @@ class PrimaryNotification(models.Model):
     system = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return _(u"Notification for %s on %s" % (unicode(self.show), unicode(self.path)))
+        return _(u"Notification for %(show)s on %(path)s" % {'show': unicode(self.show), 'path': unicode(self.path)})
 
 @receiver(post_delete, sender=PrimaryNotification)
 def post_delete_primarynotification(sender, instance, *args, **kwargs):
