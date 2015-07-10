@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-07 16:02+0200\n"
+"POT-Creation-Date: 2015-07-08 16:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,32 +282,37 @@ msgstr ""
 msgid "White Gaussian noise"
 msgstr ""
 
-#: models.py:518
+#: models.py:520
 #, python-format
 msgid "HTTP Callback %s"
 msgstr "HTTP Callback %s"
 
-#: models.py:528
+#: models.py:530
 #, python-format
 msgid "IRC Channel %s"
 msgstr "IRC Kanal %s"
 
-#: models.py:540
+#: models.py:542
 #, python-format
 msgid "Twitter Account @%s"
 msgstr "Twitter Account @%s"
 
-#: models.py:557
+#: models.py:555
 #, python-format
-msgid "Notification for %s on %s"
-msgstr "Benachrichtigung für %s auf %s"
+msgid "Auphonic Account %s"
+msgstr "Auphonic Account @%s"
 
-#: models.py:576
+#: models.py:572
+#, python-format
+msgid "Notification for %(show)s on %(path)s"
+msgstr "Benachrichtigung für %(show)s auf %(path)s"
+
+#: models.py:591
 #, python-format
 msgid "Retweet Notification on %s"
 msgstr "Twitter Retweet Benachrichtigung auf %s"
 
-#: models.py:578
+#: models.py:593
 #, python-format
 msgid " from %s"
 msgstr " von %s"
@@ -339,24 +344,36 @@ msgstr "Voreinstellung"
 msgid "Associated"
 msgstr ""
 
-#: dashboard/notification.py:54
+#: dashboard/notification.py:58
 #: templates/radioportal/dashboard/notification/list.html:53
 msgid "Template for start"
 msgstr "Template für Folgenstart"
 
-#: dashboard/notification.py:63
+#: dashboard/notification.py:67
 #: templates/radioportal/dashboard/notification/list.html:55
 msgid "Template for stop"
 msgstr "Template für Folgenende"
 
-#: dashboard/notification.py:72
+#: dashboard/notification.py:76
 #: templates/radioportal/dashboard/notification/list.html:54
 msgid "Template for rollover"
 msgstr "Template für Folgenänderung"
 
-#: dashboard/notification.py:92
+#: dashboard/notification.py:96
 msgid "IRC Network and Channel"
 msgstr "IRC Netzwerk und Kanal"
+
+#: dashboard/notification.py:126
+msgid "Auphonic Login Name"
+msgstr "Auphinic Login Name"
+
+#: dashboard/notification.py:127
+msgid "Auphonic Preset"
+msgstr "Auphonic Preset"
+
+#: dashboard/notification.py:128
+msgid "Start Production after upload"
+msgstr "Starte Production nach Upload"
 
 #: dashboard/views.py:159
 msgid "Could not fetch matching application"
@@ -711,7 +728,7 @@ msgstr "Öffentliche URL"
 #: templates/radioportal/dashboard/show_edit.html:55
 #: templates/radioportal/dashboard/showfeed_edit.html:61
 #: templates/radioportal/dashboard/user_edit.html:44
-#: templates/radioportal/dashboard/notification/edit.html:139
+#: templates/radioportal/dashboard/notification/edit.html:142
 msgid "Apply"
 msgstr "Anwenden"
 
@@ -788,7 +805,7 @@ msgstr "Erstelle Gruppe"
 #: templates/radioportal/dashboard/showfeed_edit.html:42
 #: templates/radioportal/dashboard/user_edit.html:36
 #: templates/radioportal/dashboard/notification/edit.html:33
-#: templates/radioportal/dashboard/notification/edit.html:131
+#: templates/radioportal/dashboard/notification/edit.html:134
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -1089,7 +1106,7 @@ msgstr ""
 "Codierungen oder HTTP Header benötigt werden bitte unter info@streams.xenim."
 "de anfragen.\n"
 
-#: templates/radioportal/dashboard/notification/edit.html:114
+#: templates/radioportal/dashboard/notification/edit.html:113
 msgid ""
 "\n"
 "IRC Notifications are posted as regular messages by <em>xsnBot</em>, who is "
@@ -1102,7 +1119,7 @@ msgstr ""
 "Netzwerken FreeNode und Hackint aktiv, falls andere Netzwerke benötigt "
 "werden bitte an info@streams.xenim.de wenden. \n"
 
-#: templates/radioportal/dashboard/notification/edit.html:120
+#: templates/radioportal/dashboard/notification/edit.html:118
 msgid ""
 "\n"
 "Twitter notification will post the evaluated template to the associated "
@@ -1114,7 +1131,7 @@ msgstr ""
 "den konfigurierten Account gepostet. Um Fehler beim Posten zu verhindern, "
 "wird die ausgefüllte Vorlage nach 140 Zeichen abgeschnitten.\n"
 
-#: templates/radioportal/dashboard/notification/edit.html:124
+#: templates/radioportal/dashboard/notification/edit.html:122
 msgid ""
 "\n"
 "The Twitter Retweet Notification will retweet the update made by selected "
@@ -1123,6 +1140,22 @@ msgstr ""
 "\n"
 "Die Twitter Retweet Benachrichtigung retweetet den Tweet der ausgewählten "
 "Twitter Benachrichtigung.\n"
+
+#: templates/radioportal/dashboard/notification/edit.html:127
+msgid ""
+"\n"
+"Auphonic notifications are used to create a production based on the selected "
+"preset, upload the currently available recording to Auphonic and start\n"
+"the production if desired.\n"
+"The start, stop and rollover templates are used for filling in the title tag "
+"of the production.\n"
+msgstr ""
+"\n"
+"Auphonic Benachrichtigungen werden genutzt, um eine Production auf Basis des "
+"ausgewählten Presets zu erstellen, die momentan verfügbare Aufzeichnung zu "
+"Auphonic hochzuladen und die Production zu starten, falls dies ausgewählt ist."
+"Die Folgenstart-, Folgenende- und Folgenänderungstemplates werden genutzt, um das "
+"Feld \"title\" der Production zu befüllen.\n"
 
 #: templates/radioportal/dashboard/notification/list.html:36
 msgid ""

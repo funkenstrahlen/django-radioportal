@@ -544,7 +544,7 @@ class TwitterAccount(NotificationPath):
 class AuphonicAccount(NotificationPath):
     access_token = models.CharField(max_length=250)
     username = models.CharField(max_length=250)
-    userid = models.CharField(max_length=250, unique=True)
+    userid = models.CharField(max_length=250)
     preset = models.CharField(max_length=250, blank=True)
     start_production = models.BooleanField(default=False)
 

@@ -410,6 +410,10 @@ def twitter_callback(request, slug, path):
         necessary tokens. Obtain final tokens and create objects
         for storage
     """
+    if not "oauth_verifier" in request.GET:
+        url = reverse_full('dashboard', 'admin-show-notification',
+                       view_kwargs={'slug': slug})
+        return redirect(url)
     oauth_verifier = request.GET['oauth_verifier']
     twitter = Twython(settings.TWITTER_CONSUMER_KEY,
                       settings.TWITTER_CONSUMER_SECRET,
@@ -507,7 +511,7 @@ def auphonic_callback(request, slug):
         if r.status_code == 200:
             res = r.json()
 
-            account, created = AuphonicAccount.objects.get_or_create(userid=res["data"]["user_id"])
+            account, created = AuphonicAccount.objects.get_or_create(userid=res["data"]["user_id"], primarynotification__show__slug=slug)
 
             account.access_token = token
             account.username = res["data"]["username"]

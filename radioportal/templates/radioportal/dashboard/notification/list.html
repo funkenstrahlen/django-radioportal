@@ -41,6 +41,7 @@ use this page to configure this notifications.
 <li><a href="{% host_url "admin-show-notification-twitter" slug=show.slug path="secondary" host "dashboard" %}">{% trans "Add new Twitter Retweet Notification" %}</a></li>
 <li><a href="{% host_url "admin-show-notification-create" slug=show.slug path="irc" host "dashboard" %}">{% trans "Add new IRC notification" %}</a></li>
 <li><a href="{% host_url "admin-show-notification-create" slug=show.slug path="http" host "dashboard" %}">{% trans "Add new HTTP Callback notification" %}</a></li>
+<li><a href="{% host_url "admin-show-notification-auphonic" slug=show.slug host "dashboard" %}">{% trans "Add new Auphonic notification" %}</a></li>
 </ul>
 {% for obj in object_list %}
   <h3>{{ obj.path }} 
