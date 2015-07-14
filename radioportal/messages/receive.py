@@ -111,8 +111,8 @@ class BackendInterpreter(object):
             d = dateutil.parser.parse(data['stamp'])
         else:
             d = None
-        m=Message(message_object=obj, origin=data["origin"], message=data["message"],
-                       severity=data["severity"], timestamp=d)
+        m=Message(message_object=obj, origin=data["path"], message=data["message"],
+                       severity=data["level"], timestamp=d)
         m.save()
 
     def channel_startmaster(self, data):
