@@ -90,6 +90,8 @@ class StreamAtom1Feed(Atom1Feed):
             handler.endElement("xsn:channel")
         if 'website' in item:
             handler.addQuickElement('xsn:website', item['website'])
+        if 'slug' in item:
+            handler.addQuickElement('xsn:slug', item['slug'])
             
 
 
@@ -147,6 +149,7 @@ class ShowFeed(Feed):
             extra_dict['icon'] = "http:%s" % item.show.icon.url
         if item.url:
             extra_dict['website'] = item.url()
+        extra_dict['slug'] = item.slug
         return extra_dict
 
     def feed_extra_kwargs(self, obj):
@@ -177,7 +180,10 @@ class ShowFeed(Feed):
             eps = eps.filter(show=obj[0])
         if obj[1] is not None:
             eps = eps.filter(status=_mapping[obj[1]])
-        return eps.annotate(end=Max('parts__end')).order_by('-end')[:30]
+        eps = eps.annotate(end=Max('parts__end'))
+        if obj[1] is not None and obj[1] == _mapping.keys()[1]:
+            return eps.order_by('end')[:30]
+        return eps.order_by('-end')[:30]
 
     def item_title(self, item):
         return item.title()
