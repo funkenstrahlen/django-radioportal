@@ -1,0 +1,25 @@
+Hallo,
+
+soeben wurde ein neuer Account für das xenim streaming network für dich 
+erstellt.
+
+Mit den folgenden Zugangsdaten:
+
+    Nutzer:   {{ username }}
+    Passwort: {{ password }}
+
+kannst du dich im Dashboard [1] einloggen. Dort kannst und solltest du
+alle weiteren Angaben zu deiner Sendung ergänzen bzw. ändern. Im Dashboard
+können auch die Zugangsdaten für den zentralen Icecast-Server nachgeguckt
+werden. Weitere Informationen befinden sich im Wiki [2].
+
+Bei Fragen einfach über einen der bekannten Kanäle [3] melden.
+
+Viele Grüße
+
+Das xenim streaming team
+
+[1] {{ dashboard_url }}
+[2] {{ wiki_url }}
+[3] {{ wiki_communication_url }}
+

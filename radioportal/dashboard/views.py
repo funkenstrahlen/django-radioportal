@@ -45,6 +45,7 @@ try:
     from django.utils.text import slugify
 except ImportError:
     from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, BaseUpdateView
@@ -227,15 +228,22 @@ class UserChannelStreamAddView(SessionWizardView):
         assign('change_episodes', user, show)
         assign('change_show', user, show)
 
-        mail_data = {'username': user.username, 'password': user_pw}
-        mail_text = _("USERCREATEDMAIL with %(username)s %(password)s") % mail_data
+        mail_data = {
+            'username': user.username,
+            'password': user_pw,
+            'dashboard_url': reverse('dashboard', host='dashboard'),
+            'wiki_url': reverse('landing', host='wiki'),
+            'wiki_communication_url': reverse('wiki-category-page', kwargs={'category': 'project', 'page': 'communication'}, host='wiki'),
+        }
+        mail_text = render_to_string("radioportal/dashboard/usercreatedmail_user.txt", mail_data)
         mail_subject = _("[xenim] Neuer Nutzer erstellt")
+
         send_mail(mail_subject, mail_text, "noreply@streams.xenim.de", [user.email,])
 
         if 'rt_id' in self.storage.extra_data:
 
             mail_data_rt = {'username': user.username, 'showname': show.name, 'channel': channel.cluster, 'streamname': stream.mount}
-            mail_text_rt = _("The following objects have been created:\n\n\tUser:\t%(username)s\n\tShow:\t%(showname)s\n\tChannel:\t%(channel)s\n\tStream:\t%(streamname)s\n") % mail_data_rt
+            mail_text_rt = render_to_string("radioportal/dashboard/usercreatedmail_rt.txt", mail_data_rt)
             mail_subject_rt = _("[xsn #%i] Neuer Nutzer") % self.storage.extra_data['rt_id']
             send_mail(mail_subject_rt, mail_text_rt, "noreply@streams.xenim.de", ["info-comment@streams.xenim.de",])
 

@@ -1,0 +1,6 @@
+The following objects have been created:
+
+    User:	{{ username }}
+    Show:	{{ showname }}
+    Channel:	{{ channel }}
+    Stream:	{{ streamname }}

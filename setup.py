@@ -34,13 +34,13 @@ try:
 except (IOError, OSError):
     reqs = ''
 
-setup(name='django-radio-portal',
+setup(name='django-radioportal',
       version="2.0",
       description='Application for aggregating shows, their episodes and streams',
       long_description="",
       author='Robert Weidlich',
       author_email='portal@robertweidlich.de',
-      url='http://git.xenim.de/streaming/portal/',
+      url='https://github.com/xenim/django-radioportal',
       packages=['radioportal'],
       include_package_data=True,
       classifiers=[
