@@ -40,7 +40,7 @@ import datetime
 import pytz
 import json
 
-from django_hosts.reverse import reverse_full
+from django_hosts.resolvers import reverse
 
 
 from radioportal.models import Show, Episode, Channel
@@ -100,7 +100,7 @@ class ShowFeed(Feed):
             obj = _dummy()
 
             def _link():
-                return  reverse_full("www", status)
+                return  reverse(status, host='www')
 
             obj.get_absolute_url = _link
             if status == _mapping.keys()[0]:
@@ -136,7 +136,7 @@ class ShowFeed(Feed):
                 for stream in item.channel.stream_set.all():
                     if not stream.running:
                         continue
-                    url = reverse_full("www", "mount", view_kwargs={'stream':stream.mount})
+                    url = reverse("mount", kwargs={'stream':stream.mount}, host='www')
                     extra_dict['streams'].append("http:%s" % url)
                 extra_dict['listener'] = str(item.channel.listener)
                 extra_dict['channel'] = item.channel.cluster
@@ -185,7 +185,7 @@ class ShowFeed(Feed):
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
-        url = reverse_full("www", "episode", view_kwargs=kwargs)
+        url = reverse("episode", kwargs=kwargs, host='www')
         return 'http:%s' % url
 
     def item_guid(self, item):
@@ -216,10 +216,10 @@ def ical_feed(request, show_name=None):
             vevent.add('dtend').value = episode.end()
         vevent.add('uid').value = '%s' % episode.pk
         kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
-        url = reverse_full("www", "episode", view_kwargs=kwargs)
+        url = reverse("episode", kwargs=kwargs, host='www')
         vevent.add('url').value = 'http:%s' % url 
     icalstream = cal.serialize()
-    response = HttpResponse(icalstream, mimetype='text/calendar')
+    response = HttpResponse(icalstream, content_type='text/calendar')
     #response['Filename'] = 'filename.ics'  # IE needs this
     #response['Content-Disposition'] = 'attachment; filename=filename.ics'
     return response

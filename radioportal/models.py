@@ -38,7 +38,7 @@ from django.db.models import Min, Max
 from django.conf import settings
 
 from autoslug import AutoSlugField
-from django_hosts.reverse import reverse_full
+from django_hosts.resolvers import reverse
 
 from easy_thumbnails.fields import ThumbnailerImageField
 
@@ -94,7 +94,7 @@ class Show(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_full("www", "show", view_kwargs={'show_name': self.slug})
+        return reverse("show", kwargs={'show_name': self.slug}, host='www')
 
     class Meta:
         permissions = (
@@ -181,7 +181,7 @@ class Episode(models.Model):
         unique_together = (('show', 'slug'),)
 
     def get_absolute_url(self):
-        return reverse_full("www", "episode", view_kwargs={'show_name': self.show.slug, 'slug': self.slug})
+        return reverse("episode", kwargs={'show_name': self.show.slug, 'slug': self.slug}, host='www')
 
 
 class EpisodePart(models.Model):
@@ -279,7 +279,7 @@ class Channel(models.Model):
     streamURL = models.URLField(blank=True, default='',
         help_text=_(u"Property »url« from stream meta data"))
 
-    show = models.ManyToManyField(Show, blank=True, null=True,
+    show = models.ManyToManyField(Show, blank=True,
         help_text=_('show which is assigned to this channel'),
         verbose_name=_('Associated shows'))
 
@@ -411,7 +411,7 @@ class Stream(models.Model):
         choices=WAVE, default=WAVE[0][0])    
 
     def get_absolute_url(self):
-        return reverse_full("www", "mount", view_kwargs={'stream': self.mount})
+        return reverse("mount", kwargs={'stream': self.mount}, host='www')
 
 #    def save(self, force_insert=False, force_update=False):
 #        super(Stream, self).save(force_insert, force_update)

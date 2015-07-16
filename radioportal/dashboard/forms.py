@@ -189,6 +189,7 @@ class EpisodePartForm(forms.ModelForm):
     end = forms.SplitDateTimeField
     class Meta:
         model = models.EpisodePart
+        exclude = ()
         widgets = {
             'begin': adminwidgets.AdminSplitDateTime(),
             'end': adminwidgets.AdminSplitDateTime(),
@@ -321,7 +322,8 @@ class ChannelForm(forms.ModelForm):
 class StreamForm(forms.ModelForm):
     required_css_class = "required"
     mount = forms.RegexField(regex='^[a-zA-Z0-9_/-]+\.(mp3|ogg|ogm|oga|aac|m3u8)$')
-
+    class Meta:
+        exclude = ()
 
 class SourcedStreamForm(StreamForm):
     required_css_class = "required"
@@ -353,6 +355,7 @@ class ShowForm(forms.ModelForm):
         widgets = {
             'chat': IRCWidget(choices=IRCNETWORKS),
         }
+        exclude = ()
 
 
 class ShowReducedForm(forms.ModelForm):
@@ -368,12 +371,13 @@ class ShowFeedForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
         model = models.ShowFeed
+        exclude = ()
         widgets = {
             'show': HiddenInput(),
         }
      
 
-FeedFormSet = inlineformset_factory(models.Show, models.ShowFeed)
+FeedFormSet = inlineformset_factory(models.Show, models.ShowFeed, exclude=())
 
 StreamFormSet = inlineformset_factory(Channel, Stream, form=StreamForm)
 

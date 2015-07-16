@@ -35,7 +35,7 @@ from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
 from django.utils.translation import ugettext as _
 
-from django_hosts.reverse import reverse_full
+from django_hosts.resolvers import reverse
 from guardian.mixins import PermissionRequiredMixin
 from twython import Twython, TwythonError
 
@@ -95,11 +95,13 @@ class IRCForm(forms.ModelForm):
         labels = {
             'url': _("IRC Network and Channel"),
         }
+        exclude = ()
 
 
 class HTTPForm(forms.ModelForm):
     class Meta:
         model = HTTPCallback
+        exclude = ()
 
 class AuphonicForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -280,8 +282,8 @@ class CreateNotificationView(NotificationMixin, MultipleFormCreateView):
     template_name = "radioportal/dashboard/notification/edit.html"
 
     def get_success_url(self):
-        return reverse_full('dashboard', 'admin-show-notification',
-                            view_kwargs={'slug': self.kwargs["slug"]})
+        return reverse('admin-show-notification',
+                            kwargs={'slug': self.kwargs["slug"]}, host='dashboard')
 
 
 class UpdateNotificationView(NotificationMixin, MultipleFormUpdateView):
@@ -294,8 +296,7 @@ class UpdateNotificationView(NotificationMixin, MultipleFormUpdateView):
     primary = True
 
     def get_success_url(self):
-        return reverse_full('dashboard', 'admin-show-notification',
-                            view_kwargs={'slug': self.kwargs["slug"]})
+        return reverse('admin-show-notification', kwargs={'slug': self.kwargs["slug"]}, host='dashboard')
 
     def get_permission_object(self):
         obj = self.get_object()
@@ -333,8 +334,8 @@ class UpdateSecondaryNotificationView(NotificationMixin,
         return form_class
 
     def get_success_url(self):
-        return reverse_full('dashboard', 'admin-show-notification',
-                            view_kwargs={'slug': self.kwargs["slug"]})
+        return reverse('admin-show-notification',
+                            kwargs={'slug': self.kwargs["slug"]}, host='dashboard')
 
 
 class DeleteNotificationView(PermissionRequiredMixin, DeleteView):
@@ -351,8 +352,8 @@ class DeleteNotificationView(PermissionRequiredMixin, DeleteView):
         return obj.show
 
     def get_success_url(self):
-        return reverse_full('dashboard', 'admin-show-notification',
-                            view_kwargs={'slug': self.kwargs["slug"]})
+        return reverse('admin-show-notification',
+                            kwargs={'slug': self.kwargs["slug"]}, host='dashboard')
 
     def get_context_data(self, **ctx):
         ctx = super(DeleteNotificationView, self).get_context_data(**ctx)
@@ -395,8 +396,8 @@ def twitter_gettoken(request, slug, path):
     """
     twitter = Twython(settings.TWITTER_CONSUMER_KEY,
                       settings.TWITTER_CONSUMER_SECRET)
-    cb = reverse_full('dashboard', 'admin-show-notification-twitter-callback',
-                      view_kwargs={'slug': slug, 'path': path})
+    cb = reverse('admin-show-notification-twitter-callback',
+                      kwargs={'slug': slug, 'path': path}, host='dashboard')
     auth = twitter.get_authentication_tokens(callback_url=cb)
     request.session['twitter_%s_oauth_token' % path] = auth['oauth_token']
     request.session[
@@ -411,8 +412,8 @@ def twitter_callback(request, slug, path):
         for storage
     """
     if not "oauth_verifier" in request.GET:
-        url = reverse_full('dashboard', 'admin-show-notification',
-                       view_kwargs={'slug': slug})
+        url = reverse('admin-show-notification',
+                       kwargs={'slug': slug}, host='dashboard')
         return redirect(url)
     oauth_verifier = request.GET['oauth_verifier']
     twitter = Twython(settings.TWITTER_CONSUMER_KEY,
@@ -457,16 +458,15 @@ def twitter_callback(request, slug, path):
         noti.save()
 
         kwargs = {'slug': show.slug, "path": "twitter", "nslug": noti.id}
-        url = reverse_full('dashboard', 'admin-show-notification-edit',
-                           view_kwargs=kwargs)
+        url = reverse('admin-show-notification-edit',
+                           kwargs=kwargs, host='dashboard')
     elif path == "secondary":
         noti = SecondaryNotification(show=show, path=account)
         noti.save()
 
         kwargs = {'slug': show.slug, "path": "twitter", "nslug": noti.id}
-        url = reverse_full('dashboard',
-                           'admin-show-secondary-notification-edit',
-                           view_kwargs=kwargs)
+        url = reverse('admin-show-secondary-notification-edit',
+                           kwargs=kwargs, host='dashboard')
     return redirect(url)
 
 
@@ -476,7 +476,7 @@ def auphonic_gettoken(request, slug):
         return HttpResponse('Unauthorized', status=401)
 
     url = "https://auphonic.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
-    cb = reverse_full('dashboard', 'admin-show-notification-auphonic-callback', view_kwargs={'slug': slug})
+    cb = reverse('admin-show-notification-auphonic-callback', kwargs={'slug': slug}, host='dashboard')
 
     cb = quote_plus(cb)
 
@@ -490,7 +490,7 @@ def auphonic_callback(request, slug):
         return HttpResponse('Unauthorized', status=401)
 
     url = "https://auphonic.com/oauth2/token/"
-    cb = reverse_full('dashboard', 'admin-show-notification-auphonic-callback', view_kwargs={'slug': slug})
+    cb = reverse('admin-show-notification-auphonic-callback', kwargs={'slug': slug}, host='dashboard')
     data = {
         'client_id': settings.AUPHONIC_CLIENT_ID,
         'client_secret': settings.AUPHONIC_CLIENT_SECRET,
@@ -532,9 +532,9 @@ def auphonic_callback(request, slug):
 
             kwargs = {'slug': slug, "path": "auphonic", "nslug": noti.id}
 
-            url = reverse_full('dashboard', 'admin-show-notification-edit',
-                               view_kwargs=kwargs)
+            url = reverse('admin-show-notification-edit',
+                               kwargs=kwargs, host='dashboard')
 
-    url = reverse_full('dashboard', 'admin-show-notification',
-                       view_kwargs={'slug': slug})
+    url = reverse('admin-show-notification',
+                       kwargs={'slug': slug}, host='dashboard')
     return redirect(url)

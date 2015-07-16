@@ -39,6 +39,7 @@ from radioportal import models
 class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
+        exclude = ()
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)

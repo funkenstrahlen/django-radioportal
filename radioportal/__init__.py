@@ -26,5 +26,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 # OF SUCH DAMAGE.
 # 
-from django.template import add_to_builtins
+
+try:
+    from django.template.base import add_to_builtins
+except ImportError:  # Django < 1.8
+    from django.template import add_to_builtins
+
 add_to_builtins('radioportal.templatetags.standard')
