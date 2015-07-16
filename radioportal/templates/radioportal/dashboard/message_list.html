@@ -30,9 +30,67 @@ OF SUCH DAMAGE.
 {{ block.super }} » 
 {% trans "Messages" %}
 {% endblock %}
+{% block head_js %}
+{{ block.super }}
+<script language="javascript" type="text/javascript">
+function init() { 
+    output = document.getElementById("output");
+    socket = new WebSocket("wss://dashboard.test.xenim.de/websocket");
+    socket.onopen = function(evt) { onOpen(evt) };
+    socket.onclose = function(evt) { onClose(evt) };
+    socket.onmessage = function(evt) { onMessage(evt) };
+    socket.onerror = function(evt) { onError(evt) };
+}
+
+function onOpen(evt) { 
+    document.getElementById("status").innerHTML = "connected!";
+}
+
+function onClose(evt) { 
+    document.getElementById("status").innerHTML = "disconnected";
+}
+
+function onError(evt) {
+    document.getElementById("status").innerHTML = "error:" + evt.data;
+}
+
+function onMessage(evt) {
+    data = JSON.parse(evt.data)
+    var table = document.getElementById("output");
+    var row = table.insertRow(1);
+    var time = row.insertCell(0);
+    time.innerHTML = new Date().toLocaleString("de")
+    var msg = row.insertCell(1);
+    msg.innerHTML = data["message"];
+    var origin = row.insertCell(2);
+    origin.innerHTML = data["path"];
+    var sev = row.insertCell(3);
+    sev.innerHTML = data["level"];
+    var object = row.insertCell(4);
+    if ("channel" in data) {
+        object.innerHTML = "Channel "+data["channel"]
+    }
+
+    $(row).css('backgroundColor','hsla(0,100%,50%, 1.0)');
+    
+    var d = 1000;
+    for(var i=50; i<=100; i=i+0.1){ //i represents the lightness
+        d  += 20;
+        (function(ii,dd){
+            setTimeout(function(){
+                $(row).css('backgroundColor','hsla(0,100%,'+ii+'%, '+(2.0-ii/50.0)+')'); 
+            }, dd);    
+        })(i,d);
+    }
+}
+
+window.addEventListener("load", init, false);
+</script>
+{% endblock %}
 {% block content %}
 <h2>{% trans "Messages" %}</h2>
-<table border=1>
+<p>Status: <span id="status">disconnected</span></p>
+<table border=1 id="output">
 <thead>
 <tr>
   <th>{% trans "Time" %}</th>
