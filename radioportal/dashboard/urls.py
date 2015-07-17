@@ -30,7 +30,7 @@
 
 from django.conf.urls import patterns, url, include
 
-from radioportal.dashboard import views, forms, notification
+from radioportal.dashboard import views, forms, notification, importer
 
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
@@ -70,6 +70,7 @@ urlpatterns = patterns('',
     url(r'^show/(?P<slug>[\w-]+)/edit/$', views.ShowEditView.as_view(), name="admin-show-edit"),
     url(r'^show/(?P<slug>[\w-]+)/delete/$', views.ShowDeleteView.as_view(), name="admin-show-delete"),
     url(r'^show/(?P<slug>[\w-]+)/feed/$', views.ShowFeedEditView.as_view(), name="admin-show-feed"),
+    url(r'^show/(?P<slug>[\w-]+)/ical/$', importer.ICalEditView.as_view(), name="admin-show-ical"),
     url(r'^show/(?P<slug>[\w-]+)/create-episode/$', views.EpisodeCreateView.as_view(), name="admin-episode-create"),
     url(r'^show/(?P<slug>[\w-]+)/notification/$', notification.NotificationListView.as_view(), name="admin-show-notification"),
     url(r'^show/(?P<slug>[\w-]+)/notification/twitter/(?P<path>(primary|secondary))/$', notification.twitter_gettoken, name="admin-show-notification-twitter"),

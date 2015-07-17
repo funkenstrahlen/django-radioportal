@@ -40,7 +40,7 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.core.serializers import json
 from django.conf import settings
 
-from radioportal.models import SourcedStream, ShowFeed, Show, Channel, RecodedStream, PrimaryNotification, SecondaryNotification
+from radioportal.models import SourcedStream, ShowFeed, Show, ICalFeed, Channel, RecodedStream, PrimaryNotification, SecondaryNotification
 
 from extshorturls.utils import ShortURLResolver
 
@@ -119,6 +119,41 @@ class DTOShow(DTO):
             self.feed['feed'] = instance.showfeed.feed
             self.feed['icalfeed'] = instance.showfeed.icalfeed
             self.feed['titlePattern'] = instance.showfeed.titlePattern
+        if hasattr(instance, "icalfeed") and instance.icalfeed.enabled:
+            self.ical = {}
+            self.ical["url"] = instance.icalfeed.url
+            self.ical["fields"] = []
+            if instance.icalfeed.slug_regex:
+                self.ical["fields"].append((
+                    "slug",
+                    instance.icalfeed.slug_field,
+                    instance.icalfeed.slug_regex.format(show=instance),
+                ))
+            if instance.icalfeed.title_regex:
+                self.ical["fields"].append((
+                    "title",
+                    instance.icalfeed.title_field,
+                    instance.icalfeed.title_regex.format(show=instance),
+                ))
+            if instance.icalfeed.description_regex:
+                self.ical["fields"].append((
+                    "description",
+                    instance.icalfeed.description_field,
+                    instance.icalfeed.description_regex.format(show=instance),
+                ))
+            if instance.icalfeed.url_regex:
+                self.ical["fields"].append((
+                    "url",
+                    instance.icalfeed.url_field,
+                    instance.icalfeed.url_regex.format(show=instance),
+                ))
+            if instance.icalfeed.filter_regex:
+                self.ical["filter"] = [
+                    (
+                        instance.icalfeed.filter_field,
+                        instance.icalfeed.filter_regex,
+                    ),
+                ]
         self.notifications = []
         for pn in instance.primarynotification_set.all():
             noti = {
@@ -154,6 +189,10 @@ class DTOShowFeed(DTOShow):
     def __init__(self, instance):
         super(DTOShowFeed, self).__init__(instance.show)
 
+class DTOIcalFeed(DTOShow):
+    def __init__(self, instance):
+        super(DTOIcalFeed, self).__init__(instance.show)
+
 class DTOPrimaryNotification(DTOShow):
     def __init__(self, instance):
         super(DTOPrimaryNotification, self).__init__(instance.show)
@@ -183,6 +222,7 @@ dto_map = {
     "showtwitter": DTOShowTwitter,
     "primarynotification": DTOPrimaryNotification,
     "secondarynotification": DTOSecondaryNotification,
+    "icalfeed": DTOIcalFeed,
     "episode": DTOEpisode,
     "channel": DTOChannel,
 }
@@ -249,7 +289,7 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed, Show, Channel, PrimaryNotification, SecondaryNotification):
+        for m in (RecodedStream, SourcedStream, ShowFeed, ICalFeed, Show, Channel, PrimaryNotification, SecondaryNotification):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             pre_delete.connect(
@@ -268,7 +308,7 @@ class AMQPInitMiddleware(object):
 
     def object_deleted(self, sender, instance, **kwargs):
         routing_key = "%s.%s.deleted" % (
-            sender._meta.app_label, sender._meta.module_name)
+            sender._meta.app_label, sender._meta.object_name.lower())
         data = serialize_object(instance)
         self.sender_callback(routing_key, data)
         logger.debug("Object delete message for %s sent" % unicode(instance))

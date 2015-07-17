@@ -54,7 +54,7 @@ import urlparse
 import uuid
 import simplejson
 
-from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message
+from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message, ICalEpisodeSource
 
 # from radioportal_auphonic.models import AuphonicSettings
 
@@ -106,7 +106,7 @@ class BackendInterpreter(object):
         if "channel" in data:
             obj = Channel.objects.get(cluster=data["channel"])
         else:
-            obj = Channel.objects.get(slug=data["show"])
+            obj = Show.objects.get(slug=data["show"])
         if "stamp" in data:
             d = dateutil.parser.parse(data['stamp'])
         else:
@@ -359,11 +359,50 @@ class BackendInterpreter(object):
             if so:
                 plain_dict.append(so.__dict__)
         routing_key = "%s.%s.%s" % (
-            model._meta.app_label, model._meta.module_name, "changed")
+            model._meta.app_label, model._meta.model_name, "changed")
 
         logger.debug("Object list sent")
         # TODO: issue rpc call in backend
         return (routing_key, plain_dict)
+
+    def importer_ical(self, data):
+        try:
+            show = Show.objects.get(slug=data['show'])
+        except Show.DoesNotExist:
+            return
+
+        for uid, e in data['entries'].iteritems():
+            if not ICalEpisodeSource.objects.filter(identifier=uid).count():
+                source = ICalEpisodeSource(identifier=uid, source=show.icalfeed)
+                source.save()
+                ep = Episode(show=show, source=source, slug=e["slug"], status=Episode.STATUS[2][0])
+                ep.save()
+                epp = EpisodePart(episode=ep)
+                epp.begin = dateutil.parser.parse(
+                    e['begin'], ignoretz=True)
+                epp.save()
+                ep.current_part = epp
+                ep.save()
+            else:
+                source = ICalEpisodeSource.objects.get(identifier=uid)
+                ep = source.episode
+
+            ep.slug = e["slug"]
+            ep.save()
+
+            epp = ep.current_part
+            epp.begin = dateutil.parser.parse(e['begin'], ignoretz=True)
+            if 'end' in e:
+                epp.end = dateutil.parser.parse(e['end'], ignoretz=True)
+            if 'url' in e:
+                epp.url = e['url']
+            if 'description' in e:
+                epp.description = e['description'][:200]
+            if "title" in e:
+                epp.title = e["title"]
+            epp.save()
+        if show.icalfeed.delete_missing:
+            ICalEpisodeSource.objects.exclude(identifier__in=data['entries'].keys()).filter(episode__status="UPCOMING").delete()
 
     def feed_updated(self, data):
         if data['global']['type'] == 'calendar':

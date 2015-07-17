@@ -1,0 +1,138 @@
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% comment %}
+Copyright © 2012 Robert Weidlich. All Rights Reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. The name of the author may not be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE LICENSOR "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
+{% endcomment %}
+{% block breadcrumb %}
+{{ block.super }} » 
+	<a href="{% host_url "admin-episode-list" object.show.slug on "dashboard" %}">{{ object.show.name }}</a> »
+	{% trans "Edit ICal Import" %}
+{% endblock %}
+{% block head_js %}
+   <script src="{{ jquery_url }}"></script>
+    <style>
+      .accounts select {
+          min-width: 8em;
+      }
+      .expert {
+          display: none;
+      }
+    </style>
+{% endblock %}
+{% block content %}
+<h2>
+{% trans "Edit" %} {{ object|object_name }}
+</h2>
+<p>
+Der iCal-Importer ruft regelmäßig den konfigurierten iCal-Feed ab und erstellt aus den dort vorhandenen Terminen geplante
+Folgen. Für das Sendungskürzel wird im Feld <em>SUMMARY</em> die Abkürzung des Sendungsnamen (z.B. <em>FS</em>) gefolgt 
+von Ziffern gesucht, also z.B. <em>FS123</em>. Für den Titel der Sendung wird der Rest des Feldes <em>SUMMARY</em> genutzt.
+Das Feld <em>DESCRIPTION</em> wird als Beschreibung der Sendung übernommen, das Feld <em>LOCATION</em> wird als URL verwendet,
+wenn http im Inhalt enthalten ist.
+<br />
+Wenn das Feld <em>DESCRIPTION</em> die Zeichenfolge <em>#noshow</em> enthält, wird der entsprechende Termin ignoriert. Termine,
+die über diese Funktion erstellt wurden, aber nicht mehr im iCal-Feed enthalten sind, werden automatisch gelöscht.
+<br/>
+Es sind <a id="show_expert">erweiterte Einstellungen</a> verfügbar, in denen alle erwähnten Dinge detailliert konfiguriert werden können.
+</p>
+<h3 class="expert">Erweiterte Einstellungen</h3>
+<p class="expert">
+In den erweiterten Einstellungen kann die automatische Erstellung von geplanten Folgen aus einem iCal-Feed 
+konfiguriert werden. Dazu kann für 
+<i>Slug</i>, <i>Title</i>, <i>Beschreibung</i> und <i>URL</i> der geplanten Folge festgelegt werden aus welchem
+Feld des entsprechenden iCal-Eintrags diese befüllt werden sollen.
+</p><p class="expert">
+Mit Hilfe jeweils eines regulären Ausdrucks wird dann der gewünschte Teil des iCal-Feldes ausgewählt. Dabei sollte
+der reguläre Ausdruck eine Gruppe mit dem Namen <i>value</i> definieren. Wenn der reguläre Ausdruck leer ist oder 
+keinen Treffer erzeugt, wird das entsprechende Feld nicht berücksichtigt. Wenn kein Beginn angegeben ist oder für
+das Feld <i>slug</i> kein Wert vorliegt, wird der entsprechende Termin ignoriert.
+</p><p class="expert">
+Mit dem Feld <i>filter</i> kann ein iCal-Feld und ein regulärer Ausdruck definiert werden. Wenn der reguläre Ausdruck
+auf das iCal-Feld matcht, wird der Termin ebenfalls ignoriert.
+</p><p class="expert">
+Die regulären Ausdrücke verwenden die Syntax des <a href="https://docs.python.org/2/library/re.html">entsprechenden 
+Python-Moduls</a>. Diese können zum Beispiel auf <a href="http://pythex.org/">pythex</a> getestet werden.
+</p>
+<p class="expert">Falls das entsprechende Feld ausgewählt ist, werden geplante Folgen, die nicht mehr im iCal-Feed sind, gelöscht.</p>
+<br />
+<form action="" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+{% for hidden in form.hidden_fields %}
+{{ hidden }}
+{% endfor %}
+{{ form.non_field_errors }}
+<table style="width: 100%;">
+<tr>
+<th>{{ form.enabled.label_tag }}</th>
+<td>{{ form.enabled.errors }}{{ form.enabled }}</td>
+</tr>
+
+<tr class="expert">
+<th>{{ form.delete_missing.label_tag }}</th>
+<td>{{ form.delete_missing.errors }}{{ form.delete_missing }}</td>
+</tr>
+
+<tr>
+<th>{{ form.url.label_tag }}</th>
+<td colspan="2">{{ form.url.errors }}{{ form.url }}</td>
+</tr>
+
+<tr class="expert">
+<th>{{ form.slug_regex.label_tag }}</th>
+<td style="width: 4em;">{{ form.slug_field.errors }}{{ form.slug_field }}</td>
+<td>{{ form.slug_regex.errors }}{{ form.slug_regex }}</td>
+</tr>
+
+<tr class="expert">
+<th>{{ form.title_regex.label_tag }}</th>
+<td>{{ form.title_field.errors }}{{ form.title_field }}</td>
+<td>{{ form.title_regex.errors }}{{ form.title_regex }}</td>
+</tr>
+
+<tr class="expert">
+<th>{{ form.description_regex.label_tag }}</th>
+<td>{{ form.description_field.errors }}{{ form.description_field }}</td>
+<td>{{ form.description_regex.errors }}{{ form.description_regex }}</td>
+</tr>
+<tr class="expert">
+<th>{{ form.url_regex.label_tag }}</th>
+<td>{{ form.url_field.errors }}{{ form.url_field }}</td>
+<td>{{ form.url_regex.errors }}{{ form.url_regex }}</td>
+</tr>
+<tr class="expert">
+<th>{{ form.filter_regex.label_tag }}</th>
+<td>{{ form.filter_field.errors }}{{ form.filter_field }}</td>
+<td>{{ form.filter_regex.errors }}{{ form.filter_regex }}</td>
+</tr>
+<tr><td colspan="3"><input style="width: 100%;" type="submit" value="{% trans "Apply" %}" /></td></tr>
+</table>
+</form>
+<script>
+$( "#show_expert" ).click(function() {
+  $( ".expert" ).show();
+});
+</script>
+{% endblock %}

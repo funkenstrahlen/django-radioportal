@@ -39,7 +39,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 from django_hosts.resolvers import reverse
-
+from polymorphic import PolymorphicModel
 from easy_thumbnails.fields import ThumbnailerImageField
 
 import jsonfield
@@ -113,6 +113,47 @@ class ShowFeed(models.Model):
         verbose_name=_("iCal feed for upcoming shows"))
 
 
+class ICalFeed(models.Model):
+    ICALFIELDS = (
+        ('SUMMARY', 'SUMMARY'),
+        ('DESCRIPTION', 'DESCRIPTION'),
+        ('LOCATION', 'LOCATION'),
+    )
+
+    show = models.OneToOneField(Show)
+    enabled = models.BooleanField(verbose_name=_("Enable"), default=False)
+    url = models.URLField(max_length=255, blank=True, verbose_name=_("iCal feed for upcoming shows"))
+
+    slug_field = models.CharField(choices=ICALFIELDS, default="SUMMARY", max_length=50)
+    slug_regex = models.CharField(max_length=255, default="(?P<value>{show.defaultShortName}[0-9]+)")
+    title_field = models.CharField(choices=ICALFIELDS, default="SUMMARY", max_length=50)
+    title_regex = models.CharField(max_length=255, default="{show.defaultShortName}[0-9]+ (?P<value>.+)")
+    description_field = models.CharField(choices=ICALFIELDS, default="DESCRIPTION", max_length=50)
+    description_regex = models.CharField(max_length=255, default="(?P<value>.+)")
+    url_field = models.CharField(choices=ICALFIELDS, default="LOCATION", max_length=50)
+    url_regex = models.CharField(max_length=255, default="(?P<value>http[^ ]+)")
+
+    filter_field = models.CharField(choices=ICALFIELDS, default="DESCRIPTION", max_length=50)
+    filter_regex = models.CharField(max_length=255, default="#noshow")
+
+    delete_missing = models.BooleanField(default=True)
+
+@receiver(post_save, sender=Show)
+def create_default_icalfeed(sender, instance, created, raw, *args, **kwargs):
+    if not created or raw:
+        return
+    feed = ICalFeed(show=instance)
+    feed.save()
+
+class EpisodeSource(PolymorphicModel):
+    pass
+
+
+class ICalEpisodeSource(EpisodeSource):
+    source = models.ForeignKey(ICalFeed)
+    identifier = models.CharField(max_length=128)
+
+
 class Episode(models.Model):
     """
         a single Episode of a show, which should be relayed or was relayed in
@@ -133,6 +174,8 @@ class Episode(models.Model):
     slug = models.SlugField(max_length=30, default='',
         verbose_name=_("Short Name"))
     
+    source = models.OneToOneField(EpisodeSource, null=True)
+
     def begin(self):
         return self.parts.aggregate(Min('begin'))['begin__min']
     

@@ -33,7 +33,8 @@ OF SUCH DAMAGE.
 <ul>
 	<li><a href="{% host_url "admin-show-edit" show.slug on "dashboard" %}">{% trans "Edit show properties" %}</a></li>
         <li><a href="{% host_url "admin-show-notification" show.slug on "dashboard" %}">{% trans "Edit show notifications" %}</a></li>
-	<li><a href="{% host_url "admin-show-feed" show.slug on "dashboard" %}">{% trans "Configure update from podcast feed" %}</a></li>
+{% comment %}	<li><a href="{% host_url "admin-show-feed" show.slug on "dashboard" %}">{% trans "Configure update from podcast feed" %}</a></li> {% endcomment %}
+	<li><a href="{% host_url "admin-show-ical" show.slug on "dashboard" %}">{% trans "Configure update from iCal-Feed" %}</a></li>
 {% if "change_episodes" in show_perms %}
 	<li><a href="{% host_url "admin-episode-create" show.slug on "dashboard" %}">{% trans "Create new episode" %}</a></li>
 {% endif %}
