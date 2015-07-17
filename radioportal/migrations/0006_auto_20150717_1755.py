@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='episode',
             name='source',
-            field=models.OneToOneField(default=2, to='radioportal.EpisodeSource'),
+            field=models.OneToOneField(default=None, null=True, to='radioportal.EpisodeSource'),
             preserve_default=False,
         ),
         migrations.AlterField(

@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='episode',
-            name='source',
-            field=models.OneToOneField(null=True, to='radioportal.EpisodeSource'),
-        ),
-        migrations.AlterField(
             model_name='icalfeed',
             name='url_regex',
             field=models.CharField(default=b'(?P<value>http[^ ]+)', max_length=255),
