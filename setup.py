@@ -26,20 +26,24 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 # OF SUCH DAMAGE.
 # 
-from setuptools import setup
 import os
+import codecs
+from setuptools import setup
 
-try:
-    reqs = open(os.path.join(os.path.dirname(__file__),'requirements.txt')).read()
-except (IOError, OSError):
-    reqs = ''
+
+def read(*parts):
+    filename = os.path.join(os.path.dirname(__file__), *parts)
+    with codecs.open(filename, encoding='utf-8') as fp:
+        return fp.read()
+
 
 setup(name='django-radioportal',
-      version="2.0",
       description='Application for aggregating shows, their episodes and streams',
-      long_description="",
+      long_description=read("README.md"),
+      use_scm_version=True,
+      setup_requires=['setuptools_scm'],
       author='Robert Weidlich',
-      author_email='portal@robertweidlich.de',
+      author_email='github@robertweidlich.de',
       url='https://github.com/xenim/django-radioportal',
       packages=['radioportal'],
       include_package_data=True,
