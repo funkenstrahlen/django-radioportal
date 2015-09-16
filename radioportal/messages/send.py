@@ -238,7 +238,7 @@ def send_msg(routing_key, data, exchange="django_send"):
                 port=settings.BROKER_PORT,
                 virtual_host=settings.BROKER_VHOST,
                 credentials=credentials,
-                ssl=settings.BROKER_SSL)
+                ssl=bool(settings.BROKER_SSL))
 
     conn = pika.BlockingConnection(parameters)
     channel = conn.channel()
