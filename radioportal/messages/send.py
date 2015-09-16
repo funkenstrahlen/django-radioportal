@@ -46,8 +46,8 @@ from extshorturls.utils import ShortURLResolver
 
 import simplejson
 
-if settings.AMQP:
-    import pika
+#if settings.AMQP:
+import pika
 
 #### Part one: sending notifications for changed objects ####
 
