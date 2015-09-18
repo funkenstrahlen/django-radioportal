@@ -42,13 +42,13 @@ class StreamTemplateView(base.TemplateResponseMixin,
     model = Stream
     slug_field = 'mount'
     context_object_name = 'stream'
+    content_type = 'audio/x-mpegurl'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         context['streamurl'] = request.build_absolute_uri(self.object.mount)
         response_kwargs = {}
-        response_kwargs['mimetype'] = 'audio/x-mpegurl'
         return self.render_to_response(context, **response_kwargs)
 
 class StreamListTemplateView(base.TemplateResponseMixin,
@@ -57,6 +57,7 @@ class StreamListTemplateView(base.TemplateResponseMixin,
     template_name = 'radioportal/stream/playlist_list.m3u'
     queryset = Episode.objects.filter(status="RUNNING")
     context_object_name = 'streams'
+    content_type = 'audio/x-mpegurl'
 
     def get(self, request, *args, **kwargs):
         self.object_list = []
@@ -66,7 +67,6 @@ class StreamListTemplateView(base.TemplateResponseMixin,
             o.fullurl = request.build_absolute_uri(o.mount)
         context = self.get_context_data(object_list=self.object_list)
         response_kwargs = {}
-        response_kwargs['mimetype'] = 'audio/x-mpegurl'
         return self.render_to_response(context, **response_kwargs)
 
 
