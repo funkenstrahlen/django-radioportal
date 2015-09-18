@@ -42,13 +42,13 @@ import datetime
 class RobotsTxtView(TemplateResponseMixin, View):
     
     template_name = "radioportal/robots.txt"
+    content_type = "text/plain"
     
     def get(self, request, *args, **kwargs):
         context = {}
         context['shows'] = Show.objects.all()
         context['streams'] = Stream.objects.all()
         request_kwargs = {}
-        request_kwargs['mimetype'] = 'text/plain'
         return self.render_to_response(context, **request_kwargs)
 
 class EpisodeView(DetailView):
