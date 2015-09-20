@@ -29,8 +29,9 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import patterns, url, include
+from django.conf import settings
 
-from radioportal.dashboard import views, forms, notification, importer
+from radioportal.dashboard import views, forms, notification, importer, debug
 
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
@@ -109,3 +110,7 @@ urlpatterns = patterns('',
     url(r'^icecast/sandbox-lauth/$', views.icecast_sandbox_lauth),
     url(r'^messages/$', views.MessageListView.as_view(), name="admin-messages-list"),
 )
+if settings.DEBUG:
+    urlpatterns += patterns('', 
+        url(r'^debug/fake-stream/$', debug.FakeStreamView.as_view(), name='debug-fake-stream'),
+    )
