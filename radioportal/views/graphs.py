@@ -74,7 +74,7 @@ def graph(request, type, show_name):
         graph = tmpfile.read()
         tmpfile.close()
         graph_lock.release()
-        return HttpResponse(graph, mimetype="image/png")
+        return HttpResponse(graph, content_type="image/png")
 
 def weekday_graph(request, show_name):
     return graph(request, "weekday", show_name)
