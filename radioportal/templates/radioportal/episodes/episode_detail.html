@@ -78,7 +78,9 @@ OF SUCH DAMAGE.
 	{% if forloop.first %}
 		{% include "radioportal/episodes/episode_streams.html" %}
 	        {% if episode.show.chat %}{% ifequal episode.status "RUNNING" %}
-			<iframe src="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"path" }}" width="100%" height="400"></iframe>
+                <span class="chat" style="border: 2px solid #D9E1EE; padding: 0.5em; margin:1em 1em;">
+			{% blocktrans with url=episode.show.chat %}<b>Chat</b>: <a href="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"fragment" }}"><code>{{ url }}</code></a>{% endblocktrans %}
+                </span>
 	        {% endifequal %}{% endif %}
 	{% endif %}
 	<div class="graphs">
