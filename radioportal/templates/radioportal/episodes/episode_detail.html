@@ -77,11 +77,13 @@ OF SUCH DAMAGE.
 	{% if part.description %}<p>{{ part.description|safe }}</p>{% endif %}
 	{% if forloop.first %}
 		{% include "radioportal/episodes/episode_streams.html" %}
+                <div class="streams">
 	        {% if episode.show.chat %}{% ifequal episode.status "RUNNING" %}
-                <span class="chat" style="border: 2px solid #D9E1EE; padding: 0.5em; margin:1em 1em;">
-			{% blocktrans with url=episode.show.chat %}<b>Chat</b>: <a href="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"fragment" }}"><code>{{ url }}</code></a>{% endblocktrans %}
+                <span class="chat" style="border: 2px solid #D9E1EE; padding: 0.5em; margin: 0.2em;">
+			<b>{% trans "Chat" %}</b>: <a href="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"fragment" }}"><code>{{ episode.show.chat }}</code></a>
                 </span>
 	        {% endifequal %}{% endif %}
+                </div>
 	{% endif %}
 	<div class="graphs">
 	{% for graphic in part.graphics.all %}
