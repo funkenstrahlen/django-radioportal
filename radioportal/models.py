@@ -65,6 +65,8 @@ class Show(models.Model):
         verbose_name=_("Description"))
     abstract = models.TextField(blank=True, default='',
         verbose_name=_('Longer description of the show'))
+    shownotes_id = models.CharField(max_length=100, blank=True, default='',
+        verbose_name=_('ID of this show on shownot.es'))
 
     LICENCES = (
         ('none', _('none')),
@@ -241,6 +243,8 @@ class EpisodePart(models.Model):
     url = models.URLField(blank=True,
         help_text=_('Page of the Episode'),
         verbose_name=_("URL"))
+    shownotes_id = models.CharField(max_length=100, blank=True, default='',
+        verbose_name=_('ID of this episode on shownot.es'))
 
     def __unicode__(self):
         return u'%s%s%s' % (self.episode.slug, " " if self.title else"", self.title, )

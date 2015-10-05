@@ -50,6 +50,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 import jsonfield.forms
+import requests
 
 from radioportal import models
 from radioportal.messages import episode_finder
@@ -187,6 +188,18 @@ class EpisodePartForm(forms.ModelForm):
     required_css_class = "required"
     begin = forms.SplitDateTimeField
     end = forms.SplitDateTimeField
+    shownotes_id = forms.ChoiceField
+
+    def __init__(self, *args, **kwargs):
+        super(EpisodePartForm, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs and kwargs['instance'].episode.show.shownotes_id:
+            url = "https://shownot.es/api/podcasts/%s/" % kwargs['instance'].episode.show.shownotes_id
+            result = requests.get(url).json()
+            choices = sorted(result['episodes'], key=lambda x: x['create_date'], reverse=True)
+            choices = map(lambda x: (x['document']['name'], x['document']['name']), choices)
+            choices.insert(0, (None, ''))
+            self.fields["shownotes_id"] = forms.ChoiceField(choices=choices, required=False)
+
     class Meta:
         model = models.EpisodePart
         exclude = ()
@@ -348,8 +361,17 @@ IRCNETWORKS=(
 )
 
 
+def shownotes_shows():
+    result = requests.get("https://shownot.es/api/archive/").json()
+    result = map(lambda x: (x['slug'], x['title']), result)
+    result.insert(0, (None, ''))
+    return result
+
 class ShowForm(forms.ModelForm):
     required_css_class = "required"
+
+    shownotes_id = forms.ChoiceField(choices=shownotes_shows, required=False)
+
     class Meta:
         model = models.Show
         widgets = {
