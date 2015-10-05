@@ -75,6 +75,7 @@ class ShowView(ListView):
     model = Episode
     paginate_by = 10
     what = "all"
+    base = 'radioportal/base.html'
 
     def get_queryset(self):
         qs = Episode.objects.all().annotate(begin=Min('parts__begin')).order_by('-begin')
@@ -101,6 +102,7 @@ class ShowView(ListView):
                 context['show'] = context['show'][0]
         else:
             context['show_name'] = False
+        context['base'] = self.base
         return context
     
     def get_template_names(self):
@@ -108,6 +110,10 @@ class ShowView(ListView):
         if self.what in ("old", "now", "future"):
             template_name = "_%s"% self.what
         return (self.template_base_name % template_name,)
+
+
+class EmbedShowView(ShowView):
+    base = 'radioportal/embed.html'
 
 
 class ShowList(ListView):

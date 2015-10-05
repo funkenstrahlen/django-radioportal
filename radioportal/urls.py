@@ -83,6 +83,13 @@ urlpatterns = patterns('',
     url(r'^upcoming/(?P<show_name>[\w-]+)/$',
         episodes.ShowView.as_view(what='future'), name="upcoming_show"),
 
+    # embedable
+
+    url(r'^live/(?P<show_name>[\w-]+)/embed/$',
+        episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
+    url(r'^(?P<show_name>[\w-]+)/embed/$',
+        episodes.EmbedShowView.as_view(what="all"), name="embed_show"),
+
     # running streams
     url(r'^live/$', episodes.ShowView.as_view(what='now'), name="live"),
     url(r'^live/(?P<show_name>[\w-]+)/$',
