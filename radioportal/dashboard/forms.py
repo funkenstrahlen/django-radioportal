@@ -196,6 +196,7 @@ class EpisodePartForm(forms.ModelForm):
             url = "https://shownot.es/api/podcasts/%s/" % kwargs['instance'].episode.show.shownotes_id
             result = requests.get(url).json()
             choices = sorted(result['episodes'], key=lambda x: x['create_date'], reverse=True)
+            choices = filter(lambda x: x and "document" in x and x["document"] and "name" in x["document"] and x["document"]["name"], choices)
             choices = map(lambda x: (x['document']['name'], x['document']['name']), choices)
             choices.insert(0, (None, ''))
             self.fields["shownotes_id"] = forms.ChoiceField(choices=choices, required=False)
