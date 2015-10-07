@@ -25,8 +25,8 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-<script src="{{ STATIC_URL }}mediaelement/build/mediaelement-and-player.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/slimbox2/slimbox2.js"></script>
+<script src="{% static "mediaelement/build/mediaelement-and-player.min.js" %}"></script>
+<script type="text/javascript" src="{% static "js/slimbox2/slimbox2.js" %}"></script>
 
 <script type="text/javascript">
     function showplayer(index, element) {

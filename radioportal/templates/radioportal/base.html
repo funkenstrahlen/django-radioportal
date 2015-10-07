@@ -27,11 +27,11 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
 {% block head_js %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/modernizr/modernizr.custom.10600.js"></script>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/font/fontello.css">
-<!--[if IE 7]><link rel="stylesheet" href="{{ STATIC_URL }}css/font/fontello-ie7.css"><![endif]-->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/sharebuttons.css">
+<script type="text/javascript" src="{% static "js/jquery/jquery-1.11.3.min.js" %}"></script>
+<script type="text/javascript" src="{% static "js/modernizr/modernizr.custom.10600.js" %}"></script>
+<link rel="stylesheet" href="{% static "css/font/fontello.css" %}">
+<!--[if IE 7]><link rel="stylesheet" href="{% static "css/font/fontello-ie7.css" %}"><![endif]-->
+<link rel="stylesheet" href="{% static "css/sharebuttons.css" %}">
 <script type="text/javascript">
   function registerPopupClick() {
     $("a.sharelink").click(function(event) {
