@@ -237,7 +237,7 @@ class MultipleFormUpdateView(MultipleFormMixin, CreateView):
 
 # views
 class NotificationMixin(PermissionRequiredMixin):
-    permission_required = 'change_show'
+    permission_required = 'radioportal.change_show'
 
     aux_form_class = {
         'path': {
@@ -341,7 +341,7 @@ class UpdateSecondaryNotificationView(NotificationMixin,
 class DeleteNotificationView(PermissionRequiredMixin, DeleteView):
     model = PrimaryNotification
     pk_url_kwarg = 'nslug'
-    permission_required = 'change_show'
+    permission_required = 'radioportal.change_show'
     template_name = "radioportal/dashboard/notification/delete.html"
 
     def get_permission_object(self):
@@ -369,7 +369,7 @@ class DeleteSecondaryNotificationView(DeleteNotificationView):
 class NotificationListView(PermissionRequiredMixin, ListView):
     model = PrimaryNotification
 
-    permission_required = 'change_show'
+    permission_required = 'radioportal.change_show'
 
     template_name = "radioportal/dashboard/notification/list.html"
 
@@ -426,7 +426,7 @@ def twitter_callback(request, slug, path):
     del request.session['twitter_%s_oauth_token_secret' % path]
 
     show = Show.objects.get(slug=slug)
-    if not request.user.has_perm('change_show', show):
+    if not request.user.has_perm('radioportal.change_show', show):
         return HttpResponse('Unauthorized', status=401)
 
     twitter = Twython(settings.TWITTER_CONSUMER_KEY,
@@ -472,7 +472,7 @@ def twitter_callback(request, slug, path):
 
 def auphonic_gettoken(request, slug):
     show = Show.objects.get(slug=slug)
-    if not request.user.has_perm('change_show', show):
+    if not request.user.has_perm('radioportal.change_show', show):
         return HttpResponse('Unauthorized', status=401)
 
     url = "https://auphonic.com/oauth2/authorize/?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
@@ -486,7 +486,7 @@ def auphonic_callback(request, slug):
     token = request.GET["code"]
 
     show = Show.objects.get(slug=slug)
-    if not request.user.has_perm('change_show', show):
+    if not request.user.has_perm('radioportal.change_show', show):
         return HttpResponse('Unauthorized', status=401)
 
     url = "https://auphonic.com/oauth2/token/"

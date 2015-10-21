@@ -222,11 +222,11 @@ class UserChannelStreamAddView(SessionWizardView):
         stream.channel = channel
         stream.save()
 
-        assign('change_channel', user, channel)
-        assign('change_stream', user, channel)
+        assign('radioportal.change_channel', user, channel)
+        assign('radioportal.change_stream', user, channel)
 
-        assign('change_episodes', user, show)
-        assign('change_show', user, show)
+        assign('radioportal.change_episodes', user, show)
+        assign('radioportal.change_show', user, show)
 
         mail_data = {
             'username': user.username,
@@ -320,11 +320,11 @@ class MessageListView(ListView):
         qs = super(MessageListView, self).get_queryset()
         channel_type = ContentType.objects.get_for_model(Channel)
         channel_ids = get_objects_for_user(self.request.user, 
-               'change_channel', klass=Channel).values_list('id', flat=True)
+               'radioportal.change_channel', klass=Channel).values_list('id', flat=True)
         channel_q = Q(content_type__pk=channel_type.id, object_id__in=channel_ids)
         show_type = ContentType.objects.get_for_model(Show)
         show_ids = get_objects_for_user(self.request.user,
-               'change_show', klass=Show).values_list('id', flat=True)
+               'radioportal.change_show', klass=Show).values_list('id', flat=True)
         show_q = Q(content_type__pk=show_type.id, object_id__in=show_ids)
         return qs.filter(channel_q | show_q)
 
@@ -421,7 +421,7 @@ class ShowCreateView(CreateView):
     def get_success_url(self):
         return reverse('admin-episode-list', kwargs={'slug': self.object.slug}, host='dashboard')
 
-    @method_decorator(permission_required('add_show'))
+    @method_decorator(permission_required('radioportal.add_show'))
     def dispatch(self, *args, **kwargs):
         return super(ShowCreateView, self).dispatch(*args, **kwargs)
 
@@ -444,7 +444,7 @@ class ShowEditView(UpdateView):
             pass
         return dforms.ShowForm
 
-    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('radioportal.change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowEditView, self).dispatch(*args, **kwargs)
 
@@ -457,7 +457,7 @@ class ShowDeleteView(DeleteView):
     def get_success_url(self):
         return reverse('dashboard', host='dashboard')
 
-    @method_decorator(permission_required('delete_show', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('radioportal.delete_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowDeleteView, self).dispatch(*args, **kwargs)
 
@@ -508,12 +508,12 @@ class ShowFeedEditView(UpdateView):
             obj.save()
         
         if request is not None:
-            if not request.user.has_perm('change_show', obj.show):
+            if not request.user.has_perm('radioportal.change_show', obj.show):
                 raise PermissionDenied()
 
         return obj
     
-    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('radioportal.change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(ShowFeedEditView, self).dispatch(*args, **kwargs)
     
@@ -533,7 +533,7 @@ class EpisodeListView(ListView):
         ctx['show'] = Show.objects.get(slug=self.kwargs['slug'])
         return ctx
     
-    @method_decorator(permission_required('change_show', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('radioportal.change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeListView, self).dispatch(*args, **kwargs)
 
@@ -554,7 +554,7 @@ class EpisodeCreateView(CreateView):
 
     def get_form_class(self):
         form_class = super(EpisodeCreateView, self).get_form_class()
-#        qs = get_objects_for_user(self.request.user, "change_episodes", Show)
+#        qs = get_objects_for_user(self.request.user, "radioportal.change_episodes", Show)
 #        form_class.base_fields['show'].queryset = qs
         return form_class
 
@@ -578,7 +578,7 @@ class EpisodeCreateView(CreateView):
             form.instance.episode = e
         return super(EpisodeCreateView, self).form_valid(form)
 
-    @method_decorator(permission_required('change_episodes', (Show, 'slug', 'slug')))
+    @method_decorator(permission_required('radioportal.change_episodes', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeCreateView, self).dispatch(*args, **kwargs)
 
@@ -596,7 +596,7 @@ class EpisodeEditView(UpdateView):
         ctx['show'] = self.object.show
         return ctx
 
-    @method_decorator(permission_required('change_episodes', (Show, 'episode__pk', 'pk')))
+    @method_decorator(permission_required('radioportal.change_episodes', (Show, 'episode__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeEditView, self).dispatch(*args, **kwargs)
 
@@ -614,7 +614,7 @@ class EpisodeDeleteView(DeleteView):
             return HttpResponse("Currently Running Episodes cannot be deleted")
         return super(EpisodeDeleteView, self).delete(request, *args, **kwargs)
 
-    @method_decorator(permission_required('change_episodes', (Show, 'episode__pk', 'pk')))
+    @method_decorator(permission_required('radioportal.change_episodes', (Show, 'episode__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodeDeleteView, self).dispatch(*args, **kwargs)
 
@@ -632,7 +632,7 @@ class EpisodePartEditView(UpdateView):
         ctx['show'] = self.object.episode.show
         return ctx
 
-    @method_decorator(permission_required('change_episodes', (Show, 'episode__parts__pk', 'pk')))
+    @method_decorator(permission_required('radioportal.change_episodes', (Show, 'episode__parts__pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(EpisodePartEditView, self).dispatch(*args, **kwargs)
 
@@ -647,11 +647,11 @@ class ChannelCreateView(CreateView):
 
     def get_form_class(self):
         form_class = super(ChannelCreateView, self).get_form_class()
-        qs = get_objects_for_user(self.request.user, "change_show", Show)
+        qs = get_objects_for_user(self.request.user, "radioportal.change_show", Show)
         form_class.form_classes[0].base_fields['show'].queryset = qs
         return form_class
 
-    @method_decorator(permission_required('add_channel'))
+    @method_decorator(permission_required('radioportal.add_channel'))
     def dispatch(self, *args, **kwargs):
         return super(ChannelCreateView, self).dispatch(*args, **kwargs)
 
@@ -714,7 +714,7 @@ class ChannelChangeCurrentEpisode(UpdateView):
 
     def get_form_class(self):
         form_class = super(ChannelChangeCurrentEpisode, self).get_form_class()
-        show_qs = get_objects_for_user(self.request.user, "change_show", Show)
+        show_qs = get_objects_for_user(self.request.user, "radioportal.change_show", Show)
         show_qs = show_qs.filter(channel__in=(self.object,))
         qs = Episode.objects.filter(show__in=show_qs).annotate(begin=Min('parts__begin')).order_by('-begin')
         form_class.base_fields['currentEpisode'].queryset = qs
@@ -735,7 +735,7 @@ class ChannelChangeCurrentEpisode(UpdateView):
         else:
             return super(ChannelChangeCurrentEpisode, self).post(request, *args, **kwargs)
 
-    @method_decorator(permission_required('change_channel', (Channel, 'pk', 'pk')))
+    @method_decorator(permission_required('radioportal.change_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(ChannelChangeCurrentEpisode, self).dispatch(*args, **kwargs)
 
@@ -750,7 +750,7 @@ class ChannelEditView(UpdateView):
 
     def get_form_class(self):
         form_class = super(ChannelEditView, self).get_form_class()
-        qs = get_objects_for_user(self.request.user, "change_show", Show)
+        qs = get_objects_for_user(self.request.user, "radioportal.change_show", Show)
         form_class.form_classes[0].base_fields['show'].queryset = qs
         return form_class
 
@@ -768,7 +768,7 @@ class ChannelEditView(UpdateView):
         kwargs['can_delete'] = self.request.user.has_perm('radioportal.delete_stream', self.object)
         return kwargs
 
-    @method_decorator(permission_required('change_channel', (Channel, 'pk', 'pk')))
+    @method_decorator(permission_required('radioportal.change_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(ChannelEditView, self).dispatch(*args, **kwargs)
 
@@ -779,7 +779,7 @@ class ChannelClusterEditView(ChannelEditView):
     def get_object(self):
         return Channel.objects.get(cluster=self.kwargs.get("slug"))
 
-    @method_decorator(permission_required('change_channel', (Channel, 'cluster', 'slug'), return_403=True))
+    @method_decorator(permission_required('radioportal.change_channel', (Channel, 'cluster', 'slug'), return_403=True))
     def dispatch(self, *args, **kwargs):
         return super(UpdateView, self).dispatch(*args, **kwargs)
 
@@ -791,7 +791,7 @@ class ChannelDeleteView(DeleteView):
     def get_success_url(self):
         return reverse('dashboard', host='dashboard')
 
-    @method_decorator(permission_required('delete_channel', (Channel, 'pk', 'pk')))
+    @method_decorator(permission_required('radioportal.delete_channel', (Channel, 'pk', 'pk')))
     def dispatch(self, *args, **kwargs):
         return super(ChannelDeleteView, self).dispatch(*args, **kwargs)
 

@@ -36,7 +36,7 @@ class ICalEditView(PermissionRequiredMixin, UpdateView):
     slug_field = 'show__slug'
     template_name = "radioportal/dashboard/importer_ical.html"
     
-    permission_required = 'change_show'
+    permission_required = 'radioportal.change_show'
     
     def get_permission_object(self):
         return Show.objects.get(slug=self.kwargs["slug"])
