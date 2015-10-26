@@ -162,7 +162,8 @@ class ShowFeed(Feed):
         return item.show.name
 
     def item_pubdate(self):
-	return datetime.datetime.now()
+        tz = pytz.timezone(settings.TIME_ZONE)
+        return tz.localize(datetime.datetime.now())
 
     def title(self, obj):
         return _("xsn Archive for %s" % obj[0].name)
