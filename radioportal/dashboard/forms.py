@@ -42,7 +42,7 @@ from django.contrib.admin import widgets as adminwidgets
 from django.contrib.auth.models import User
 from django.forms import widgets
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.forms.widgets import Media, HiddenInput, SelectMultiple
 from django.utils.encoding import force_unicode
 from django.utils.html import conditional_escape
