@@ -81,24 +81,6 @@ def object_name(value):
     return value._meta.object_name
 
 
-@register.filter
-def formataudio(number, format):
-    """Usage: {{ stream.bitrate|formataudio:stream.format }}"""
-    if format == "mp3":
-        if number[-1] == 'k':
-            number = number[:-1]
-        return "%sKBit/s" % (number,)
-    elif format == "ogg":
-        if "q" in number:
-            return "Quality %s" % (number[1:],)
-        else:
-            if number[-1] == 'k':
-                number = number[:-1]
-            return "%sKBit/s" % (number,)
-    else:
-        return number
-
-
 import time, hashlib
 
 from django.utils.http import urlquote

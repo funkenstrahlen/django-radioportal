@@ -348,11 +348,46 @@ class SourcedStreamForm(StreamForm):
 #        js = ('http://code.jquery.com/jquery-1.6.1.min.js', 'dashboard/stream.js',)
 
 
+FORMATS = (
+ ("mp3-none-http", "Icecast MP3"),
+ ("vorbis-ogg-http", "Icecast Ogg/Vorbis"),
+ ("opus-ogg-http", "Icecast Ogg/Opus"),
+ ("aac-none-http", "Icecast AAC"),
+ ("aac-mpegts-hls", "HLS AAC"),
+ ("mp3-mpegts-hls", "HLS MP3"),
+)
+
+FILEENDINGS = {
+ "mp3-none-http": "mp3",
+ "vorbis-ogg-http": "ogg",
+ "opus-ogg-http": "opus",
+ "aac-none-http": "aac",
+ "aac-mpegts-hls": "m3u8",
+ "mp3-mpegts-hls": "m3u8",
+}
+
 class RecodedStreamForm(StreamForm):
     required_css_class = "required"
+    formats = forms.ChoiceField(choices=FORMATS)
+
+    def __init__(self, *args, **kwargs):
+        super(RecodedStreamForm, self).__init__(*args, **kwargs)
+        self.initial['formats'] = "-".join([
+            self.instance.codec,
+            self.instance.container,
+            self.instance.transport,
+        ])
+
+    def save(self, commit=True):
+        self.instance.mount = ".".join([self.cleaned_data["mount"].split(".")[0], FILEENDINGS[self.cleaned_data['formats']]])
+        self.instance.codec = self.cleaned_data['formats'].split("-")[0]
+        self.instance.container = self.cleaned_data['formats'].split("-")[1]
+        self.instance.transport = self.cleaned_data['formats'].split("-")[2]
+        return super(RecodedStreamForm, self).save(commit)
+
     class Meta:
         model = models.RecodedStream
-        fields = ('mount', 'bitrate', 'format', 'source')
+        fields = ('mount', 'bitrate', 'source', 'formats')
 
 
 IRCNETWORKS=(

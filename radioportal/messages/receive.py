@@ -217,7 +217,14 @@ class BackendInterpreter(object):
 
         stream.running = True
         stream.bitrate = data['quality']
-        stream.format = data['format']
+        stream.transport = data['type']
+        stream.codec = data['format']
+        if stream.transport == "hls":
+            stream.container = "mpegts"
+        elif stream.codec in ("vorbis", "opus", "theora"):
+            stream.container = "ogg"
+        else:
+            stream.container = "none"
         stream.save()
         # stream.channel.updateRunning()
 

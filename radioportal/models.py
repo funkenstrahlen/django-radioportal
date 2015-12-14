@@ -380,6 +380,34 @@ class Stream(models.Model):
     mount = models.CharField(max_length=80, unique=True)
     running = models.BooleanField(default=False)
 
+    CODECS = (
+        ('mp3', _('MP3')),
+        ('aac', _('AAC')),
+        ('vorbis', _('Vorbis')),
+        ('theora', _('Theora')),
+        ('opus', _('Opus')),
+    )
+
+    codec = models.CharField(max_length=100,
+        choices=CODECS, default=CODECS[0][0])
+
+    CONTAINERS = (
+        ('none', _('None')),
+        ('ogg', _('Ogg')),
+        ('mpegts', _('MPEG/TS')),
+    )
+
+    container = models.CharField(max_length=100,
+        choices=CONTAINERS, default=CONTAINERS[0][0])
+
+    TRANSPORTS = (
+        ('http', _('HTTP (Icecast)')),
+        ('hls', _('Apple HTTP Live Streaming')),
+    )
+
+    transport = models.CharField(max_length=100,
+        choices=TRANSPORTS, default=TRANSPORTS[0][0])
+
     FORMATS = (
         ('mp3', _('MP3')),
         ('aac', _('AAC')),
@@ -429,6 +457,26 @@ class Stream(models.Model):
 
     encoding = models.CharField(max_length=255,
         choices=ENCODINGS, default=ENCODINGS[0][0])
+
+    def displayFormat(self):
+        f = ""
+        if self.transport == "hls":
+            f += self.get_transport_display()
+        if self.container == "ogg":
+            f += self.get_container_display()
+            f += "/"
+        f += self.get_codec_display()
+        if self.bitrate and "k" in self.bitrate:
+            f += " %sKBit/s" % self.bitrate[:-1]
+        if "q" in self.bitrate:
+            f += " Quality %s" % self.bitrate[1:]
+        return f
+
+    def mimetype(self):
+        if self.transport == "http":
+            return "audio/%s" % self.codec
+        elif self.transport == "hls":
+            return "application/vnd.apple.mpegurl"
 
     def updateRunning(self):
         self.running = False

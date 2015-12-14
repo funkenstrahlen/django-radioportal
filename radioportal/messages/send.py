@@ -94,7 +94,13 @@ class DTOSourcedStream(DTO):
         self.id = instance.mount
         self.recode = []
         for rs in instance.recoded.all():
-            self.recode.append({'mount': rs.mount, 'format': rs.format, 'bitrate': rs.bitrate})
+            self.recode.append({
+                'mount': rs.mount,
+                'bitrate': rs.bitrate,
+                'codec': rs.codec,
+                'container': rs.container,
+                'transport': rs.transport
+            })
 
 
 class DTORecodedStream(DTOSourcedStream):
