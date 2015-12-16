@@ -63,7 +63,8 @@ setup(name='django-radioportal',
         "simplejson <= 3.7.3",
         "translitcodec <= 0.4.0",
         "vobject <= 0.6.6",
-        "django-jsonfield <= 0.9.13"
+        "django-jsonfield <= 0.9.13",
+        "django-tastypie <= 0.12.2"
       ],
       classifiers=[
           'Framework :: Django',

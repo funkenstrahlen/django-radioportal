@@ -26,6 +26,9 @@ class FakeStreamView(FormView):
         stream = Stream.objects.get(id=form.cleaned_data['stream'])
         bi = BackendInterpreter()
         bi.channel_startmaster({'name': stream.channel.cluster, 'metadata': {'name': form.cleaned_data['title']}})
-        bi.stream_start({'name': "/%s" % stream.mount, 'quality': '128k', 'format': 'mp3'})
+        if stream.mount.endswith("mp3"):
+            bi.stream_start({'name': "/%s" % stream.mount, 'quality': '128k', 'format': 'mp3', 'type': 'http'})
+        else:
+            bi.stream_start({'name': "/%s" % stream.mount, 'quality': '128k', 'format': 'vorbis', 'type': 'http'})
         return super(FakeStreamView, self).form_valid(form)
 

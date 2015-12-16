@@ -55,6 +55,7 @@ class Show(models.Model):
         verbose_name=_('Name of the show'),
     )
     slug = AutoSlugField(populate_from='name', always_update=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     url = models.URLField(blank=True, default='',
         verbose_name=_('Homepage of the Show'))
     twitter = models.CharField(max_length=100, blank=True, default='',
@@ -146,6 +147,9 @@ def create_default_icalfeed(sender, instance, created, raw, *args, **kwargs):
         return
     feed = ICalFeed(show=instance)
     feed.save()
+    podcast = ShowFeed(show=instance)
+    podcast.save()
+
 
 class EpisodeSource(PolymorphicModel):
     pass
@@ -175,6 +179,7 @@ class Episode(models.Model):
     show = models.ForeignKey(Show, verbose_name=_("Show"))
     slug = models.SlugField(max_length=30, default='',
         verbose_name=_("Short Name"))
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     
     source = models.OneToOneField(EpisodeSource, null=True)
 
