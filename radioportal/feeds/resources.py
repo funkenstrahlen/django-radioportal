@@ -101,12 +101,12 @@ class PodcastResource(ModelResource):
 #    artwork_url = fields.FileField("")
     website_url = fields.CharField("url")
     feed_url = fields.CharField(attribute="showfeed__feed")
-#    email = fields.CharField("")
+    email = fields.CharField("public_email")
 
     irc_url = fields.CharField("chat")
     webchat_url = fields.CharField("chat")
     twitter_handle = fields.CharField("twitter")
-#    flattr_handle = fields.CharField("")
+    donation_url = fields.CharField("donation_url")
 
     episodes = fields.ToManyField('radioportal.feeds.resources.EpisodeResource', 'episode_set', related_name='show')
 
