@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.utils.timezone import is_naive
 
+from easy_thumbnails.alias import aliases
 from tastypie import fields
 from tastypie.constants import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
@@ -109,6 +110,17 @@ class PodcastResource(ModelResource):
     donation_url = fields.CharField("donation_url")
 
     episodes = fields.ToManyField('radioportal.feeds.resources.EpisodeResource', 'episode_set', related_name='show')
+
+    artwork = fields.DictField()
+
+    def dehydrate_artwork(self, bundle):
+        artworks = {}
+        artworks["original"] = bundle.obj.icon.url
+        for name, settings in aliases.all(target='radioportal.Show.icon').iteritems():
+            thumb = bundle.obj.icon.get_existing_thumbnail(settings)
+            if thumb:
+                artworks[settings['size'][0]] = thumb.url
+        return artworks
 
     def dehydrate_webchat_url(self, bundle):
         u = urlparse.urlparse(bundle.data["webchat_url"])

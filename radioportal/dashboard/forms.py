@@ -51,6 +51,7 @@ from django.utils.translation import ugettext as _
 
 import jsonfield.forms
 import requests
+from easy_thumbnails.widgets import ImageClearableFileInput
 
 from radioportal import models
 from radioportal.messages import episode_finder
@@ -412,6 +413,7 @@ class ShowForm(forms.ModelForm):
         model = models.Show
         widgets = {
             'chat': IRCWidget(choices=IRCNETWORKS),
+            'icon': ImageClearableFileInput,
         }
         exclude = ()
 

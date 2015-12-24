@@ -91,7 +91,7 @@ class Show(models.Model):
         help_text=_('The number of the next episode to be aired. Used to construct the episode identifier'),
         verbose_name=_("Number of the next episode"))
 
-    icon = ThumbnailerImageField(resize_source=dict(size=(150, 150), crop='smart'), upload_to="show-icons/", blank=True)
+    icon = ThumbnailerImageField(upload_to="show-icons/", blank=True)
     public_email = models.EmailField(default="", blank=True)
 
     donation_url = models.URLField(blank=True, default='',
@@ -107,6 +107,11 @@ class Show(models.Model):
         permissions = (
             ('change_episodes', _('Delete Episodes')),
         )
+
+from easy_thumbnails.signals import saved_file
+from easy_thumbnails.signal_handlers import generate_aliases_global
+
+saved_file.connect(generate_aliases_global)
 
 class ShowFeed(models.Model):
     show = models.OneToOneField(Show)

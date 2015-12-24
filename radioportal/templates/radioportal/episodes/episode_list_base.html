@@ -1,4 +1,4 @@
-{% extends base %}{% load cache i18n shorturl hosts %}
+{% extends base %}{% load cache i18n shorturl hosts thumbnail %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -75,7 +75,7 @@ OF SUCH DAMAGE.
 {% if show %}
 {% cache 900 episode_list_head show.slug %}
 <div class="showheader">
-{% if show.icon %}<img src="{{ show.icon.url }}" class="showicon" alt="{{ show.name }} logo" />{% endif %}
+{% if show.icon %}<img src="{{ show.icon|thumbnail_url:'listing' }}" class="showicon" alt="{{ show.name }} logo" />{% endif %}
 <h1><a href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></h1>
 <small>{{ show.description }} (<a href="{{ show.url }}">{% trans "Homepage" %}</a>)</small>
 <p>{{ show.abstract }}</p>
