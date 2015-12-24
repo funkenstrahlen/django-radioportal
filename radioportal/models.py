@@ -92,7 +92,7 @@ class Show(models.Model):
         verbose_name=_("Number of the next episode"))
 
     icon = ThumbnailerImageField(resize_source=dict(size=(150, 150), crop='smart'), upload_to="show-icons/", blank=True)
-    public_email = models.EmailField()
+    public_email = models.EmailField(default="", blank=True)
 
     donation_url = models.URLField(blank=True, default='',
         verbose_name=_('URL for donations (flattr, paypal.me) for this show'))
