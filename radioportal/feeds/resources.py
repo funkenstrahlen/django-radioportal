@@ -24,7 +24,7 @@ class MyDateSerializer(Serializer):
         # If naive or rfc-2822, default behavior...
         if is_naive(data) or self.datetime_formatting == 'rfc-2822':
             return super(MyDateSerializer, self).format_datetime(data)
-
+        data = data.replace(microsecond=0)
         return data.isoformat()
 
 
