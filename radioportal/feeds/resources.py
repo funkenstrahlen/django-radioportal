@@ -98,10 +98,8 @@ class PodcastResource(ModelResource):
     description = fields.CharField("description")
     id = fields.CharField("uuid")
     slug = fields.CharField("slug")
-    artwork_thumb_url = fields.FileField("icon")
-#    artwork_url = fields.FileField("")
     website_url = fields.CharField("url")
-    feed_url = fields.CharField(attribute="showfeed__feed")
+    feed_url = fields.CharField(attribute="podcastfeed__feed_url")
     email = fields.CharField("public_email")
 
     irc_url = fields.CharField("chat")

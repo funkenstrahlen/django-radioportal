@@ -94,7 +94,7 @@ class Show(models.Model):
     icon = ThumbnailerImageField(upload_to="show-icons/", blank=True)
     public_email = models.EmailField(default="", blank=True)
 
-    donation_url = models.URLField(blank=True, default='',
+    donation_url = models.URLField(blank=True, default='', max_length=512,
         verbose_name=_('URL for donations (flattr, paypal.me) for this show'))
 
     def __unicode__(self):
@@ -113,16 +113,81 @@ from easy_thumbnails.signal_handlers import generate_aliases_global
 
 saved_file.connect(generate_aliases_global)
 
-class ShowFeed(models.Model):
+class PodcastFeed(models.Model):
+    PODCASTFIELDS = (
+        ("//channel/title/text()", "//channel/title/text()"),
+        ("//channel/link/text()", "//channel/link/text()"),
+        ("//channel/description/text()", "//channel/description/text()"),
+        ("//channel/copyright/text()", "//channel/copyright/text()"),
+        ("//channel/image/url/text()", "//channel/image/url/text()"),
+        ("//channel/atom:link[@rel='payment']/@href", "//channel/atom:link[@rel='payment']/@href"),
+        ("//channel/itunes:summary/text()", "//channel/itunes:summary/text()"),
+        ("//channel/itunes:owner/itunes:email/text()", "//channel/itunes:owner/itunes:email/text()"),
+        ("//channel/itunes:image/@href", "//channel/itunes:image/@href"),
+        ("//channel/itunes:subtitle/text()", "//channel/itunes:subtitle/text()"),
+    )
     show = models.OneToOneField(Show)
     enabled = models.BooleanField(verbose_name=_("Enable"), default=False)
-    feed = models.URLField(max_length=240, blank=True,
-        verbose_name=_("Feed of the podcast"),)
-    titlePattern = models.CharField(max_length=240, blank=True,
-        verbose_name=_("Regular expression for the title"),
-        help_text=_(u"Used to extract the id and title from the »title« field of the feed. Should contain the match groups »id« and »title«. "))
-    icalfeed = models.URLField(max_length=255, blank=True,
-        verbose_name=_("iCal feed for upcoming shows"))
+    feed_url = models.URLField(max_length=240, 
+                               blank=True,
+                               verbose_name=_("Feed of the podcast"),)
+    feed_url_enabled = models.BooleanField(default=False)
+
+    name_enabled = models.BooleanField(default=False)
+    name_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                  default=PODCASTFIELDS[0][0],
+                                  max_length=127)
+    name_regex = models.CharField(default="(?P<value>.*)",
+                                  max_length=127)
+
+    url_enabled = models.BooleanField(default=False)
+    url_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                 default=PODCASTFIELDS[1][0],
+                                 max_length=127)
+    url_regex = models.CharField(default="(?P<value>.*)",
+                                 max_length=127)
+
+    description_enabled = models.BooleanField(default=False)
+    description_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                         default=PODCASTFIELDS[2][0],
+                                         max_length=127)
+    description_regex = models.CharField(default="(?P<value>.*)",
+                                         max_length=127)
+
+    abstract_enabled = models.BooleanField(default=False)
+    abstract_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                      default=PODCASTFIELDS[6][0],
+                                      max_length=127)
+    abstract_regex = models.CharField(default="(?P<value>.*)",
+                                      max_length=127)
+
+    icon_enabled = models.BooleanField(default=False)
+    icon_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                  default=PODCASTFIELDS[4][0],
+                                  max_length=127)
+    icon_regex = models.CharField(default="(?P<value>.*)",
+                                  max_length=127)
+
+    public_email_enabled = models.BooleanField(default=False)
+    public_email_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                          default=PODCASTFIELDS[7][0],
+                                          max_length=127)
+    public_email_regex = models.CharField(default="(?P<value>.*)",
+                                          max_length=127)
+
+    donation_url_enabled = models.BooleanField(default=False)
+    donation_url_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                          default=PODCASTFIELDS[5][0],
+                                          max_length=127)
+    donation_url_regex = models.CharField(default="(?P<value>.*)",
+                                          max_length=127)
+
+    licence_enabled = models.BooleanField(default=False)
+    licence_xpath = models.CharField(choices=PODCASTFIELDS, 
+                                     default=PODCASTFIELDS[3][0],
+                                     max_length=127)
+    licence_regex = models.CharField(default="(?P<value>.*)",
+                                     max_length=127)
 
 
 class ICalFeed(models.Model):
@@ -156,7 +221,7 @@ def create_default_icalfeed(sender, instance, created, raw, *args, **kwargs):
         return
     feed = ICalFeed(show=instance)
     feed.save()
-    podcast = ShowFeed(show=instance)
+    podcast = PodcastFeed(show=instance)
     podcast.save()
 
 
@@ -571,7 +636,7 @@ class Message(models.Model):
 import reversion
 
 reversion.register(Show)
-reversion.register(ShowFeed)
+reversion.register(PodcastFeed)
 reversion.register(Episode)
 reversion.register(EpisodePart)
 reversion.register(Marker)
@@ -590,7 +655,7 @@ reversion.register(Status)
 # 
 # 
 # post_save.connect(saved, Show)
-# post_save.connect(saved, ShowFeed)
+# post_save.connect(saved, PodcastFeed)
 # post_save.connect(saved, Episode)
 # post_save.connect(saved, EpisodePart)
 # post_save.connect(saved, Graphic)

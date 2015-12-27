@@ -40,7 +40,7 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.core.serializers import json
 from django.conf import settings
 
-from radioportal.models import SourcedStream, ShowFeed, Show, ICalFeed, Channel, RecodedStream, PrimaryNotification, SecondaryNotification
+from radioportal.models import SourcedStream, PodcastFeed, Show, ICalFeed, Channel, RecodedStream, PrimaryNotification, SecondaryNotification
 
 from extshorturls.utils import ShortURLResolver
 
@@ -119,11 +119,10 @@ class DTOShow(DTO):
         if hasattr(instance, "showtwitter"):
             self.twitter_token = instance.showtwitter.token
             self.twitter_secret = instance.showtwitter.secret
-        if hasattr(instance, "showfeed"):
+        if hasattr(instance, "podcastfeed"):
             self.feed = {}
             self.feed['enabled'] = instance.showfeed.enabled
-            self.feed['feed'] = instance.showfeed.feed
-            self.feed['icalfeed'] = instance.showfeed.icalfeed
+            self.feed['feed'] = instance.showfeed.url
             self.feed['titlePattern'] = instance.showfeed.titlePattern
         if hasattr(instance, "icalfeed") and instance.icalfeed.enabled:
             self.ical = {}
@@ -191,9 +190,9 @@ class DTOShowTwitter(DTOShow):
     def __init__(self, instance):
         super(DTOShowTwitter, self).__init__(instance.show)
 
-class DTOShowFeed(DTOShow):
+class DTOPodcastFeed(DTOShow):
     def __init__(self, instance):
-        super(DTOShowFeed, self).__init__(instance.show)
+        super(DTOPodcastFeed, self).__init__(instance.show)
 
 class DTOIcalFeed(DTOShow):
     def __init__(self, instance):
@@ -224,7 +223,7 @@ dto_map = {
     "sourcedstream": DTOSourcedStream,
     "recodedstream": DTORecodedStream,
     "show": DTOShow,
-    "showfeed": DTOShowFeed,
+    "showfeed": DTOPodcastFeed,
     "showtwitter": DTOShowTwitter,
     "primarynotification": DTOPrimaryNotification,
     "secondarynotification": DTOSecondaryNotification,
@@ -295,7 +294,7 @@ class AMQPInitMiddleware(object):
 
         print "Connecting model change signals to amqp"
 
-        for m in (RecodedStream, SourcedStream, ShowFeed, ICalFeed, Show, Channel, PrimaryNotification, SecondaryNotification):
+        for m in (RecodedStream, SourcedStream, PodcastFeed, ICalFeed, Show, Channel, PrimaryNotification, SecondaryNotification):
             post_save.connect(
                 self.object_changed, m, dispatch_uid="my_dispatch_uid")
             pre_delete.connect(

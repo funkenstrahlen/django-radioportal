@@ -60,7 +60,7 @@ from radioportal import forms
 from radioportal.dashboard import forms as dforms
 from radioportal.dashboard.decorators import superuser_only
 from radioportal.messages.send import send_msg
-from radioportal.models import Show, Channel, Episode, ShowFeed, EpisodePart, Marker, Message, SourcedStream
+from radioportal.models import Show, Channel, Episode, PodcastFeed, EpisodePart, Marker, Message, SourcedStream
 
 from django.core.mail import send_mail
 from formtools.wizard.views import SessionWizardView
@@ -437,10 +437,10 @@ class ShowEditView(UpdateView):
 
     def get_form_class(self):
         try:
-            feed = self.object.showfeed
+            feed = self.object.podcastfeed
             if feed.enabled:
                 return dforms.ShowReducedForm
-        except ShowFeed.DoesNotExist:
+        except PodcastFeed.DoesNotExist:
             pass
         return dforms.ShowForm
 
@@ -462,9 +462,9 @@ class ShowDeleteView(DeleteView):
         return super(ShowDeleteView, self).dispatch(*args, **kwargs)
 
 
-class ShowFeedEditView(UpdateView):
-    form_class = dforms.ShowFeedForm
-    model = ShowFeed
+class PodcastFeedEditView(UpdateView):
+    form_class = dforms.PodcastFeedForm
+    model = PodcastFeed
     slug_field = 'show__slug'
     template_name = "radioportal/dashboard/showfeed_edit.html"
 
@@ -504,7 +504,7 @@ class ShowFeedEditView(UpdateView):
         try:
             obj = queryset.get()
         except ObjectDoesNotExist:
-            obj = ShowFeed(show=Show.objects.get(slug=slug))
+            obj = PodcastFeed(show=Show.objects.get(slug=slug))
             obj.save()
         
         if request is not None:
@@ -515,7 +515,7 @@ class ShowFeedEditView(UpdateView):
     
     @method_decorator(permission_required('radioportal.change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):
-        return super(ShowFeedEditView, self).dispatch(*args, **kwargs)
+        return super(PodcastFeedEditView, self).dispatch(*args, **kwargs)
     
 
 class EpisodeListView(ListView):

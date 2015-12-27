@@ -53,8 +53,14 @@ import urllib2
 import urlparse
 import uuid
 import simplejson
+from lxml import etree
+import requests
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from easy_thumbnails.files import generate_all_aliases
 
-from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message, ICalEpisodeSource
+
+from radioportal.models import Channel, Episode, EpisodePart, Stream, Graphic, Recording, Show, Message, ICalEpisodeSource, PodcastFeed
 
 # from radioportal_auphonic.models import AuphonicSettings
 
@@ -410,6 +416,37 @@ class BackendInterpreter(object):
             epp.save()
         if show.icalfeed.delete_missing:
             ICalEpisodeSource.objects.exclude(identifier__in=data['entries'].keys()).filter(episode__status="UPCOMING").delete()
+
+    def podcast_feed(self, data):
+        tree = etree.fromstring(data["content"])
+        pf = PodcastFeed.objects.get(show__slug=data["show"])
+        for field, value in filter(lambda x: x[0].endswith("_enabled"), vars(pf).iteritems()):
+            if not value:
+                continue
+            xpath = vars(pf)[field[:-8] + "_xpath"]
+            value = tree.xpath(xpath, namespaces=tree.nsmap)
+            if not value:
+                continue
+            value = value[0]
+            regex = vars(pf)[field[:-8] + "_regex"]
+            print regex, value
+            if regex:
+                match = re.search(regex,value)
+                if match and "value" in match.groupdict():
+                    value = match.group("value")
+            show = pf.show
+            if field[:-8] == "icon":
+                r = requests.get(value)
+                img_temp = NamedTemporaryFile(delete=True)
+                img_temp.write(r.content)
+                img_temp.flush()
+
+                show.icon.save("%s.jpg" % show.slug, File(img_temp), save=True)
+                generate_all_aliases(show.icon, include_global=True)
+            else:
+                setattr(show, field[:-8], value)
+            show.save()
+
 
     def feed_updated(self, data):
         if data['global']['type'] == 'calendar':

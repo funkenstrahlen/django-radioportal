@@ -427,17 +427,17 @@ class ShowReducedForm(forms.ModelForm):
             'chat': IRCWidget(choices=IRCNETWORKS),
         }
 
-class ShowFeedForm(forms.ModelForm):
+class PodcastFeedForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
-        model = models.ShowFeed
+        model = models.PodcastFeed
         exclude = ()
         widgets = {
             'show': HiddenInput(),
         }
      
 
-FeedFormSet = inlineformset_factory(models.Show, models.ShowFeed, exclude=())
+FeedFormSet = inlineformset_factory(models.Show, models.PodcastFeed, exclude=())
 
 StreamFormSet = inlineformset_factory(Channel, Stream, form=StreamForm)
 
