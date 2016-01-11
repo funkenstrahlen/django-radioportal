@@ -25,7 +25,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-{% load cache i18n %}{% spaceless %}
+{% load cache i18n thumbnail %}{% spaceless %}
 <div class="episode{% if episode.show.icon and not show %} showicon{% endif %}">
 	{% cache 900 episode.id episode.status %}
 	{% if episode.show.icon and not show %}<img src="{{ episode.show.icon|thumbnail_url:'listing' }}" alt="{{ episode.show.name }} logo" />{% endif %}
