@@ -139,14 +139,14 @@ class ShowFeed(Feed):
                     if not stream.running:
                         continue
                     url = reverse("mount", kwargs={'stream':stream.mount}, host='www')
-                    extra_dict['streams'].append("http:%s" % url)
+                    extra_dict['streams'].append(url)
                 extra_dict['listener'] = str(item.channel.listener)
                 extra_dict['channel'] = item.channel.cluster
                 extra_dict['current_song'] = item.channel.streamCurrentSong
             except Channel.DoesNotExist:
                 pass
         if item.show.icon:
-            extra_dict['icon'] = "http:%s" % item.show.icon.url
+            extra_dict['icon'] = item.show.icon.url
         if item.url:
             extra_dict['website'] = item.url()
         extra_dict['slug'] = item.slug
@@ -155,7 +155,7 @@ class ShowFeed(Feed):
     def feed_extra_kwargs(self, obj):
         kwargs = super(ShowFeed, self).feed_extra_kwargs(obj)
         if hasattr(obj[0], 'icon') and obj[0].icon:
-            kwargs['icon'] = "http:%s" % obj[0].icon.url
+            kwargs['icon'] = obj[0].icon.url
         return kwargs
 
     def item_author_name(self, item):
@@ -169,8 +169,7 @@ class ShowFeed(Feed):
         return _("xsn Archive for %s" % obj[0].name)
 
     def link(self, obj):
-        url = obj[0].get_absolute_url()
-        return 'http:%s' % url
+        return obj[0].get_absolute_url()
 
     def description(self, obj):
         return "%s %s" % (obj[0].abstract, obj[0].description)
@@ -192,8 +191,7 @@ class ShowFeed(Feed):
 
     def item_link(self, item):
         kwargs = {'show_name': item.show.slug, 'slug': item.slug}
-        url = reverse("episode", kwargs=kwargs, host='www')
-        return 'http:%s' % url
+        return reverse("episode", kwargs=kwargs, host='www')
 
     def item_guid(self, item):
         return item.get_id()
@@ -223,8 +221,7 @@ def ical_feed(request, show_name=None):
             vevent.add('dtend').value = episode.end()
         vevent.add('uid').value = '%s' % episode.pk
         kwargs = {'show_name': episode.show.slug, 'slug': episode.slug}
-        url = reverse("episode", kwargs=kwargs, host='www')
-        vevent.add('url').value = 'http:%s' % url 
+        vevent.add('url').value = reverse("episode", kwargs=kwargs, host='www')
     icalstream = cal.serialize()
     response = HttpResponse(icalstream, content_type='text/calendar')
     #response['Filename'] = 'filename.ics'  # IE needs this
@@ -281,7 +278,7 @@ class ShowListFeed(Feed):
     def item_extra_kwargs(self, item):
         extra_dict = {}
         if item.icon:
-            extra_dict['icon'] = "http:%s" % item.icon.url
+            extra_dict['icon'] = item.icon.url
         if item.url:
             extra_dict['website'] = item.url
         return extra_dict
