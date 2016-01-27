@@ -113,6 +113,8 @@ class PodcastResource(ModelResource):
 
     def dehydrate_artwork(self, bundle):
         artworks = {}
+        if not bundle.obj.icon:
+            return artworks
         artworks["original"] = bundle.obj.icon.url
         for name, settings in aliases.all(target='radioportal.Show.icon').iteritems():
             thumb = bundle.obj.icon.get_existing_thumbnail(settings)
