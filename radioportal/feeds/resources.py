@@ -94,8 +94,8 @@ class EpisodeResource(ModelResource):
 
 class PodcastResource(ModelResource):
     name = fields.CharField("name")
-    subtitle = fields.CharField("abstract")
-    description = fields.CharField("description")
+    subtitle = fields.CharField("description")
+    description = fields.CharField("abstract")
     id = fields.CharField("uuid")
     slug = fields.CharField("slug")
     website_url = fields.CharField("url")
