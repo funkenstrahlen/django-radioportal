@@ -46,9 +46,6 @@ from extshorturls.utils import ShortURLResolver
 
 import simplejson
 
-#if settings.AMQP:
-import pika
-
 #### Part one: sending notifications for changed objects ####
 
 shorturls = ShortURLResolver()
@@ -121,9 +118,9 @@ class DTOShow(DTO):
             self.twitter_secret = instance.showtwitter.secret
         if hasattr(instance, "podcastfeed"):
             self.feed = {}
-            self.feed['enabled'] = instance.showfeed.enabled
-            self.feed['feed'] = instance.showfeed.url
-            self.feed['titlePattern'] = instance.showfeed.titlePattern
+#            self.feed['enabled'] = instance.showfeed.enabled
+#            self.feed['feed'] = instance.showfeed.url
+#            self.feed['titlePattern'] = instance.showfeed.titlePattern
         if hasattr(instance, "icalfeed") and instance.icalfeed.enabled:
             self.ical = {}
             self.ical["url"] = instance.icalfeed.url
@@ -223,7 +220,7 @@ dto_map = {
     "sourcedstream": DTOSourcedStream,
     "recodedstream": DTORecodedStream,
     "show": DTOShow,
-    "showfeed": DTOPodcastFeed,
+#    "showfeed": DTOPodcastFeed,
     "showtwitter": DTOShowTwitter,
     "primarynotification": DTOPrimaryNotification,
     "secondarynotification": DTOSecondaryNotification,
@@ -234,6 +231,7 @@ dto_map = {
 
 
 def send_msg(routing_key, data, exchange="django_send"):
+    import pika
     credentials = pika.PlainCredentials(
         username=settings.BROKER_USER,
         password=settings.BROKER_PASSWORD)
