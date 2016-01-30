@@ -107,7 +107,7 @@ def secdownload(rel_path):
     expiry = calendar.timegm(future.timetuple())
     
     secure_link = "{key}{url}{expiry}".format(key=secret,
-                                              url=url,
+                                              url=rel_path,
                                               expiry=expiry)
     secure_hash = hashlib.md5(secure_link).digest()
     encoded_hash = base64.urlsafe_b64encode(secure_hash).rstrip('=')
