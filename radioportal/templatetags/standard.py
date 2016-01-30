@@ -81,17 +81,40 @@ def object_name(value):
     return value._meta.object_name
 
 
-import time, hashlib
-
 from django.utils.http import urlquote
+import time
+import base64
+import hashlib
+import calendar
+import datetime
+
 
 @register.filter
-def secdownload(rel_path):
+def secdownload_lighttpd(rel_path):
     secret = getattr(settings, "RP_DL_SECRET", "verysecret")
     uri_prefix = getattr(settings, "RP_DL_PREFIX", "/dl/")
     hextime = "%08x" % time.time()
     token = hashlib.md5((secret + rel_path + hextime).encode('utf-8')).hexdigest()
     return '%s%s/%s%s' % (uri_prefix, token, hextime, urlquote(rel_path))
+
+
+@register.filter
+def secdownload(rel_path):
+    secret = getattr(settings, "RP_DL_SECRET", "verysecret")
+    uri_prefix = getattr(settings, "RP_DL_PREFIX", "/download/")
+
+    future = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+    expiry = calendar.timegm(future.timetuple())
+    
+    secure_link = "{key}{url}{expiry}".format(key=secret,
+                                              url=url,
+                                              expiry=expiry)
+    secure_hash = hashlib.md5(secure_link).digest()
+    encoded_hash = base64.urlsafe_b64encode(secure_hash).rstrip('=')
+
+    return "{prefix}{ehash}/{expire}/{url}".format(prefix=uri_prefix, 
+                                                   ehash=encoded_hash, 
+                                                   expire=str(expiry), url=url)
 
 import os.path
 
