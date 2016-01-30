@@ -112,7 +112,7 @@ def secdownload(rel_path):
     secure_hash = hashlib.md5(secure_link).digest()
     encoded_hash = base64.urlsafe_b64encode(secure_hash).rstrip('=')
 
-    return "{prefix}{ehash}/{expire}/{url}".format(prefix=uri_prefix, 
+    return "{prefix}{ehash}/{expire}{url}".format(prefix=uri_prefix, 
                                                    ehash=encoded_hash, 
                                                    expire=str(expiry), url=rel_path)
 
