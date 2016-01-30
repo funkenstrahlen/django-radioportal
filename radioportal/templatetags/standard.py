@@ -114,7 +114,7 @@ def secdownload(rel_path):
 
     return "{prefix}{ehash}/{expire}/{url}".format(prefix=uri_prefix, 
                                                    ehash=encoded_hash, 
-                                                   expire=str(expiry), url=url)
+                                                   expire=str(expiry), url=rel_path)
 
 import os.path
 
