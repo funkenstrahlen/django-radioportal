@@ -471,47 +471,47 @@ class PodcastFeedEditView(UpdateView):
     def get_success_url(self):
         return reverse('admin-episode-list', kwargs={'slug': self.object.show.slug}, host='dashboard')
     
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(request=request)
-        return super(BaseUpdateView, self).get(request, *args, **kwargs)
+#    def get(self, request, *args, **kwargs):
+#        self.object = self.get_object(request=request)
+#        return super(BaseUpdateView, self).get(request, *args, **kwargs)
 
-    def get_object(self, queryset=None, request=None):
-        """
-        Returns the object the view is displaying.
-
-        By default this requires `self.queryset` and a `pk` or `slug` argument
-        in the URLconf, but subclasses can override this to return any object.
-        """
-        # Use a custom queryset if provided; this is required for subclasses
-        # like DateDetailView
-        if queryset is None:
-            queryset = self.get_queryset()
-
-        # Next, try looking up by primary key.
-        pk = self.kwargs.get('pk', None)
-        slug = self.kwargs.get('slug', None)
-        if pk is not None:
-            queryset = queryset.filter(pk=pk)
-        # Next, try looking up by slug.
-        elif slug is not None:
-            slug_field = self.get_slug_field()
-            queryset = queryset.filter(**{slug_field: slug})
-        # If none of those are defined, it's an error.
-        else:
-            raise AttributeError(u"Generic detail view %s must be called with "
-                                 u"either an object pk or a slug."
-                                 % self.__class__.__name__)
-        try:
-            obj = queryset.get()
-        except ObjectDoesNotExist:
-            obj = PodcastFeed(show=Show.objects.get(slug=slug))
-            obj.save()
-        
-        if request is not None:
-            if not request.user.has_perm('radioportal.change_show', obj.show):
-                raise PermissionDenied()
-
-        return obj
+#    def get_object(self, queryset=None, request=None):
+#        """
+#        Returns the object the view is displaying.
+#
+#        By default this requires `self.queryset` and a `pk` or `slug` argument
+#        in the URLconf, but subclasses can override this to return any object.
+#        """
+#        # Use a custom queryset if provided; this is required for subclasses
+#        # like DateDetailView
+#        if queryset is None:
+#            queryset = self.get_queryset()
+#
+#        # Next, try looking up by primary key.
+#        pk = self.kwargs.get('pk', None)
+#        slug = self.kwargs.get('slug', None)
+#        if pk is not None:
+#            queryset = queryset.filter(pk=pk)
+#        # Next, try looking up by slug.
+#        elif slug is not None:
+#            slug_field = self.get_slug_field()
+#            queryset = queryset.filter(**{slug_field: slug})
+#        # If none of those are defined, it's an error.
+#        else:
+#            raise AttributeError(u"Generic detail view %s must be called with "
+#                                 u"either an object pk or a slug."
+#                                 % self.__class__.__name__)
+#        try:
+#            obj = queryset.get()
+#        except ObjectDoesNotExist:
+#            obj = PodcastFeed(show=Show.objects.get(slug=slug))
+#            obj.save()
+#        
+#        if request is not None:
+#            if not request.user.has_perm('radioportal.change_show', obj.show):
+#                raise PermissionDenied()
+#
+#        return obj
     
     @method_decorator(permission_required('radioportal.change_show', (Show, 'slug', 'slug')))
     def dispatch(self, *args, **kwargs):

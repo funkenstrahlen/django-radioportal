@@ -421,20 +421,24 @@ class BackendInterpreter(object):
         tree = etree.fromstring(data["content"])
         pf = PodcastFeed.objects.get(show__slug=data["show"])
         for field, value in filter(lambda x: x[0].endswith("_enabled"), vars(pf).iteritems()):
+            print field, value
             if not value:
                 continue
-            xpath = vars(pf)[field[:-8] + "_xpath"]
-            value = tree.xpath(xpath, namespaces=tree.nsmap)
-            if not value:
-                continue
-            value = value[0]
-            regex = vars(pf)[field[:-8] + "_regex"]
-            print regex, value
+            if field[:-8] + "_xpath" in vars(pf):
+                xpath = vars(pf)[field[:-8] + "_xpath"]
+                value = tree.xpath(xpath, namespaces=tree.nsmap)
+                if not value:
+                    continue
+                value = value[0]
+            regex = None
+            if field[:-8] + "_regex" in vars(pf):
+                regex = vars(pf)[field[:-8] + "_regex"]
             if regex:
                 match = re.search(regex,value)
                 if match and "value" in match.groupdict():
                     value = match.group("value")
             show = pf.show
+            print field[:-8], value
             if field[:-8] == "icon":
                 r = requests.get(value)
                 img_temp = NamedTemporaryFile(delete=True)
