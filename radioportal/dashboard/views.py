@@ -326,7 +326,13 @@ class MessageListView(ListView):
         show_ids = get_objects_for_user(self.request.user,
                'radioportal.change_show', klass=Show).values_list('id', flat=True)
         show_q = Q(content_type__pk=show_type.id, object_id__in=show_ids)
-        return qs.filter(channel_q | show_q)
+        qs = qs.filter(channel_q | show_q)
+        severity_f = int(self.request.GET.get('level', '4'))
+        qs = qs.filter(severity__gte=severity_f)
+        origin_f = self.request.GET.get("origin", "")
+        if origin_f:
+            qs = qs.filter(origin__startswith=origin_f)
+        return qs
 
 
 class UserGroupListView(ListView):
