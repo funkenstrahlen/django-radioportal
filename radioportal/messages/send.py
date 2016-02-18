@@ -116,11 +116,10 @@ class DTOShow(DTO):
         if hasattr(instance, "showtwitter"):
             self.twitter_token = instance.showtwitter.token
             self.twitter_secret = instance.showtwitter.secret
-        if hasattr(instance, "podcastfeed"):
+        if hasattr(instance, "podcastfeed") and instance.podcastfeed.enabled:
             self.feed = {}
-#            self.feed['enabled'] = instance.showfeed.enabled
-#            self.feed['feed'] = instance.showfeed.url
-#            self.feed['titlePattern'] = instance.showfeed.titlePattern
+            self.feed['feed'] = instance.podcastfeed.feed_url
+            self.feed['website'] = instance.url
         if hasattr(instance, "icalfeed") and instance.icalfeed.enabled:
             self.ical = {}
             self.ical["url"] = instance.icalfeed.url
@@ -220,7 +219,7 @@ dto_map = {
     "sourcedstream": DTOSourcedStream,
     "recodedstream": DTORecodedStream,
     "show": DTOShow,
-#    "showfeed": DTOPodcastFeed,
+    "podcastfeed": DTOPodcastFeed,
     "showtwitter": DTOShowTwitter,
     "primarynotification": DTOPrimaryNotification,
     "secondarynotification": DTOSecondaryNotification,
