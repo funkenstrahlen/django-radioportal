@@ -117,8 +117,12 @@ class BackendInterpreter(object):
             d = dateutil.parser.parse(data['stamp'])
         else:
             d = None
-        m=Message(message_object=obj, origin=data["path"], message=data["message"],
-                       severity=data["level"], timestamp=d)
+        if "path" in data:
+            m=Message(message_object=obj, origin=data["path"], message=data["message"],
+                      severity=data["level"], timestamp=d)
+        else:
+            m=Message(message_object=obj, origin=data["component"], message=str(data["context"]),
+                      severity=data["level"], timestamp=d)
         m.save()
 
     def channel_startmaster(self, data):
@@ -420,6 +424,7 @@ class BackendInterpreter(object):
     def podcast_feed(self, data):
         tree = etree.fromstring(data["content"])
         pf = PodcastFeed.objects.get(show__slug=data["show"])
+        show = pf.show
         for field, value in filter(lambda x: x[0].endswith("_enabled"), vars(pf).iteritems()):
             print field, value
             if not value:
@@ -437,19 +442,17 @@ class BackendInterpreter(object):
                 match = re.search(regex,value)
                 if match and "value" in match.groupdict():
                     value = match.group("value")
-            show = pf.show
             print field[:-8], value
             if field[:-8] == "icon":
                 r = requests.get(value)
                 img_temp = NamedTemporaryFile(delete=True)
                 img_temp.write(r.content)
                 img_temp.flush()
-
                 show.icon.save("%s.jpg" % show.slug, File(img_temp), save=True)
                 generate_all_aliases(show.icon, include_global=True)
             else:
                 setattr(show, field[:-8], value)
-            show.save()
+        show.save()
 
 
     def feed_updated(self, data):
