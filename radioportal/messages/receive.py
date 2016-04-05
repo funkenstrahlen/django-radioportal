@@ -402,7 +402,15 @@ class BackendInterpreter(object):
                 ep.save()
             else:
                 source = ICalEpisodeSource.objects.get(identifier=uid)
-                ep = source.episode
+                try:
+                    ep = source.episode
+                except Episode.DoesNotExist:
+                    text = "No episode created for uid %s as the previously"
+                         + " created episode was deleted" % uid
+                    m = Message(message_object=show, origin="importer.ical", message=msg,
+                       severity=3)
+                    m.save()
+                    continue
 
             ep.slug = e["slug"]
             ep.save()
