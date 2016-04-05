@@ -405,8 +405,8 @@ class BackendInterpreter(object):
                 try:
                     ep = source.episode
                 except Episode.DoesNotExist:
-                    text = "No episode created for uid %s as the previously"
-                         + " created episode was deleted" % uid
+                    text = "No episode created for uid %s as the previously" \
+                           " created episode was deleted" % uid
                     m = Message(message_object=show, origin="importer.ical", message=msg,
                        severity=3)
                     m.save()
