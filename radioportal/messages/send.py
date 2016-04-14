@@ -180,28 +180,42 @@ class DTOShow(DTO):
                 noti["preset"] = pn.path.get().preset
                 noti["start_production"] = pn.path.get().start_production
             self.notifications.append(noti)
-        push = {
-            'start': simplejson.dumps({
-                "where": {
-                    "channels": "podcast_%s" % instance.uuid
-                },
-                "data": {
-                    "alert": "%s sendet jetzt live." % instance.name,
-                    "badge": "1",
-                    "sound": "ios_defaultsound.caf"
+        for server in settings.PUSH_URL:
+            push = {
+                'start': simplejson.dumps({
+                    "where": {
+                        "channels": "podcast_%s" % instance.uuid
+                    },
+                    "data": {
+                        "alert": "%s sendet jetzt live." % instance.name,
+                        "badge": "1",
+                        "sound": "ios_defaultsound.caf"
+                    }
+                }).replace('{','{{').replace('}','}}'), # string escape fuer .format()
+                'stop': '',
+                'rollover': '',
+                'type': 'http',
+                'url': server,
+                'header': {
+                    "X-Parse-Application-Id": settings.PUSH_APPLICATION_ID,
+                    "X-Parse-Master-Key": settings.PUSH_MASTER_KEY,
+                    "Content-Type": "application/json"
                 }
-            }).replace('{','{{').replace('}','}}'), # string escape fuer .format()
-            'stop': '',
-            'rollover': '',
-            'type': 'http',
-            'url': settings.PUSH_URL,
-            'header': {
-                "X-Parse-Application-Id": settings.PUSH_APPLICATION_ID,
-                "X-Parse-Master-Key": settings.PUSH_MASTER_KEY,
-                "Content-Type": "application/json"
             }
-        }
-        self.notifications.append(push)
+            self.notifications.append(push)
+            push = {
+                'start': simplejson.dumps({"where": {}, "data": {}}).replace('{','{{').replace('}','}}'),
+                'stop': simplejson.dumps({"where": {}, "data": {}}).replace('{','{{').replace('}','}}'),
+                'rollover': simplejson.dumps({"where": {}, "data": {}}).replace('{','{{').replace('}','}}'),
+                'type': 'http',
+                'url': server,
+                'header': {
+                    "X-Parse-Application-Id": settings.PUSH_APPLICATION_ID,
+                    "X-Parse-Master-Key": settings.PUSH_MASTER_KEY,
+                    "Content-Type": "application/json"
+                }
+            }
+            self.notifications.append(push)
 
 
 
