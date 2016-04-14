@@ -180,6 +180,29 @@ class DTOShow(DTO):
                 noti["preset"] = pn.path.get().preset
                 noti["start_production"] = pn.path.get().start_production
             self.notifications.append(noti)
+        push = {
+            'start': simplejson.dumps({
+                "where": {
+                    "channels": "podcast_%s" % instance.uuid
+                },
+                "data": {
+                    "alert": "%s sendet jetzt live." % instance.name,
+                    "badge": "1",
+                    "sound": "ios_defaultsound.caf"
+                }
+            }).replace('{','{{').replace('}','}}'), # string escape fuer .format()
+            'stop': '',
+            'rollover': '',
+            'type': 'http',
+            'url': settings.PUSH_URL,
+            'header': {
+                "X-Parse-Application-Id": settings.PUSH_APPLICATION_ID,
+                "X-Parse-Master-Key": settings.PUSH_MASTER_KEY,
+                "Content-Type": "application/json"
+            }
+        }
+        self.notifications.append(push)
+
 
 
 class DTOShowTwitter(DTOShow):
