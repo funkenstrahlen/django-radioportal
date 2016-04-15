@@ -683,7 +683,6 @@ class NotificationPath(models.Model):
     def __unicode__(self):
         return self.get().__unicode__()
 
-
 class HTTPCallback(NotificationPath):
     url = models.URLField()
 
@@ -693,6 +692,10 @@ class HTTPCallback(NotificationPath):
     def __unicode__(self):
         return _(u"HTTP Callback %s" % self.url)
 
+class HTTPCallbackHeader(models.Model):
+    name = models.CharField(max_length=250)
+    value = models.CharField(max_length=250)
+    callback = models.ForeignKey(HTTPCallback)
 
 class IRCChannel(NotificationPath):
     url = models.CharField(max_length=250)

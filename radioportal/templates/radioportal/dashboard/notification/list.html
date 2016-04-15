@@ -54,6 +54,13 @@ use this page to configure this notifications.
     <dt>{% trans "Template for start" %}</dt><dd>{{ obj.start }}</dd>
     <dt>{% trans "Template for rollover" %}</dt><dd>{{ obj.rollover }}</dd>
     <dt>{% trans "Template for stop" %}</dt><dd>{{ obj.stop }}</dd>
+{% if obj.path.name == "http" %}
+<dt>{% trans "HTTP Headers" %}</dt><dd><li>
+{% for header in obj.path.get.httpcallbackheader_set.all %}
+<dt>{{ header.name }}: {{ header.value }}</dt>
+{% endfor %}
+</li></dd>
+{% endif %}
   </dl>
 {% endfor %}
 {% for obj in secondary %}

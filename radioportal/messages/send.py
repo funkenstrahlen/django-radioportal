@@ -173,8 +173,13 @@ class DTOShow(DTO):
                         'token': sn.path.get().oauth_token,
                         'secret': sn.path.get().oauth_secret,
                     })
-            elif pn.path.name() in ("irc", "http"):
+            elif pn.path.name() == "irc":
                 noti["url"] = pn.path.get().url
+            elif pn.path.name() == "http":
+                noti["url"] = pn.path.get().url
+                noti["header"] = {}
+                for h in pn.path.get().httpcallbackheader_set.all():
+                    noti["header"][h.name] = h.value
             elif pn.path.name() == "auphonic":
                 noti["access_token"] = pn.path.get().access_token
                 noti["preset"] = pn.path.get().preset
