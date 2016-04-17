@@ -2,6 +2,7 @@ from radioportal.models import Show, Episode, Stream
 
 from django.conf import settings
 from django.conf.urls import url
+from django.db.models.aggregates import Min
 from django.utils.timezone import is_naive
 
 from easy_thumbnails.alias import aliases
@@ -46,7 +47,7 @@ class EpisodeResource(ModelResource):
 
     def dehydrate_begin(self, bundle):
         tz = pytz.timezone(settings.TIME_ZONE)
-        begin = bundle.obj.begin()
+        begin = bundle.obj.begin
         if begin:
             begin = tz.localize(begin)
         return begin
@@ -76,7 +77,7 @@ class EpisodeResource(ModelResource):
     listeners = fields.IntegerField('channel__listener', default=-1)
 
     class Meta:
-        queryset = Episode.objects.all()
+        queryset = Episode.objects.all().annotate(begin=Min('parts__begin'))
         serializer = MyDateSerializer()
         resource_name = "episode"
         list_allowed_methods = ["get", ]
@@ -85,12 +86,12 @@ class EpisodeResource(ModelResource):
         include_absolute_url = True
         excludes = ("uuid",)
         filtering = {
-            "status": ('exact',),
+            "status": ('exact', 'in'),
             # "begin": ('lte', 'lt', 'gt', 'gte', 'exact'),
             # "end": ('lte', 'lt', 'gt', 'gte', 'exact'),
             "podcast": ALL_WITH_RELATIONS,
         }
-
+        ordering = [ 'begin', ]
 
 class PodcastResource(ModelResource):
     name = fields.CharField("name")
