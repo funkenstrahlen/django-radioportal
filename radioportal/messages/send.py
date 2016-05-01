@@ -193,7 +193,7 @@ class DTOShow(DTO):
                     },
                     "data": {
                         "alert": "%s sendet jetzt live." % instance.name,
-                        "badge": "1",
+                        "badge": 1,
                         "sound": "ios_defaultsound.caf"
                     }
                 }).replace('{','{{').replace('}','}}'), # string escape fuer .format()
