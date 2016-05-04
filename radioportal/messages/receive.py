@@ -426,7 +426,7 @@ class BackendInterpreter(object):
             if "title" in e:
                 epp.title = e["title"]
             epp.save()
-        if show.icalfeed.delete_missing:
+        if show.icalfeed.delete_missing and False:
             ICalEpisodeSource.objects.exclude(identifier__in=data['entries'].keys()).filter(episode__status="UPCOMING").delete()
 
     def podcast_feed(self, data):
