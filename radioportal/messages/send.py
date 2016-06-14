@@ -272,6 +272,8 @@ dto_map = {
 
 
 def send_msg(routing_key, data, exchange="django_send"):
+    if not settings.AMQP:
+        return
     import pika
     credentials = pika.PlainCredentials(
         username=settings.BROKER_USER,
