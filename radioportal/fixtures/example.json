@@ -1,0 +1,405 @@
+[
+    {
+        "fields": {
+            "domain": "streams.xenim.de",
+            "name": "streams.xenim.de"
+        },
+        "model": "sites.site",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "domain": "xsn.io",
+            "name": "xsn.io"
+        },
+        "model": "sites.site",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "domain": "feeds.streams.xenim.de",
+            "name": "feeds.streams.xenim.de"
+        },
+        "model": "sites.site",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "domain": "dashboard.xenim.de",
+            "name": "dashboard.xenim.de"
+        },
+        "model": "sites.site",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "domain": "review.streams.xenim.de",
+            "name": "review.streams.xenim.de"
+        },
+        "model": "sites.site",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "abstract": "",
+            "chat": "",
+            "defaultShortName": "",
+            "description": "",
+            "donation_url": "",
+            "icon": "",
+            "licence": "none",
+            "name": "ExampleCast",
+            "nextEpisodeNumber": 4,
+            "public_email": "",
+            "shownotes_id": "",
+            "slug": "examplecast",
+            "twitter": "",
+            "url": "http://cast.example.net",
+            "uuid": "d05cb7ee-2d44-49a9-8f77-843cf8cd3ebc"
+        },
+        "model": "radioportal.show",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "abstract_enabled": false,
+            "abstract_regex": "(?P<value>.*)",
+            "abstract_xpath": "//channel/itunes:summary/text()",
+            "description_enabled": false,
+            "description_regex": "(?P<value>.*)",
+            "description_xpath": "//channel/description/text()",
+            "donation_url_enabled": false,
+            "donation_url_regex": "(?P<value>.*)",
+            "donation_url_xpath": "//channel/atom:link[@rel='payment']/@href",
+            "enabled": false,
+            "feed_url": "",
+            "feed_url_enabled": false,
+            "icon_enabled": false,
+            "icon_regex": "(?P<value>.*)",
+            "icon_xpath": "//channel/image/url/text()",
+            "licence_enabled": false,
+            "licence_regex": "(?P<value>.*)",
+            "licence_xpath": "//channel/copyright/text()",
+            "name_enabled": false,
+            "name_regex": "(?P<value>.*)",
+            "name_xpath": "//channel/title/text()",
+            "public_email_enabled": false,
+            "public_email_regex": "(?P<value>.*)",
+            "public_email_xpath": "//channel/itunes:owner/itunes:email/text()",
+            "show": 2,
+            "url_enabled": false,
+            "url_regex": "(?P<value>.*)",
+            "url_xpath": "//channel/link/text()"
+        },
+        "model": "radioportal.podcastfeed",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "delete_missing": true,
+            "description_field": "DESCRIPTION",
+            "description_regex": "(?P<value>.+)",
+            "enabled": false,
+            "filter_field": "DESCRIPTION",
+            "filter_regex": "#noshow",
+            "show": 2,
+            "slug_field": "SUMMARY",
+            "slug_regex": "(?P<value>{show.defaultShortName}[0-9]+)",
+            "title_field": "SUMMARY",
+            "title_regex": "{show.defaultShortName}[0-9]+ (?P<value>.+)",
+            "url": "",
+            "url_field": "LOCATION",
+            "url_regex": "(?P<value>http[^ ]+)"
+        },
+        "model": "radioportal.icalfeed",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "current_part": null,
+            "show": 2,
+            "slug": "001",
+            "source": null,
+            "status": "UPCOMING",
+            "uuid": "cca0fb3b-f7a6-4a33-9718-aa96e5594af6"
+        },
+        "model": "radioportal.episode",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "current_part": 5,
+            "show": 2,
+            "slug": "002",
+            "source": null,
+            "status": "RUNNING",
+            "uuid": "74d8985e-635b-4c3c-b89d-e53705518d63"
+        },
+        "model": "radioportal.episode",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "current_part": null,
+            "show": 2,
+            "slug": "003",
+            "source": null,
+            "status": "ARCHIVED",
+            "uuid": "4e1758a5-4334-45e4-8074-71fce5eb5179"
+        },
+        "model": "radioportal.episode",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "begin": "2020-06-14T21:36:44",
+            "description": "",
+            "end": "2020-06-14T22:36:44",
+            "episode": 1,
+            "shownotes_id": "",
+            "title": "",
+            "url": ""
+        },
+        "model": "radioportal.episodepart",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "begin": "2016-06-14T21:38:14.649",
+            "description": "",
+            "end": "2016-06-14T22:37:00",
+            "episode": 2,
+            "shownotes_id": "",
+            "title": "",
+            "url": ""
+        },
+        "model": "radioportal.episodepart",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "begin": "2010-06-14T21:37:16",
+            "description": "",
+            "end": "2010-06-14T22:07:16",
+            "episode": 3,
+            "shownotes_id": "",
+            "title": "",
+            "url": ""
+        },
+        "model": "radioportal.episodepart",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "begin": "2016-06-14T21:50:10.388",
+            "description": "",
+            "end": null,
+            "episode": 2,
+            "shownotes_id": "",
+            "title": "",
+            "url": ""
+        },
+        "model": "radioportal.episodepart",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "begin": "2016-06-14T21:50:39.141",
+            "description": "",
+            "end": null,
+            "episode": 2,
+            "shownotes_id": "",
+            "title": "Test dingens",
+            "url": ""
+        },
+        "model": "radioportal.episodepart",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "cluster": "examplecast",
+            "currentEpisode": 2,
+            "graphic_differ_by": "",
+            "graphic_title": "",
+            "listener": 0,
+            "mapping_method": [
+                "find-from-title",
+                "make-from-title",
+                "find-or-make-live"
+            ],
+            "public_recording": true,
+            "recording": true,
+            "show": [
+                2
+            ],
+            "streamCurrentSong": "",
+            "streamDescription": "",
+            "streamGenre": "",
+            "streamShow": "002 Test dingens",
+            "streamURL": ""
+        },
+        "model": "radioportal.channel",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "bitrate": "128k",
+            "channel": 1,
+            "codec": "mp3",
+            "container": "none",
+            "encoding": "UTF-8",
+            "fallback": "none",
+            "format": "mp3",
+            "mount": "examplecast.mp3",
+            "running": true,
+            "transport": "http"
+        },
+        "model": "radioportal.stream",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "password": "tr7QSkZRxj",
+            "user": "source"
+        },
+        "model": "radioportal.sourcedstream",
+        "pk": 1
+    },
+    {
+        "fields": {},
+        "model": "radioportal.notificationpath",
+        "pk": 1
+    },
+    {
+        "fields": {},
+        "model": "radioportal.notificationpath",
+        "pk": 2
+    },
+    {
+        "fields": {},
+        "model": "radioportal.notificationpath",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "url": "irc://irc.freenode.net/#xsn-intern"
+        },
+        "model": "radioportal.ircchannel",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "url": "irc://irc.freenode.net/#xsn"
+        },
+        "model": "radioportal.ircchannel",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "oauth_secret": "**CHANGEME**",
+            "oauth_token": "**CHANGEME**",
+            "screen_name": "xenim"
+        },
+        "model": "radioportal.twitteraccount",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "text": "Sendung {name} ({channel}) hat angefangen {streams}"
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "text": ""
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "text": ""
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "text": "Sendung {name} ({channel}) hat angefangen {streams}"
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "text": "Sendung {channel} ist beendet"
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "text": ""
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "text": "Sendung {name} ({channel}) hat angefangen {streams}"
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "text": "Sendung {channel} ist beendet"
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 8
+    },
+    {
+        "fields": {
+            "text": ""
+        },
+        "model": "radioportal.notificationtemplate",
+        "pk": 9
+    },
+    {
+        "fields": {
+            "path": 1,
+            "rollover": 3,
+            "show": 2,
+            "start": 1,
+            "stop": 2,
+            "system": true
+        },
+        "model": "radioportal.primarynotification",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "path": 2,
+            "rollover": 6,
+            "show": 2,
+            "start": 4,
+            "stop": 5,
+            "system": true
+        },
+        "model": "radioportal.primarynotification",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "path": 3,
+            "rollover": 9,
+            "show": 2,
+            "start": 7,
+            "stop": 8,
+            "system": true
+        },
+        "model": "radioportal.primarynotification",
+        "pk": 3
+    }
+]
