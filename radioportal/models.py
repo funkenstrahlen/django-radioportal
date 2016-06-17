@@ -359,6 +359,8 @@ def get_graphic_path(instance, filename):
 class Graphic(models.Model):
     file = models.ImageField(upload_to=get_graphic_path, blank=True)
     type = models.CharField(max_length=10, choices=GTYPES, default='')
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    data = jsonfield.JSONField()
     episode = models.ForeignKey('EpisodePart', related_name='graphics')
 
     def __unicode__(self):

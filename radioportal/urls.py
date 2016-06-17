@@ -69,6 +69,8 @@ urlpatterns = patterns('',
     # ),
     #======================================================================
 
+    url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
+
     # archive
     url(r'^shows/$', episodes.ShowList.as_view(), name="shows"),
 

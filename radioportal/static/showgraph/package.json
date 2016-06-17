@@ -1,0 +1,13 @@
+{
+  "name": "d3-custom-example",
+  "version": "0.0.1",
+  "scripts": {
+    "prepublish": "rollup -c && uglifyjs showgraph.js -c -m -o ../showgraph.min.js"
+  },
+  "devDependencies": {
+    "d3": "^3.5.17",
+    "rollup": "^0.26.3",
+    "rollup-plugin-node-resolve": "^1.5.0",
+    "uglify-js": "^2.6.2"
+  }
+}

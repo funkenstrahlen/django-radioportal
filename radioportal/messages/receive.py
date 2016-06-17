@@ -309,12 +309,16 @@ class BackendInterpreter(object):
         part = channel.currentEpisode.current_part
 
         g, created = Graphic.objects.get_or_create(type=data["type"], episode=part)
-        if created:
-            g.file.save("", ContentFile(base64.b64decode(data["image"])))
-        else:
-            f = open(g.file.path, "w")
-            f.write(base64.b64decode(data["image"]))
-            f.close()
+        if "image" in data:
+            if created:
+                g.file.save("", ContentFile(base64.b64decode(data["image"])))
+            else:
+                f = open(g.file.path, "w")
+                f.write(base64.b64decode(data["image"]))
+                f.close()
+        elif "data" in data:
+            g.data = data["data"]
+            g.save()
 
     def graphic_created(self, data):
         """

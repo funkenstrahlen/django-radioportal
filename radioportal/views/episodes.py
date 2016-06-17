@@ -31,13 +31,16 @@ Created on 21.05.2011
 
 @author: robert
 '''
-from django.views.generic.base import TemplateResponseMixin, View
-from radioportal.models import Show, Stream, Episode
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
-from django.db.models.aggregates import Max, Sum, Min
 
 import datetime
+
+from radioportal.models import Show, Stream, Episode, Graphic
+
+from django.db.models.aggregates import Max, Sum, Min
+from django.http import JsonResponse
+from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.detail import DetailView, BaseDetailView
+from django.views.generic.list import ListView
 
 class RobotsTxtView(TemplateResponseMixin, View):
     
@@ -50,6 +53,15 @@ class RobotsTxtView(TemplateResponseMixin, View):
         context['streams'] = Stream.objects.all()
         request_kwargs = {}
         return self.render_to_response(context, **request_kwargs)
+
+
+class GraphicStats(BaseDetailView):
+    model = Graphic
+    slug_field = 'uuid'
+
+    def render_to_response(self, context, **response_kwargs):
+        return JsonResponse(self.object.data, safe=False, **response_kwargs)
+
 
 class EpisodeView(DetailView):
     model = Episode
