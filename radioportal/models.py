@@ -92,6 +92,8 @@ class Show(models.Model):
         verbose_name=_("Number of the next episode"))
 
     icon = ThumbnailerImageField(upload_to="show-icons/", blank=True)
+    icon_url = models.URLField(blank=True, max_length=255)
+    icon_etag = models.CharField(blank=True, max_length=255)
     public_email = models.EmailField(default="", blank=True)
 
     donation_url = models.URLField(blank=True, default='', max_length=512,

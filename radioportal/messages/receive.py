@@ -47,6 +47,7 @@ import base64
 import copy
 import easy_thumbnails.files
 import os.path
+import time
 import re
 import urllib
 import urllib2
@@ -438,7 +439,7 @@ class BackendInterpreter(object):
         pf = PodcastFeed.objects.get(show__slug=data["show"])
         show = pf.show
         for field, value in filter(lambda x: x[0].endswith("_enabled"), vars(pf).iteritems()):
-            print field, value
+            # print field, value
             if not value:
                 continue
             if field[:-8] + "_xpath" in vars(pf):
@@ -454,14 +455,35 @@ class BackendInterpreter(object):
                 match = re.search(regex,value)
                 if match and "value" in match.groupdict():
                     value = match.group("value")
-            print field[:-8], value
+            # print field[:-8], value
             if field[:-8] == "icon":
-                r = requests.get(value)
-                img_temp = NamedTemporaryFile(delete=True)
-                img_temp.write(r.content)
-                img_temp.flush()
-                show.icon.save("%s.jpg" % show.slug, File(img_temp), save=True)
-                generate_all_aliases(show.icon, include_global=True)
+                headers = {}
+                local_modtime = None
+                if os.path.exists(show.icon.path):
+                    if show.icon_url == value and show.icon_etag:
+                        headers["If-None-Match"] = show.icon_etag
+                    local_modtime = os.path.getmtime(show.icon.path)
+                    headers["If-Modified-Since"] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', time.localtime(local_modtime))
+                r = requests.head(value, headers=headers)
+                if r.status_code == 200:
+                    if local_modtime and "last-modified" in r.headers:
+                        time_s = r.headers['last-modified']
+                        time_d = dateutil.parser.parse(time_s)
+                        remote_modtime = int(time_d.strftime("%s"))
+                        if remote_modtime < local_modtime:
+                            continue
+                    r = requests.get(value, headers=headers)
+                    if r.status_code != 200:
+                        continue
+                    img_temp = NamedTemporaryFile(delete=True)
+                    img_temp.write(r.content)
+                    img_temp.flush()
+                    show.icon.save("%s.jpg" % show.slug, File(img_temp), save=True)
+                    generate_all_aliases(show.icon, include_global=True)
+                    if "etag" in r.headers:
+                        show.icon_etag = r.headers["etag"]
+                    show.icon_url = r.url
+                    show.save()
             else:
                 setattr(show, field[:-8], value)
         show.save()
