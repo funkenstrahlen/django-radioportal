@@ -109,7 +109,7 @@ urlpatterns = patterns('',
         cache_page(60 * 60 * 3)(stream.StreamTemplateView.as_view()),
         name="playlist"),
     url(r'^(?P<stream>.*\.(mp3|ogg|ogm|nsv|aac|m3u8))$',
-        stream.stream, name="mount"),
+        stream.StreamView.as_view(), name="mount"),
 
     # graphs
     url(r'^graphs/weekday/(?P<show_name>[\w-]+)/$', graphs.weekday_graph,

@@ -28,6 +28,7 @@
 # 
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
@@ -70,5 +71,6 @@ class StreamListTemplateView(base.TemplateResponseMixin,
         return self.render_to_response(context, **response_kwargs)
 
 
-def stream(request, **kwargs):
-        return HttpResponse(_("This URL should be mapped to the backend."))
+class StreamView(base.RedirectView):
+    url = settings.TEST_STREAM_URL
+    permanent = False
