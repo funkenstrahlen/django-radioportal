@@ -33,7 +33,7 @@ from radioportal.models import Show
 from django.conf.urls import url, patterns, include
 from django.views.generic.base import TemplateView
 
-from .api import v1_api
+from .api import api_urls
 
 class OverView(TemplateView):
     template_name = 'radioportal/feeds/overview.html'
@@ -47,7 +47,7 @@ class OverView(TemplateView):
 
 urlpatterns = patterns('',
     url(r'^$', OverView.as_view()),
-    url(r'^api/', include(v1_api.urls)),
+    url(r'^api/', include(api_urls)),
     url(r'^upcoming/ical/$', ical_feed, name="upcoming-all-ical"),
     url(r'^feed/$', ShowListFeed(), name="index-feed"),
     url(r'^json/$', JsonShowListFeed(), name="index-json"),

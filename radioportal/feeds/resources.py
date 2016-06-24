@@ -93,6 +93,7 @@ class EpisodeResource(ModelResource):
         }
         ordering = [ 'begin', ]
 
+
 class PodcastResource(ModelResource):
     name = fields.CharField("name")
     subtitle = fields.CharField("description")
@@ -116,8 +117,9 @@ class PodcastResource(ModelResource):
         artworks = {}
         if not bundle.obj.icon:
             return artworks
-        artworks["original"] = bundle.obj.icon.url
         for name, settings in aliases.all(target='radioportal.Show.icon').iteritems():
+            if not "v2" in name:
+                continue
             thumb = bundle.obj.icon.get_existing_thumbnail(settings)
             if thumb:
                 artworks[settings['size'][0]] = thumb.url
@@ -158,3 +160,19 @@ class PodcastResource(ModelResource):
     def get_episodes(self, request, **kwargs):
         episode_resource = EpisodeResource()
         return episode_resource.get_list(request, podcast__id=kwargs["uuid"])
+
+class PodcastResourceV1(PodcastResource):
+    artwork = fields.DictField()
+
+    def dehydrate_artwork(self, bundle):
+        artworks = {}
+        if not bundle.obj.icon:
+            return artworks
+        artworks["original"] = bundle.obj.icon.url
+        for name, settings in aliases.all(target='radioportal.Show.icon').iteritems():
+            if not "v1" in name:
+                continue
+            thumb = bundle.obj.icon.get_existing_thumbnail(settings)
+            if thumb:
+                artworks[settings['size'][0]] = thumb.url
+        return artworks
