@@ -28,14 +28,14 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block shorturl_header %}<link rev="canonical" href="http://xsn.io" />{% endblock %}
 {% block shorturl_footer %}http://xsn.io<!--<li><a rev="canonical" href="http://xsn.io">{% trans "Short URL" %}</a></li>-->{% endblock %}
-{% block breadcrumb %}{% endblock %}
+
+
 {% block head_css %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_css.html" %}
 {% endblock %}
+
 {% block head_js %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_js.html" %}
 {% endblock %}
 
 {% block head %}
@@ -46,44 +46,121 @@ OF SUCH DAMAGE.
 {% endblock %}
 
 {% block content %}
-{% if running %}
-<h2>{% trans "Running Episodes" %}&nbsp;<a href="{% host_url "all-feed" status='live' on "feeds" %}" class="feed atom"></a></h2>
-{% for episode in running %}
-	{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
-{% else %}
-<h2 style="margin-bottom:8em;margin-top:3em;">{% trans "No episodes are streamed at the moment" %}&nbsp;<a href="{% host_url "all-feed" status='live' on "feeds" %}" class="feed atom"></a></h2>
-{% endif %}
 
-{% if upcoming %}
-<h2>{% trans "Upcoming Episodes" %}&nbsp;<a href="{% host_url "all-feed" status='upcoming' on "feeds" %}" class="feed atom"></a><a href="{% host_url "upcoming-all-ical" on "feeds" %}" class="feed ical"></a></h2>
-{% for episode in upcoming %}
-	{% include "radioportal/episodes/episode_list_entry.html" %}
-{% endfor %}
-{% endif %}
 
-<h2>{% trans "Recent Episodes" %}&nbsp;<a href="{% host_url "all-feed" status='recent' on "feeds" %}" class="feed atom"></a></h2>
-{% for episode in archived %}
-	{% include "radioportal/episodes/episode_list_entry.html" %}
-{% empty %}
-<p>{% trans "No episodes available." %}</p>
-{% endfor %}
+<div class="callout large">
+<div class="row column text-center">
+<h1>Höre deine Lieblingspodcasts live</h1>
+<p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
+<!-- <a href="#" class="button large">Learn More</a>
+<a href="#" class="button large hollow">Learn Less</a> -->
+</div>
+</div>
+
+<div class="row">
+	<div class="small-12 columns">
+		<h2>{% trans "Running Episodes" %}</h2>
+		{% if running %}
+		{% for episode in running %}
+			{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
+		{% else %}
+		<p>{% trans "No episodes are streamed at the moment" %}</p>
+		{% endif %}
+	</div>
+</div>
+
+<div class="row">
+	<div class="small-12 medium-6 columns">
+		<h2>{% trans "Upcoming Episodes" %}</h2>
+		{% if upcoming %}
+		{% for episode in upcoming %}
+			{% include "radioportal/episodes/episode_list_entry.html" %}
+		{% endfor %}
+		{% else %}
+		<p>{% trans "No episodes are planned at the moment" %}</p>
+		{% endif %}
+		<a href="#">Kalender</a>
+	</div>
+	<div class="small-12 medium-6 columns">
+		<h2>{% trans "Verpasste Episoden" %}</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed cum, debitis voluptates maiores impedit facere quaerat, distinctio consequuntur voluptas suscipit temporibus quo sint sit harum dolores consectetur repellendus sequi nam.</p>
+		<a href="#">Archiv</a>
+	</div>
+</div>
+
+<hr>
+<div class="row">
+<div class="medium-6 columns medium-push-6">
+<img class="thumbnail" src="http://placehold.it/750x350">
+</div>
+<div class="medium-6 columns medium-pull-6">
+<h2>Podcasts live hörbar machen</h2>
+<p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna diam porttitor mauris, quis sollicitudin sapien justo in libero. Vestibulum mollis mauris enim. Morbi euismod magna ac lorem rutrum elementum. Donec viverra auctor.</p>
+</div>
+</div>
+
+<div class="row">
+<div class="medium-4 columns">
+<h3>Livestream</h3>
+<p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+</div>
+<div class="medium-4 columns">
+<h3>Chat</h3>
+<p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+</div>
+<div class="medium-4 columns">
+<h3>Apps</h3>
+<p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
+</div>
+</div>
+<hr>
+
+<div class="row column">
+<h2>Podcasts auf Xenim</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure enim recusandae optio saepe, assumenda incidunt, delectus dolore voluptates aperiam, dolor voluptatum sapiente labore nobis, explicabo voluptas ab eligendi minima unde.</p>
+</div>
+
+<div class="row small-up-2 medium-up-3 large-up-5">
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+<div class="column">
+<img class="thumbnail" src="http://placehold.it/550x550">
+</div>
+</div>
+
+
+
+
+
 {% endblock %}
-{% comment %}
-	{% ifchanged %}
-		<h2>
-		{% ifequal episode.status "RUNNING" %}
-			{% if show_name %}<a href="{% url 'live_show' show_name=show.slug %}">{% endif %}
-				{% trans "Running Episodes" %}
-			{% if show_name %}</a>{% endif %}
-		{% endifequal %}
-		{% ifequal episode.status "ARCHIVED" %}
-			{% trans "Archived Episodes" %}
-		{% endifequal %}
-		{% ifequal episode.status "UPCOMING" %}
-			{% if show_name %}<a href="{% url 'upcoming_show' show_name=show.slug %}">{% endif %}
-				{% trans "Upcoming Episodes" %}
-			{% if show_name %}</a>{% endif %}
-		{% endifequal %}
-		</h2>
-	{% endifchanged %}
-{% endcomment %}

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+
+
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -26,89 +28,3 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
-{% block head_js %}
-{% load staticfiles %}
-<script type="text/javascript" src="{% static "js/jquery/jquery-1.11.3.min.js" %}"></script>
-<script type="text/javascript" src="{% static "js/modernizr/modernizr.custom.10600.js" %}"></script>
-<link rel="stylesheet" href="{% static "css/font/fontello.css" %}">
-<!--[if IE 7]><link rel="stylesheet" href="{% static "css/font/fontello-ie7.css" %}"><![endif]-->
-<link rel="stylesheet" href="{% static "css/sharebuttons.css" %}">
-<script type="text/javascript">
-  function registerPopupClick() {
-    $("a.sharelink").click(function(event) {
-      event.preventDefault();
-      window.open(this.href, "_blank", "width=500,height=500,menubar=0,toolbar=0,", false);
-    });
-  }
-  $(registerPopupClick);
-</script>
-{% endblock %}
-{% block navigation %}
-{% load i18n hosts %}
-{% host_url "live" on "www" as live_url %}
-<li{% if request.path|startswith:live_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_live %}{% endblock %}collapsed" href="http:{{ live_url }}">{% trans "Live" %}</a>
-  {% block navi_live %}{% endblock %}
-</li>
-{% host_url "upcoming" on "www" as upcoming_url %}
-<li{% if request.path|startswith:upcoming_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_upcoming %}{% endblock %}collapsed" href="http:{{ upcoming_url }}">{% trans "Upcoming" %}</a>
-  {% block navi_upcoming %}{% endblock %}
-</li>
-{% comment %}
-{% host_url "recent" on "www" as recent_url %}
-<li{% if request.path|startswith:recent_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_recent %}{% endblock %}collapsed" href="http:{{ recent_url }}">{% trans "Recent" %}</a>
-  {% block navi_recent %}{% endblock %}
-</li>
-{% endcomment %}
-{% comment %}{% host_url "statistic" on "www" as stat_url %}
-<li{% if request.path|startswith:stat_url %} class="active"{% endif %}>
-  <a  href="{{ stat_url }}">{% trans "Statistics" %}</a>
-  {% block navi_stats %}{% endblock %}
-</li>{% endcomment %}
-
-{% host_url "shows" on "www" as show_url %}
-<li{% if request.path|startswith:show_url %} class="active"{% endif %}>
-  <a class="{% block collapsed_shows %}{% endblock %}collapsed"	href="http:{{ show_url }}">{% trans "Shows" %}</a>
-  <!-- {% block navi_shows %}{% endblock %} -->
-</li>
-
-{% if user.is_authenticated %}
-{% host_url "dashboard" on "dashboard" as profile_url %}
-<li{% if request.path|startswith:profile_url %} class="active"{% endif %}>
-	<a href="{% host_url "dashboard" on "dashboard" %}">{% trans "Dashboard" %}</a>
-	{% block navi_account %}{% endblock %}
-</li>
-{% endif %}
-{% endblock %}
-{% block breadcrumb %}<a href="{% url 'root' %}">{% trans "Start" %}</a>{% endblock %}
-{% block content_foot %}
-<div id="socialshareprivacy"></div>
-<!-- Social -->
-{% spaceless %}
-<div class="icon-only">
-    <h4>{% trans "Share on:" %}</h4>
-    <ul id="sharelist">
-        <li>
-            <a target="_blank" href="https://plus.google.com/share?url={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-gplus"></i>
-                <span>Google+</span>
-            </a>
-        </li>
-        <li>
-            <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-facebook"></i>
-                <span>Facebook</span>
-            </a>
-        </li>
-        <li>
-            <a target="_blank" href="https://twitter.com/home?status={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-twitter"></i>
-                <span>Twitter</span>
-            </a>
-        </li>
-    </ul>
-</div>
-{% endspaceless %}
-{% endblock %}
