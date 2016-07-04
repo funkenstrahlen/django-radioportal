@@ -415,14 +415,14 @@ class ShowForm(forms.ModelForm):
             'chat': IRCWidget(choices=IRCNETWORKS),
             'icon': ImageClearableFileInput,
         }
-        exclude = ()
+        exclude = ('icon_url', 'icon_etag')
 
 
 class ShowReducedForm(forms.ModelForm):
     required_css_class = "required"
     class Meta:
         model = models.Show
-        exclude = ('name', 'url', 'abstract', 'description', 'icon')
+        exclude = ('name', 'url', 'abstract', 'description', 'icon', 'icon_url', 'icon_etag')
         widgets = {
             'chat': IRCWidget(choices=IRCNETWORKS),
         }
