@@ -31,59 +31,69 @@ OF SUCH DAMAGE.
 
 
 {% block content %}
-<h2>{% trans "Dashboard" %}</h2>
-<p>{% blocktrans %}Welcome to the configuration panel of the xenim streaming network. 
-Here you can change all settings regarding the appearance of your show and the behavior of the streams.
-You might also have a look at the wiki for additional features, documentation and contact informations.{% endblocktrans %}</p>
 
-{% if shows %}
-<h3>{% trans "Shows" %}</h3>
-<p class="explanation">
-{% blocktrans %}
-Shows are the entities that are responsible for representing your streams at the homepage of the xenim streaming network. 
-They also contain episodes for time a stream is online.
-{% endblocktrans %}
-</p>
-<ul>
-{% for s in shows %}
-{% get_obj_perms request.user for s as "show_perms" %}
-	<li>
-{% if "change_show" in show_perms %}<a href="{% host_url "admin-episode-list" s.slug on "dashboard" %}">{% endif %}
-{{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
-{% if "delete_show" in show_perms %}(<a href="{% host_url "admin-show-delete" s.slug on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
-</li>
-{% endfor %}
-</ul>
-{% endif %}
+<div class="row">
+	<div class="small-12 columns">
+		
+		<h2>{% trans "Dashboard" %}</h2>
+		<p>{% blocktrans %}Welcome to the configuration panel of the xenim streaming network. 
+		Here you can change all settings regarding the appearance of your show and the behavior of the streams.
+		You might also have a look at the wiki for additional features, documentation and contact informations.{% endblocktrans %}</p>
 
-
-
-
-
-{% if channels %}
-<h3>{% trans "Streams" %}</h3>
-<p class="explanation">
-{% blocktrans %}
-For every show there is usually a channel of streams. Such a channel of streams combines various streams which differ in bitrates or formats. 
-This is the place to view or change the credentials for your streams.
-{% endblocktrans %}
-</p>
-<ul>
-{% for s in channels %}
-{% get_obj_perms request.user for s as "channel_perms" %}
-	<li>
-		<a href="{% host_url "admin-channel-edit" s.id on "dashboard" %}">{{ s }}</a>
-		{% if "delete_channel" in channel_perms %}(<a href="{% host_url "admin-channel-delete" s.id on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
-	</li>
-{% endfor %}
-</ul>
-{% endif %}
+		{% if shows %}
+		<h3>{% trans "Shows" %}</h3>
+		<p class="explanation">
+		{% blocktrans %}
+		Shows are the entities that are responsible for representing your streams at the homepage of the xenim streaming network. 
+		They also contain episodes for time a stream is online.
+		{% endblocktrans %}
+		</p>
+		<ul>
+		{% for s in shows %}
+		{% get_obj_perms request.user for s as "show_perms" %}
+			<li>
+		{% if "change_show" in show_perms %}<a href="{% host_url "admin-episode-list" s.slug on "dashboard" %}">{% endif %}
+		{{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
+		{% if "delete_show" in show_perms %}(<a href="{% host_url "admin-show-delete" s.slug on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
+		</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
 
 
 
 
-<h3>{% trans "Recordings" %}</h3>
-<ul>
-<li><a href="{% host_url "archive-list" on "dashboard" %}">{% trans "List of Recordings" %}</a></li>
-</ul>
+
+		{% if channels %}
+		<h3>{% trans "Streams" %}</h3>
+		<p class="explanation">
+		{% blocktrans %}
+		For every show there is usually a channel of streams. Such a channel of streams combines various streams which differ in bitrates or formats. 
+		This is the place to view or change the credentials for your streams.
+		{% endblocktrans %}
+		</p>
+		<ul>
+		{% for s in channels %}
+		{% get_obj_perms request.user for s as "channel_perms" %}
+			<li>
+				<a href="{% host_url "admin-channel-edit" s.id on "dashboard" %}">{{ s }}</a>
+				{% if "delete_channel" in channel_perms %}(<a href="{% host_url "admin-channel-delete" s.id on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
+			</li>
+		{% endfor %}
+		</ul>
+		{% endif %}
+
+
+
+
+		<h3>{% trans "Recordings" %}</h3>
+		<ul>
+		<li><a href="{% host_url "archive-list" on "dashboard" %}">{% trans "List of Recordings" %}</a></li>
+		</ul>
+
+
+		
+	</div>
+</div>
+
 {% endblock %}
