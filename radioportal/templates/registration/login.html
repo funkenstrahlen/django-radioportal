@@ -29,25 +29,35 @@ OF SUCH DAMAGE.
 
 {% block content %}
 
-{% if form.errors %}
-<p>{% trans "Your username and password didn't match. Please try again." %}</p>
-{% endif %}
 
-<form method="post" action="" class="login">
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
-{% csrf_token %}
-<input type="submit" value="{% trans "login" %}" />
-<input type="hidden" name="next" value="{{ next }}" />
+<form method="post">
+  <div class="row">
+    <div class="small-12 medium-8 medium-centered columns">
+      <h1>Login</h1>
+      
+      {% if form.errors %}
+        <div class="callout alert">
+          <!-- <h5>This is a secondary callout</h5> -->
+          <p>{% trans "Your username and password didn't match. Please try again." %}</p>
+          <a href="{% host_url "django.contrib.auth.views.password_reset" on "dashboard" %}">{% trans "Password reset" %}</a>
+        </div>
+	  {% endif %}
+
+
+      <label>{{ form.username.label_tag }}
+      {{ form.username }}
+        <!-- <input type="text" placeholder=".medium-6.columns"> -->
+      </label>
+      <label>{{ form.password.label_tag }}
+      	{{ form.password }}
+        <!-- <input type="text" placeholder=".medium-6.columns"> -->
+      </label>
+      {% csrf_token %}
+      <input type="submit" class="button" value="{% trans "login" %}" />
+	  <input type="hidden" name="next" value="{{ next }}" />
+    </div>
+  </div>
 </form>
-<p><a href="{% host_url "django.contrib.auth.views.password_reset" on "dashboard" %}">{% trans "Password reset" %}</a></p>
+
 {% endblock %}
 
