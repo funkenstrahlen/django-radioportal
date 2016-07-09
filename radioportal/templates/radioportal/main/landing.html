@@ -52,13 +52,14 @@ OF SUCH DAMAGE.
 <div class="row column text-center">
 <h1>Höre deine Lieblingspodcasts live</h1>
 <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
-<!-- <a href="#" class="button large">Learn More</a>
-<a href="#" class="button large hollow">Learn Less</a> -->
+<!-- <a href="#" class="button large"><i class="fa fa-play" aria-hidden="true"></i>
+ Jetzt Live</a>
+<a href="#" class="button large hollow">Alle Shows</a> -->
 </div>
 </div>
 
 <div class="row">
-	<div class="small-12 columns">
+	<div class="small-12 medium-6 columns">
 		<h2>{% trans "Running Episodes" %}</h2>
 		{% if running %}
 		{% for episode in running %}
@@ -66,10 +67,33 @@ OF SUCH DAMAGE.
 		{% else %}
 		<p>{% trans "No episodes are streamed at the moment" %}</p>
 		{% endif %}
-	</div>
+
+
+
+<div class="media-object">
+  <div class="media-object-section">
+      <img class="thumbnail" src="http://placehold.it/80x80">
+  </div>
+  <div class="media-object-section">
+    <h5>Freakshow <small>Sendungstitel</small></h5>
+    <p>I'm going to improvise. Listen, there's something you should know about me...</p>
+  </div>
 </div>
 
-<div class="row">
+<div class="media-object">
+  <div class="media-object-section">
+      <img class="thumbnail" src="http://placehold.it/80x80">
+  </div>
+  <div class="media-object-section">
+    <h5>Freakshow <small>Sendungstitel</small></h5>
+    <p>I'm going to improvise. Listen, there's something you should know about me...</p>
+  </div>
+</div>
+
+
+
+
+	</div>
 	<div class="small-12 medium-6 columns">
 		<h2>{% trans "Upcoming Episodes" %}</h2>
 		{% if upcoming %}
@@ -79,12 +103,41 @@ OF SUCH DAMAGE.
 		{% else %}
 		<p>{% trans "No episodes are planned at the moment" %}</p>
 		{% endif %}
-		<a href="#">Kalender</a>
-	</div>
-	<div class="small-12 medium-6 columns">
-		<h2>{% trans "Verpasste Episoden" %}</h2>
-		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed cum, debitis voluptates maiores impedit facere quaerat, distinctio consequuntur voluptas suscipit temporibus quo sint sit harum dolores consectetur repellendus sequi nam.</p>
-		<a href="#">Archiv</a>
+		
+
+
+<div class="media-object">
+  <div class="media-object-section">
+      <img class="thumbnail" src="http://placehold.it/80x80">
+  </div>
+  <div class="media-object-section">
+    <h5>Freakshow <small>Sendungstitel</small></h5>
+    <p>I'm going to improvise. Listen, there's something you should know about me...</p>
+  </div>
+</div>
+
+<div class="media-object">
+  <div class="media-object-section">
+      <img class="thumbnail" src="http://placehold.it/80x80">
+  </div>
+  <div class="media-object-section">
+    <h5>Freakshow <small>Sendungstitel</small></h5>
+    <p>I'm going to improvise. Listen, there's something you should know about me...</p>
+  </div>
+</div>
+
+<div class="media-object">
+  <div class="media-object-section">
+      <img class="thumbnail" src="http://placehold.it/80x80">
+  </div>
+  <div class="media-object-section">
+    <h5>Freakshow <small>Sendungstitel</small></h5>
+    <p>I'm going to improvise. Listen, there's something you should know about me...</p>
+  </div>
+</div>
+
+<a href="{% url 'recent' %}" class="button"><i class="fa fa-calendar" aria-hidden="true"></i> Kompletter Sendeplan</a>
+		
 	</div>
 </div>
 
@@ -113,54 +166,6 @@ OF SUCH DAMAGE.
 <p>Vivamus luctus urna sed urna ultricies ac tempor dui sagittis. In condimentum facilisis porta. Sed nec diam eu diam mattis viverra. Nulla fringilla, orci ac euismod semper, magna.</p>
 </div>
 </div>
-<hr>
-
-<div class="row column">
-<h2>Podcasts auf Xenim</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure enim recusandae optio saepe, assumenda incidunt, delectus dolore voluptates aperiam, dolor voluptatum sapiente labore nobis, explicabo voluptas ab eligendi minima unde.</p>
-</div>
-
-<div class="row small-up-2 medium-up-3 large-up-5">
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-<div class="column">
-<img class="thumbnail" src="http://placehold.it/550x550">
-</div>
-</div>
-
-
-
 
 
 {% endblock %}

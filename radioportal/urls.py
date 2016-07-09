@@ -31,7 +31,7 @@
 from django.conf.urls import patterns, url, include
 from django.views.decorators.cache import cache_page
 from django.views.generic import base
-from radioportal.views import stream, episodes, graphs
+from radioportal.views import main, stream, episodes, graphs, shows
 
 
 urlpatterns = patterns('',
@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     
     # root
     url(r'^home/$', base.RedirectView.as_view(url='/', permanent=True), name="home"),
-    url(r'^$', episodes.LandingView.as_view(), name="root"),
+    url(r'^$', main.LandingView.as_view(), name="root"),
 
     #======================================================================
     # # statistic, temp-hack
@@ -71,8 +71,10 @@ urlpatterns = patterns('',
 
     url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
-    # archive
-    url(r'^archive/$', episodes.ShowList.as_view(), name="archive"),
+    # all shows
+    url(r'^shows/$', shows.show_list.as_view(), name="show_list"),
+    url(r'^shows/(?P<show_name>[\w-]+)/$',
+        shows.show_detail.as_view(), name="show_detail"),
 
     # recent
     url(r'^recent/$', episodes.ShowView.as_view(what='old'), name="recent"),
@@ -86,7 +88,6 @@ urlpatterns = patterns('',
         episodes.ShowView.as_view(what='future'), name="upcoming_show"),
 
     # embedable
-
     url(r'^live/(?P<show_name>[\w-]+)/embed/$',
         episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
     url(r'^(?P<show_name>[\w-]+)/embed/$',

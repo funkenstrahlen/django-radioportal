@@ -126,27 +126,3 @@ class ShowView(ListView):
 
 class EmbedShowView(ShowView):
     base = 'radioportal/embed.html'
-
-
-class ShowList(ListView):
-    template_name = 'radioportal/episodes/archive.html'
-    paginate_by = 10
-
-    def get_queryset(self):
-        #queryset = Show.objects.all() #annotate(newest=Max('episode__end')).order_by('-newest'),
-        qs = Show.objects.all()
-        qs = qs.annotate(sum=Sum('episode__id')).filter(sum__gt=0)
-        qs = qs.annotate(newest=Max('episode__parts__end')).order_by('-newest')
-        return qs
-
-
-class LandingView(ListView):
-    template_name = "radioportal/episodes/landing.html"
-    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).annotate(begin=Min('parts__begin')).order_by('-begin')[:5]
-    context_object_name = 'running'
-    
-    def get_context_data(self, **kwargs):
-        ctx = super(LandingView, self).get_context_data(**kwargs)
-        ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).annotate(end=Max('parts__end')).order_by('-end')[:5]
-        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
-        return ctx
