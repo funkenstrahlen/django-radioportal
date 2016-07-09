@@ -129,7 +129,7 @@ class EmbedShowView(ShowView):
 
 
 class ShowList(ListView):
-    template_name = 'radioportal/episodes/show_list.html'
+    template_name = 'radioportal/episodes/archive.html'
     paginate_by = 10
 
     def get_queryset(self):

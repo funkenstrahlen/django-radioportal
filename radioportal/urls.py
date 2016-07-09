@@ -72,7 +72,7 @@ urlpatterns = patterns('',
     url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
     # archive
-    url(r'^shows/$', episodes.ShowList.as_view(), name="shows"),
+    url(r'^archive/$', episodes.ShowList.as_view(), name="archive"),
 
     # recent
     url(r'^recent/$', episodes.ShowView.as_view(what='old'), name="recent"),

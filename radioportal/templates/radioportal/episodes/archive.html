@@ -26,6 +26,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 {% endcomment %}
+
+
+
 {% block title %} &middot; {% trans "Archive" %}{% endblock %}
 {% block collapsed_shows %}un{% endblock %}
 {% block navi_shows %}{% comment %}
@@ -40,24 +43,56 @@ OF SUCH DAMAGE.
 {% endif %}
 {% endcache %}{% endcomment %}
 {% endblock %}
+
+
+
 {% block content %}
-<h2>{% trans "Archive" %}</h2>
-<p>{% blocktrans %}Here are informations about the shows available, which were distributed through this streaming system. This includes the graphical statistic about listener counts.{% endblocktrans %}</p>
-{# {% cache 900 show_list %} #}
-<!-- show_list {% now "r" %} -->
-{% if object_list %}
-{% for show in object_list %}
-	<div class="showslug {% if show.icon %}showicon{% endif %}">
-	{% if show.icon %}<img src="{{ show.icon|thumbnail_url:'detail' }}" alt="{{ show.name }} logo" />{% endif %}
-	<h3><a href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></h3>
-	{% if show.description %}<small>{{ show.description }}</small>{% endif %}
-	<p>{{ show.abstract|truncatewords:50 }} <a href="{% url 'show' show_name=show.slug %}">{% trans "Read more" %} »</a></p>
-	<span style="clear: both;"></span>
+
+<div class="row">
+	<div class="small-12 columns">
+		<h2>{% trans "Archive" %}</h2>
+		
+		{# {% cache 900 show_list %} #}
+		<!-- show_list {% now "r" %} -->
+		{% if object_list %}
+		{% for show in object_list %}
+
+		<div class="media-object">
+		  <div class="media-object-section">
+		    <div class="thumbnail">
+		      {% if show.icon %}<img src="{{ show.icon|thumbnail_url:'detail' }}" alt="{{ show.name }} logo" />{% endif %}
+		    </div>
+		  </div>
+		  <div class="media-object-section">
+		    <h4><a href="{% url 'show' show_name=show.slug %}">{{ show.name }}</a></h4>
+		    <p>{{ show.abstract|truncatewords:50 }} <a href="{% url 'show' show_name=show.slug %}">{% trans "Read more" %} »</a></p>
+		  </div>
+		</div>
+
+		{% endfor %}
+		{% else %}
+			<p>{% trans "No shows available." %}</p>
+		{% endif %}
+		
 	</div>
-{% endfor %}
-{% else %}
-	<p>{% trans "No shows available." %}</p>
-{% endif %}
+</div>
+
+
+
+<ul class="pagination text-center" role="navigation" aria-label="Pagination">
+  <li class="pagination-previous disabled">Previous</li>
+  <li class="current"><span class="show-for-sr">You're on page</span> 1</li>
+  <li><a href="#" aria-label="Page 2">2</a></li>
+  <li><a href="#" aria-label="Page 3">3</a></li>
+  <li><a href="#" aria-label="Page 4">4</a></li>
+  <li class="ellipsis"></li>
+  <li><a href="#" aria-label="Page 12">12</a></li>
+  <li><a href="#" aria-label="Page 13">13</a></li>
+  <li class="pagination-next"><a href="#" aria-label="Next page">Next</a></li>
+</ul>
+
+
+
 {% if is_paginated %}
 <div class="pagination">
 <ul>
