@@ -30,11 +30,9 @@ OF SUCH DAMAGE.
 {% block breadcrumb %}{{ block.super }} » <a href="{% url 'shows' %}">{% trans "Shows" %}</a>{% if show %} » {{ show.name }}{% endif %}{% endblock %}
 {% block head_css %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_css.html" %}
 {% endblock %}
 {% block head_js %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_js.html" %}
 {% endblock %}
 {% block head %}
 {% if show %}
