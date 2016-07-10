@@ -81,48 +81,16 @@ class EpisodeView(DetailView):
     
     def get_queryset(self):
         return Episode.objects.filter(show__slug=self.kwargs.get('show_name', None))
+
+class Calendar(ListView):
+    template_name = "radioportal/episodes/calendar.html"
+    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).annotate(begin=Min('parts__begin')).order_by('-begin')[:5]
+    context_object_name = 'running'
     
-class ShowView(ListView):
-    template_base_name = 'radioportal/episodes/episode_list%s.html'
-    model = Episode
-    paginate_by = 10
-    what = "all"
-    base = 'radioportal/base.html'
-
-    def get_queryset(self):
-        qs = Episode.objects.all().annotate(begin=Min('parts__begin')).order_by('-begin')
-        if 'show_name' in self.kwargs:
-            if not Show.objects.filter(slug=self.kwargs['show_name']).exists():
-                self.allow_empty = False
-                return Episode.objects.none()
-            qs = qs.filter(show__slug=self.kwargs['show_name'])
-        if hasattr(self, 'what'):
-            if self.what in ('old'):
-                qs = qs.filter(status=Episode.STATUS[0][0])
-            if self.what in ('now'):
-                qs = qs.filter(status=Episode.STATUS[1][0])
-            if self.what in ('future'):
-                qs = qs.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).order_by('begin')
-        return qs
-
     def get_context_data(self, **kwargs):
-        context = super(ShowView, self).get_context_data(**kwargs)
-        if 'show_name' in self.kwargs:
-            context['show_name'] = self.kwargs['show_name']
-            context['show'] = Show.objects.filter(slug=self.kwargs['show_name'])
-            if len(context['show']) > 0:
-                context['show'] = context['show'][0]
-        else:
-            context['show_name'] = False
-        context['base'] = self.base
-        return context
-    
-    def get_template_names(self):
-        template_name = ""
-        if self.what in ("old", "now", "future"):
-            template_name = "_%s"% self.what
-        return (self.template_base_name % template_name,)
-
+        ctx = super(Calendar, self).get_context_data(**kwargs)
+        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
+        return ctx
 
 class EmbedShowView(ShowView):
     base = 'radioportal/embed.html'

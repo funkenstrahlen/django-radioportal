@@ -31,7 +31,7 @@
 from django.conf.urls import patterns, url, include
 from django.views.decorators.cache import cache_page
 from django.views.generic import base
-from radioportal.views import main, stream, episodes, graphs, shows
+from radioportal.views import main, stream, episodes, graphs, podcasts
 
 
 urlpatterns = patterns('',
@@ -71,32 +71,21 @@ urlpatterns = patterns('',
 
     url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
-    # all shows
-    url(r'^shows/$', shows.show_list.as_view(), name="show_list"),
-    url(r'^shows/(?P<show_name>[\w-]+)/$',
-        shows.show_detail.as_view(), name="show_detail"),
+    # all podcasts
+    url(r'^podcasts/$', podcasts.podcast_list.as_view(), name="podcast_list"),
+    url(r'^podcasts/(?P<show_name>[\w-]+)/$',
+        podcasts.podcast_detail.as_view(), name="podcast_detail"),
 
-    # recent
-    url(r'^recent/$', episodes.ShowView.as_view(what='old'), name="recent"),
-    url(r'^recent/(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what='old'), name="recent_show"),
-
-    # upcoming
-    url(r'^upcoming/$', episodes.ShowView.as_view(what='future'),
-        name="upcoming"),
-    url(r'^upcoming/(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what='future'), name="upcoming_show"),
+    # calendar
+    url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),
+    url(r'^calendar/(?P<show_name>[\w-]+)/$',
+        episodes.Calendar.as_view(), name="calendar_show"),
 
     # embedable
     url(r'^live/(?P<show_name>[\w-]+)/embed/$',
         episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
     url(r'^(?P<show_name>[\w-]+)/embed/$',
         episodes.EmbedShowView.as_view(what="all"), name="embed_show"),
-
-    # running streams
-    url(r'^live/$', episodes.ShowView.as_view(what='now'), name="live"),
-    url(r'^live/(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what='now'), name="live_show"),
 
     url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
         episodes.EpisodeView.as_view(), name="episode"),
