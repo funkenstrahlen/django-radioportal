@@ -92,5 +92,5 @@ class Calendar(ListView):
         ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
         return ctx
 
-class EmbedShowView(ShowView):
-    base = 'radioportal/embed.html'
+# class EmbedShowView(ShowView):
+#     base = 'radioportal/embed.html'
