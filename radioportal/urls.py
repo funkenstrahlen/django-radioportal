@@ -82,16 +82,16 @@ urlpatterns = patterns('',
         episodes.Calendar.as_view(), name="calendar_show"),
 
     # embedable
-    url(r'^live/(?P<show_name>[\w-]+)/embed/$',
-        episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
-    url(r'^(?P<show_name>[\w-]+)/embed/$',
-        episodes.EmbedShowView.as_view(what="all"), name="embed_show"),
+    # url(r'^live/(?P<show_name>[\w-]+)/embed/$',
+    #     episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
+    # url(r'^(?P<show_name>[\w-]+)/embed/$',
+    #     episodes.EmbedShowView.as_view(what="all"), name="embed_show"),
 
     url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
         episodes.EpisodeView.as_view(), name="episode"),
 
-    url(r'^(?P<show_name>[\w-]+)/$',
-        episodes.ShowView.as_view(what="all"), name="show"),
+    # url(r'^(?P<show_name>[\w-]+)/$',
+    #     episodes.ShowView.as_view(what="all"), name="show"),
 
     url(r'^live\.m3u$', stream.StreamListTemplateView.as_view(), name="playlist_list"),
 
