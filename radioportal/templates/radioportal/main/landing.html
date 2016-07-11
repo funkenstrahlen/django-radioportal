@@ -67,98 +67,50 @@ OF SUCH DAMAGE.
 		<h2>Jetzt live</h2>
 		{% if running %}
 		{% for episode in running %}
-			{% include "radioportal/episodes/episode_list_entry.html" %}{% endfor %}
+
+      <div class="media-object">
+        <div class="media-object-section">
+          <a href="{% url 'show_detail' slug=episode.show.slug %}">        
+            <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
+            <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
+          </a>
+        </div>
+        <div class="media-object-section">
+          <h4>{{episode.show.name}} <small>{{episode.title}}</small></h4>
+          <p class="show-for-medium">{{episode.show.abstract}}</p>
+          <a href="#" class="button"><i class="fa fa-play" aria-hidden="true"></i> Hören</a>
+        </div>
+      </div>
+
+    {% endfor %}
 		{% else %}
 		<p>{% trans "No episodes are streamed at the moment" %}</p>
 		{% endif %}
-
-
-
-    <div class="media-object">
-      <div class="media-object-section">
-        <a href="#">        
-          <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-          <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-        </a>
-      </div>
-      <div class="media-object-section">
-        <h4>Freakshow <small>Sendungstitel</small></h4>
-        <p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
-        <a href="#" class="button"><i class="fa fa-play" aria-hidden="true"></i> Hören</a>
-      </div>
-    </div>
-
-    <div class="media-object">
-      <div class="media-object-section">
-        <a href="#">        
-          <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-          <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-        </a>
-      </div>
-      <div class="media-object-section">
-        <h4>Freakshow <small>Sendungstitel</small></h4>
-        <p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
-        <a href="#" class="button"><i class="fa fa-play" aria-hidden="true"></i> Hören</a>
-      </div>
-    </div>
-
-
-
 
 	</div>
 	<div class="small-12 medium-6 columns">
 		<h2>Geplant</h2>
 		{% if upcoming %}
 		{% for episode in upcoming %}
-			{% include "radioportal/episodes/episode_list_entry.html" %}
+
+      <div class="media-object">
+        <div class="media-object-section">
+          <a href="{% url 'show_detail' slug=episode.show.slug %}">        
+            <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
+            <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
+          </a>
+        </div>
+        <div class="media-object-section">
+          <h4>{{ episode.show.name }} <small>{{episode.title}}</small></h4>
+          <p>{{episode.begin}}</p>
+        </div>
+      </div>
+
+
 		{% endfor %}
 		{% else %}
 		<p>{% trans "No episodes are planned at the moment" %}</p>
 		{% endif %}
-		
-
-
-    <div class="media-object">
-      <div class="media-object-section">
-        <a href="#">        
-          <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-          <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-        </a>
-      </div>
-      <div class="media-object-section">
-        <h4>Freakshow <small>Sendungstitel</small></h4>
-        <p>Donnerstag, 18:30</p>
-      </div>
-    </div>
-
-
-
-    <div class="media-object">
-      <div class="media-object-section">
-        <a href="#">        
-          <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-          <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-        </a>
-      </div>
-      <div class="media-object-section">
-        <h4>Freakshow <small>Sendungstitel</small></h4>
-        <p>Donnerstag, 18:30</p>
-      </div>
-    </div>
-
-
-    <div class="media-object">
-      <div class="media-object-section">
-        <a href="#">        
-          <img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-          <img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-        </a>
-      </div>
-      <div class="media-object-section">
-        <h4>Freakshow <small>Sendungstitel</small></h4>
-        <p>Donnerstag, 18:30</p>
-      </div>
-    </div>
 
 <a href="{% host_url 'calendar' on 'www' %}" class="button"><i class="fa fa-calendar" aria-hidden="true"></i> Kompletter Sendeplan</a>
 		
