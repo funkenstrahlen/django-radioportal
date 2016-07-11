@@ -43,8 +43,8 @@ from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
 
-class podcast_list(ListView):
-    template_name = 'radioportal/podcasts/podcast_list.html'
+class show_list(ListView):
+    template_name = 'radioportal/shows/show_list.html'
     paginate_by = 10
 
     def get_queryset(self):
@@ -53,8 +53,8 @@ class podcast_list(ListView):
         qs = qs.annotate(newest=Max('episode__parts__end')).order_by('-newest')
         return qs
 
-class podcast_detail(ListView):
-    template_name = 'radioportal/podcasts/podcast_detail.html'
+class show_detail(ListView):
+    template_name = 'radioportal/shows/show_detail.html'
     
     def get_queryset(self):
         #queryset = Show.objects.all() #annotate(newest=Max('episode__end')).order_by('-newest'),

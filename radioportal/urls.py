@@ -31,7 +31,7 @@
 from django.conf.urls import patterns, url, include
 from django.views.decorators.cache import cache_page
 from django.views.generic import base
-from radioportal.views import main, stream, episodes, graphs, podcasts
+from radioportal.views import main, stream, episodes, graphs, shows
 
 
 urlpatterns = patterns('',
@@ -71,10 +71,10 @@ urlpatterns = patterns('',
 
     url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
-    # all podcasts
-    url(r'^podcasts/$', podcasts.podcast_list.as_view(), name="podcast_list"),
-    url(r'^podcasts/(?P<show_name>[\w-]+)/$',
-        podcasts.podcast_detail.as_view(), name="podcast_detail"),
+    # all shows
+    url(r'^shows/$', shows.show_list.as_view(), name="show_list"),
+    url(r'^shows/(?P<show_name>[\w-]+)/$',
+        shows.show_detail.as_view(), name="show_detail"),
 
     # calendar
     url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),
