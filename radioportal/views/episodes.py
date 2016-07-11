@@ -62,25 +62,15 @@ class GraphicStats(BaseDetailView):
     def render_to_response(self, context, **response_kwargs):
         return JsonResponse(self.object.data, safe=False, **response_kwargs)
 
-
 class EpisodeView(DetailView):
     model = Episode
     slug_field = 'slug'
     context_object_name = 'episode'
     template_name = 'radioportal/episodes/episode_detail.html'
     
-#    def get_context_data(self, **kwargs):
-#        context = super(ShowView, self).get_context_data(**kwargs)
-#        if 'show_name' in self.kwargs:
-#            context['show_name'] = self.kwargs['show_name']
-#            context['show'] = Show.objects.get(slug=self.kwargs['show_name'])
-#        else:
-#            context['show_name'] = False
-#        return context
-
-    
-    def get_queryset(self):
-        return Episode.objects.filter(show__slug=self.kwargs.get('show_name', None))
+    def get_context_data(self, **kwargs):
+       context = super(EpisodeView, self).get_context_data(**kwargs)
+       return context
 
 class Calendar(ListView):
     template_name = "radioportal/episodes/calendar.html"
