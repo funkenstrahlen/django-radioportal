@@ -72,9 +72,9 @@ urlpatterns = patterns('',
     url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
     # all shows
-    url(r'^shows/$', shows.show_list.as_view(), name="show_list"),
-    url(r'^shows/(?P<show_name>[\w-]+)/$',
-        shows.show_detail.as_view(), name="show_detail"),
+    url(r'^shows/$', shows.ShowListView.as_view(), name="show_list"),
+    url(r'^shows/(?P<slug>[\w-]+)/$',
+        shows.ShowDetailView.as_view(), name="show_detail"),
 
     # calendar
     url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),

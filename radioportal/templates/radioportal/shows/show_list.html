@@ -37,84 +37,21 @@ OF SUCH DAMAGE.
 
 {% block content %}
 
-{% for show in object_list %}
-works
-{% endfor %}
-
 <div class="row column">
-<h2>Podcasts auf Xenim</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure enim recusandae optio saepe, assumenda incidunt, delectus dolore voluptates aperiam, dolor voluptatum sapiente labore nobis, explicabo voluptas ab eligendi minima unde.</p>
+	<h2>Podcasts auf Xenim</h2>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure enim recusandae optio saepe, assumenda incidunt, delectus dolore voluptates aperiam, dolor voluptatum sapiente labore nobis, explicabo voluptas ab eligendi minima unde.</p>
 </div>
 
 <div class="row small-up-2 medium-up-3 large-up-5">
-	<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
+
+	{% for show in object_list %}
 		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
-		<div class="column">
-		<h4>Freakshow</h4>
-		<a href="#"><img class="thumbnail" src="http://placehold.it/550x550"></a>
-	</div>
+			<h4>{{ show.name }}</h4>
+			<a href="{% url 'show_detail' slug=show.slug %}"><img class="thumbnail" src="http://placehold.it/200x200"></a>
+		</div>
+	{% empty %}
+	    <p>No shows yet.</p>
+	{% endfor %}
 
 </div>
 

@@ -43,22 +43,20 @@ from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
 
-class show_list(ListView):
+class ShowListView(ListView):
+    model = Show
     template_name = 'radioportal/shows/show_list.html'
-    paginate_by = 10
+    # paginate_by = 10
 
-    def get_queryset(self):
-        qs = Show.objects.all()
-        qs = qs.annotate(sum=Sum('episode__id')).filter(sum__gt=0)
-        qs = qs.annotate(newest=Max('episode__parts__end')).order_by('-newest')
-        return qs
+    def get_context_data(self, **kwargs):
+        context = super(ShowListView, self).get_context_data(**kwargs)
+        # context['now'] = timezone.now()
+        return context
 
-class show_detail(ListView):
+class ShowDetailView(DetailView):
+    model = Show
     template_name = 'radioportal/shows/show_detail.html'
     
-    def get_queryset(self):
-        #queryset = Show.objects.all() #annotate(newest=Max('episode__end')).order_by('-newest'),
-        qs = Show.objects.all()
-        qs = qs.annotate(sum=Sum('episode__id')).filter(sum__gt=0)
-        qs = qs.annotate(newest=Max('episode__parts__end')).order_by('-newest')
-        return qs
+    def get_context_data(self, **kwargs):
+        context = super(ShowDetailView, self).get_context_data(**kwargs)
+        return context
