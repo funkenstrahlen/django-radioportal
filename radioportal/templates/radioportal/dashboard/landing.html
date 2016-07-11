@@ -35,63 +35,65 @@ OF SUCH DAMAGE.
 <div class="row">
 	<div class="small-12 columns">
 		
-		<h2>{% trans "Dashboard" %}</h2>
-		<p>{% blocktrans %}Welcome to the configuration panel of the xenim streaming network. 
-		Here you can change all settings regarding the appearance of your show and the behavior of the streams.
-		You might also have a look at the wiki for additional features, documentation and contact informations.{% endblocktrans %}</p>
+		<h1>{% trans "Dashboard" %}</h1>
 
-		{% if shows %}
-		<h3>{% trans "Shows" %}</h3>
-		<p class="explanation">
-		{% blocktrans %}
-		Shows are the entities that are responsible for representing your streams at the homepage of the xenim streaming network. 
-		They also contain episodes for time a stream is online.
-		{% endblocktrans %}
-		</p>
-		<ul>
-		{% for s in shows %}
-		{% get_obj_perms request.user for s as "show_perms" %}
-			<li>
-		{% if "change_show" in show_perms %}<a href="{% host_url "admin-episode-list" s.slug on "dashboard" %}">{% endif %}
-		{{ s }}{% if "change_show" in show_perms %}</a>{% endif %}
-		{% if "delete_show" in show_perms %}(<a href="{% host_url "admin-show-delete" s.slug on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
-		</li>
+		<h2>Shows</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque aliquid quidem quae esse magnam autem ipsam atque repellendus, iste cumque ratione perferendis pariatur, amet perspiciatis. Explicabo debitis, quibusdam amet dolores.</p>
+
+		{% for show in shows %}
+		{% get_obj_perms request.user for show as "show_perms" %}
+
+		<div class="row">
+			<div class="medium-2 columns">
+				<img class="thumbnail" src="http://placehold.it/200x200">
+			</div>
+			<div class="medium-10 columns">
+				<h3>{{ show.name }} <small>Subtitle</small></h3>
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem accusantium quasi atque possimus fuga ea illo excepturi repudiandae repellat necessitatibus, aperiam eos dicta amet harum, fugit provident rem, earum. Culpa.</p>
+				
+				{% if "change_show" in show_perms %}
+
+				<ul class="dropdown menu" data-dropdown-menu>
+					{% if "change_episodes" in show_perms %}
+						<li><a href="{% host_url "admin-episode-create" show.slug on "dashboard" %}" class="button success"><i class="fa fa-plus" aria-hidden="true"></i> Sendung Planen</a></li>
+					{% endif %}
+					<li>
+					<a href="#" class="button dropdown"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Bearbeiten</a>
+						<ul class="menu">
+							<li><a href="{% host_url "admin-show-edit" show.slug on "dashboard" %}">Allgemein</a></li>
+							<li><a href="{% host_url "admin-show-notification" show.slug on "dashboard" %}">Notifications</a></li>
+							<li><a href="{% host_url "admin-show-feed" show.slug on "dashboard" %}">Metadaten aus dem Podcastfeed</a></li>
+							<li><a href="{% host_url "admin-show-ical" show.slug on "dashboard" %}">Sendungen mit iCal planen</a></li>
+						</ul>
+					</li>
+					<li><a href="{% host_url "admin-episode-list" show.slug on "dashboard" %}" class="button"><i class="fa fa-list" aria-hidden="true"></i> Alle Episoden</a></li>
+					<li><a href="{% host_url "archive-detail" show.slug on "dashboard" %}" class="button"><i class="fa fa-cloud" aria-hidden="true"></i> Aufzeichnungen</a></li>
+	 				{% if "delete_show" in show_perms %}
+						<li><a href="{% host_url "admin-show-delete" show.slug on "dashboard" %}" class="button alert"><i class="fa fa-trash-o" aria-hidden="true"></i> Löschen</a></li>
+					{% endif %}
+				</ul>
+
+ 				{% endif %}
+
+			</div>
+		</div>
+
 		{% endfor %}
-		</ul>
-		{% endif %}
 
+		
+		<hr>
+		<h2>Channel</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium, architecto explicabo adipisci nam, debitis soluta. Harum maiores explicabo consectetur reprehenderit ipsam natus, cupiditate doloribus ipsum odio recusandae quo impedit quisquam.</p>
 
-
-
-
-		{% if channels %}
-		<h3>{% trans "Streams" %}</h3>
-		<p class="explanation">
-		{% blocktrans %}
-		For every show there is usually a channel of streams. Such a channel of streams combines various streams which differ in bitrates or formats. 
-		This is the place to view or change the credentials for your streams.
-		{% endblocktrans %}
-		</p>
-		<ul>
-		{% for s in channels %}
-		{% get_obj_perms request.user for s as "channel_perms" %}
-			<li>
-				<a href="{% host_url "admin-channel-edit" s.id on "dashboard" %}">{{ s }}</a>
-				{% if "delete_channel" in channel_perms %}(<a href="{% host_url "admin-channel-delete" s.id on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
-			</li>
+		{% for channel in channels %}
+			{% get_obj_perms request.user for channel as "channel_perms" %}
+			<h3>{{ channel }}</h3>
+			<p>Stream URL: <a href="{{ channel.streamURL }}">{{ channel.streamURL }}</a></p>
+			<a href="{% host_url "admin-channel-edit" channel.id on "dashboard" %}" class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Bearbeiten</a>
+			{% if "delete_channel" in channel_perms %}
+				<a href="{% host_url "admin-channel-delete" channel.id on "dashboard" %}" class="button alert"><i class="fa fa-trash-o" aria-hidden="true"></i> Löschen</a>
+			{% endif %}
 		{% endfor %}
-		</ul>
-		{% endif %}
-
-
-
-
-		<h3>{% trans "Recordings" %}</h3>
-		<ul>
-		<li><a href="{% host_url "archive-list" on "dashboard" %}">{% trans "List of Recordings" %}</a></li>
-		</ul>
-
-
 		
 	</div>
 </div>
