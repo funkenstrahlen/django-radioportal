@@ -59,4 +59,5 @@ class ShowDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(ShowDetailView, self).get_context_data(**kwargs)
+        context["episodes"] = Episode.objects.filter(show=self.object)
         return context
