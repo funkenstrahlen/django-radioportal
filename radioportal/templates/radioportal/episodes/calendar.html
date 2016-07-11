@@ -37,78 +37,54 @@ OF SUCH DAMAGE.
 
 		<hr>
 		<h2>Jetzt live</h2>
+
+		{% if running %}
+		{% for episode in running %}
+
 		<div class="media-object">
 			<div class="media-object-section">
-				<a href="#">				
+				<a href="{% url 'show_detail' slug=episode.show.slug %}">        
 					<img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
 					<img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
 				</a>
 			</div>
 			<div class="media-object-section">
-				<h3>Freakshow <small>Sendungstitel</small></h3>
-				<p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
+				<h3>{{episode.show.name}} <small>{{episode.title}}</small></h3>
+				<p class="show-for-medium">{{episode.show.abstract}}</p>
 				<a href="#" class="button"><i class="fa fa-play" aria-hidden="true"></i> Hören</a>
 			</div>
 		</div>
 
-		<div class="media-object">
-			<div class="media-object-section">
-				<a href="#">				
-					<img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-					<img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-				</a>
-			</div>
-			<div class="media-object-section">
-				<h3>Freakshow <small>Sendungstitel</small></h3>
-				<p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
-				<a href="#" class="button"><i class="fa fa-play" aria-hidden="true"></i> Hören</a>
-			</div>
-		</div>
+		{% endfor %}
+		{% else %}
+		<p>{% trans "No episodes are streamed at the moment" %}</p>
+		{% endif %}
 
 		<hr>
 		<h2>Geplant</h2>
 
-		<div class="media-object">
-			<div class="media-object-section">
-				<a href="#">				
-					<img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-					<img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-				</a>
-			</div>
-			<div class="media-object-section">
-				<h3>Freakshow <small>Sendungstitel</small></h3>
-				<p>Donnerstag, 18:30</p>
-				<p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
-			</div>
-		</div>
+		{% if upcoming %}
+		{% for episode in upcoming %}
 
 		<div class="media-object">
 			<div class="media-object-section">
-				<a href="#">				
+				<a href="{% url 'show_detail' slug=episode.show.slug %}">        
 					<img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
 					<img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
 				</a>
 			</div>
 			<div class="media-object-section">
-				<h3>Freakshow <small>Sendungstitel</small></h3>
-				<p>Donnerstag, 18:30</p>
-				<p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
+				<h3>{{ episode.show.name }} <small>{{episode.title}}</small></h3>
+				<p>{{episode.begin}}</p>
+				<p class="show-for-medium">{{ episode.show.abstract }}</p>
 			</div>
 		</div>
 
-		<div class="media-object">
-			<div class="media-object-section">
-				<a href="#">				
-					<img class="thumbnail show-for-medium" src="http://placehold.it/100x100">
-					<img class="thumbnail hide-for-medium" src="http://placehold.it/80x80">
-				</a>
-			</div>
-			<div class="media-object-section">
-				<h3>Freakshow <small>Sendungstitel</small></h3>
-				<p>Donnerstag, 18:30</p>
-				<p class="show-for-medium">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci porro illo, illum amet aliquid ipsum soluta eum quibusdam nemo corporis facere fugit cumque placeat mollitia quidem quod delectus, suscipit id.</p>
-			</div>
-		</div>
+
+		{% endfor %}
+		{% else %}
+		<p>{% trans "No episodes are planned at the moment" %}</p>
+		{% endif %}
 
 
 	</div>
