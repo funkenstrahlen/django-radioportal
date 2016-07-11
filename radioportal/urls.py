@@ -46,28 +46,17 @@ urlpatterns = patterns('',
     url(r'^home/$', base.RedirectView.as_view(url='/', permanent=True), name="home"),
     url(r'^$', main.LandingView.as_view(), name="root"),
 
-
-    # all shows
+    # show
     url(r'^shows/$', shows.ShowListView.as_view(), name="show_list"),
     url(r'^shows/(?P<slug>[\w-]+)/$',
         shows.ShowDetailView.as_view(), name="show_detail"),
 
-    # calendar
-    url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),
-    url(r'^calendar/(?P<show_name>[\w-]+)/$',
-        episodes.Calendar.as_view(), name="calendar_show"),
-
-    # embedable
-    # url(r'^live/(?P<show_name>[\w-]+)/embed/$',
-    #     episodes.EmbedShowView.as_view(what='now'), name="embed_live_show"),
-    # url(r'^(?P<show_name>[\w-]+)/embed/$',
-    #     episodes.EmbedShowView.as_view(what="all"), name="embed_show"),
-
+    # episode of a show
     url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
         episodes.EpisodeView.as_view(), name="episode"),
 
-    # url(r'^(?P<show_name>[\w-]+)/$',
-    #     episodes.ShowView.as_view(what="all"), name="show"),
+    # calendar
+    url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),
 
     url(r'^live\.m3u$', stream.StreamListTemplateView.as_view(), name="playlist_list"),
 
