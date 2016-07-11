@@ -59,8 +59,8 @@ class GraphicStats(BaseDetailView):
     model = Graphic
     slug_field = 'uuid'
 
-    def render_to_response(self, context, **response_kwargs):
-        return JsonResponse(self.object.data, safe=False, **response_kwargs)
+    def render_to_response(self, context, **kwargs):
+        return JsonResponse(self.object.data, safe=False, **kwargs)
 
 class EpisodeView(DetailView):
     model = Episode
@@ -72,6 +72,38 @@ class EpisodeView(DetailView):
        context = super(EpisodeView, self).get_context_data(**kwargs)
        context["show"] = self.object.show
        return context
+
+class EpisodeViewJSON(BaseDetailView):
+    model = Episode
+
+    def render_to_response(self, context, **kwargs):
+        episode = self.object
+        playerConfiguration = {
+          "options": {
+            "theme": "default"
+          },
+          "extensions": {
+            "EpisodeInfo": {},
+            "Playlist": {
+              "disabled": "true"
+            }
+          },
+          "podcast": {
+            "feed": "https://cdn.podigee.com/ppp/samples/feed.xml"
+          },
+          "episode": {
+            "media": {
+              "mp3": "https://cdn.podigee.com/ppp/samples/media.mp3"
+            },
+            "coverUrl": "https://cdn.podigee.com/ppp/samples/cover.jpg",
+            "title": "%s" % episode.title(),
+            "subtitle": "Wie Henrik Müller in Dortmund wirtschaftspolitischen Journalismus lehrt und erforscht. Und was guten Wirtschaftsjournalismus ausmacht.",
+            "url": "http://forschergeist.de/podcast/fg009-wirtschaftspolitischer-journalismus/",
+            "embedCode": "<script class=\"podigee-podcast-player\" src=\"https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js\" data-configuration=\"https://podigee.github.io/podigee-podcast-player/example/config.json\"><\/script>",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit quam consequuntur expedita cum nihil, libero laudantium dolorum, quis asperiores consequatur voluptates sit, recusandae hic praesentium cupiditate labore necessitatibus rerum quidem."
+          }
+        }
+        return JsonResponse(playerConfiguration, safe=False, **kwargs)
 
 class Calendar(ListView):
     template_name = "radioportal/episodes/calendar.html"
