@@ -46,28 +46,6 @@ urlpatterns = patterns('',
     url(r'^home/$', base.RedirectView.as_view(url='/', permanent=True), name="home"),
     url(r'^$', main.LandingView.as_view(), name="root"),
 
-    #======================================================================
-    # # statistic, temp-hack
-    # url(r'^statistic/$', list_detail.object_list,
-    #    {
-    #        'queryset': Channel.objects.select_related().all(),
-    #        'template_name': 'portal/statistic.html',
-    #    },
-    #    name="statistic"
-    # ),
-    # # Status
-    # url(
-    #   r'^status/$',
-    #   'django.views.generic.list_detail.object_list',
-    #   {
-    #       'queryset': Status.objects.all().order_by('category'),
-    #       'template_name': 'portal/status.html'
-    #   },
-    #   name="status"
-    # ),
-    #======================================================================
-
-    url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 
     # all shows
     url(r'^shows/$', shows.ShowListView.as_view(), name="show_list"),
@@ -108,4 +86,27 @@ urlpatterns = patterns('',
         name="weekday_hours_graph"),
     url(r'^graphs/time_per_episode/(?P<show_name>[\w-]+)/$', graphs.time_per_episode_graph,
         name="time_per_episode_graph"),
+
+    #======================================================================
+    # # statistic, temp-hack
+    # url(r'^statistic/$', list_detail.object_list,
+    #    {
+    #        'queryset': Channel.objects.select_related().all(),
+    #        'template_name': 'portal/statistic.html',
+    #    },
+    #    name="statistic"
+    # ),
+    # # Status
+    # url(
+    #   r'^status/$',
+    #   'django.views.generic.list_detail.object_list',
+    #   {
+    #       'queryset': Status.objects.all().order_by('category'),
+    #       'template_name': 'portal/status.html'
+    #   },
+    #   name="status"
+    # ),
+    #======================================================================
+
+    url(r'^stats/(?P<slug>[a-z0-9-]+).json', episodes.GraphicStats.as_view(), name="graphic_stats"),
 )
