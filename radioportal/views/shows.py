@@ -59,5 +59,6 @@ class ShowDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(ShowDetailView, self).get_context_data(**kwargs)
-        context["episodes"] = Episode.objects.filter(show=self.object)
+        context['upcoming'] = Episode.objects.filter(show=self.object, status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')
+        context['running'] = Episode.objects.filter(show=self.object, status=Episode.STATUS[1][0]).annotate(begin=Min('parts__begin')).order_by('-begin')
         return context
