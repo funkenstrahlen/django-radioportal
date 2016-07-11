@@ -75,10 +75,10 @@ class EpisodeView(DetailView):
 
 class Calendar(ListView):
     template_name = "radioportal/episodes/calendar.html"
-    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).annotate(begin=Min('parts__begin')).order_by('-begin')[:5]
+    queryset = Episode.objects.filter(status=Episode.STATUS[1][0]).annotate(begin=Min('parts__begin')).order_by('-begin')
     context_object_name = 'running'
     
     def get_context_data(self, **kwargs):
         ctx = super(Calendar, self).get_context_data(**kwargs)
-        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
+        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')
         return ctx
