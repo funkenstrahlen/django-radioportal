@@ -46,9 +46,9 @@ OF SUCH DAMAGE.
 		<h3><small>{{ object.description }}</small></h3>
 		<p>{{ object.abstract }}</p>
 		<ul class="vertical medium-horizontal menu">
-		  <li><a href="#"><i class="fa fa-safari" aria-hidden="true"></i> <span>Webseite</span></a></li>
-		  <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Twitter</span></a></li>
-		  <li><a href="#"><i class="fa fa-envelope" aria-hidden="true"></i> <span>Kontakt</span></a></li>
+		  {% if show.url %}<li><a href="{{ show.url }}"><i class="fa fa-safari" aria-hidden="true"></i> <span>Webseite</span></a></li>{% endif %}
+		  {% if show.twitter %}<li><a href="https://twitter.com/{{ show.twitter }}"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Twitter</span></a></li>{% endif %}
+		  {% if show.public_email %}<li><a href="mailto:{{ show.public_email }}"><i class="fa fa-envelope" aria-hidden="true"></i> <span>Kontakt</span></a></li>{% endif %}
 		</ul>
 	</div>
 </div>
