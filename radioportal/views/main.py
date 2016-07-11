@@ -50,6 +50,6 @@ class LandingView(ListView):
     
     def get_context_data(self, **kwargs):
         ctx = super(LandingView, self).get_context_data(**kwargs)
-        ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).annotate(end=Max('parts__end')).order_by('-end')[:5]
-        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:5]
+        # ctx['archived'] = Episode.objects.filter(status=Episode.STATUS[0][0]).annotate(end=Max('parts__end')).order_by('-end')[:5]
+        ctx['upcoming'] = Episode.objects.filter(status=Episode.STATUS[2][0]).annotate(begin=Min('parts__begin')).filter(begin__gt=datetime.datetime.now()-datetime.timedelta(hours=24)).order_by('begin')[:3]
         return ctx
