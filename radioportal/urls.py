@@ -39,8 +39,6 @@ urlpatterns = patterns('',
     url(r'^robots.txt$',
         cache_page(60 * 60 * 3)(episodes.RobotsTxtView.as_view()),
         name="robots"),
-        
-    #url(r'^dashboard/', include('radioportal.dashboard.urls')),
     
     url(r'^feeds/', include('radioportal.feeds.urls')),
     
