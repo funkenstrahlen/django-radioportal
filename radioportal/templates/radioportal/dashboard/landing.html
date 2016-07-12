@@ -58,7 +58,7 @@ OF SUCH DAMAGE.
 						<li><a href="{% host_url "admin-episode-create" show.slug on "dashboard" %}" class="button success"><i class="fa fa-plus" aria-hidden="true"></i> Sendung Planen</a></li>
 					{% endif %}
 					<li>
-					<a href="#" class="button dropdown"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Bearbeiten</a>
+					<a href="#" class="button dropdown"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Einstellungen</a>
 						<ul class="menu">
 							<li><a href="{% host_url "admin-show-edit" show.slug on "dashboard" %}">Allgemein</a></li>
 							<li><a href="{% host_url "admin-show-notification" show.slug on "dashboard" %}">Notifications</a></li>
@@ -89,7 +89,7 @@ OF SUCH DAMAGE.
 			{% get_obj_perms request.user for channel as "channel_perms" %}
 			<h3>{{ channel }}</h3>
 			<p>Stream URL: <a href="{{ channel.streamURL }}">{{ channel.streamURL }}</a></p>
-			<a href="{% host_url "admin-channel-edit" channel.id on "dashboard" %}" class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Bearbeiten</a>
+			<a href="{% host_url "admin-channel-edit" channel.id on "dashboard" %}" class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Einstellungen</a>
 			{% if "delete_channel" in channel_perms %}
 				<a href="{% host_url "admin-channel-delete" channel.id on "dashboard" %}" class="button alert"><i class="fa fa-trash-o" aria-hidden="true"></i> Löschen</a>
 			{% endif %}
