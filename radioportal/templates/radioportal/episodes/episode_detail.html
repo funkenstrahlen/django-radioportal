@@ -46,8 +46,8 @@ OF SUCH DAMAGE.
 	<div class="medium-8 columns">
 		<h1>{{ show.name }} <small>{{ episode.slug }} {{ episode.title }}</small></h1>
 		<p> {% if episode.end %}{% trans "From" %}{% else %}{% trans "Since" %}{% endif %}
-		{{ episode.begin|date:"d. F Y H:i" }}{% if episode.end %}
-		{% trans "until"%} {{ episode.end|date:"d. F Y H:i" }}{% endif %}</p>
+		{{ episode.begin|date:"d. F Y H:i" }}
+		{% if episode.end %}{% trans "until"%} {{ episode.end|date:"d. F Y H:i" }}{% endif %}</p>
 		<p>{{ show.abstract }}</p>
 		<ul class="vertical medium-horizontal menu">
 		  {% if show.url %}<li><a href="{{ show.url }}"><i class="fa fa-safari" aria-hidden="true"></i> <span>Webseite</span></a></li>{% endif %}
