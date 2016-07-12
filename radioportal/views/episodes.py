@@ -41,6 +41,7 @@ from django.http import JsonResponse
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
+from django_hosts.resolvers import reverse
 
 class RobotsTxtView(TemplateResponseMixin, View):
     
@@ -89,21 +90,32 @@ class EpisodeViewJSON(BaseDetailView):
             }
           },
           "podcast": {
-            "feed": "https://cdn.podigee.com/ppp/samples/feed.xml"
+            "feed": "%s" % episode.show.podcastfeed.feed_url
           },
           "episode": {
             "media": {
-              "mp3": "https://cdn.podigee.com/ppp/samples/media.mp3"
+              "mp3": "https://detektor.fm/stream/mp3/musik/"
             },
             "coverUrl": "https://cdn.podigee.com/ppp/samples/cover.jpg",
-            "title": "%s" % episode.title(),
-            "subtitle": "Wie Henrik Müller in Dortmund wirtschaftspolitischen Journalismus lehrt und erforscht. Und was guten Wirtschaftsjournalismus ausmacht.",
-            "url": "http://forschergeist.de/podcast/fg009-wirtschaftspolitischer-journalismus/",
-            "embedCode": "<script class=\"podigee-podcast-player\" src=\"https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js\" data-configuration=\"https://podigee.github.io/podigee-podcast-player/example/config.json\"><\/script>",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit quam consequuntur expedita cum nihil, libero laudantium dolorum, quis asperiores consequatur voluptates sit, recusandae hic praesentium cupiditate labore necessitatibus rerum quidem."
+            "title": "%s" % episode.show.name,
+            "subtitle": "%s" % episode.title(),
+            "url": "http:%s" % reverse("show_detail", kwargs={'slug': episode.show.slug}, host='www'),
+            "embedCode": "<script class=\"podigee-podcast-player\" src=\"https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js\" data-configuration=\"https:%s\"><\/script>" % reverse("episode_json", kwargs={'slug': episode.slug, 'show_name':episode.show.slug }, host='www'),
+            "description": "%s" % episode.show.abstract
           }
         }
-        return JsonResponse(playerConfiguration, safe=False, **kwargs)
+
+        # there is only a channel linked to this episode if it is running
+        if episode.status == "RUNNING":
+          # iterate over all available streams and add them to the json
+          for stream in episode.channel.running_streams:
+            url = reverse("mount", kwargs={'stream': stream.mount}, host='www')
+            playerConfiguration["episode"]["media"]["%s" % stream.format] = "%s" % url
+
+        response = JsonResponse(playerConfiguration, safe=False, **kwargs)
+        # json needs to be accessible from external sources as the player is embeddable
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
 class Calendar(ListView):
     template_name = "radioportal/episodes/calendar.html"
