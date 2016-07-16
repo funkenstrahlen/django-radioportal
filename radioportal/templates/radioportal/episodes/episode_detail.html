@@ -37,8 +37,6 @@ OF SUCH DAMAGE.
 
 {% block content %}
 
-
-
 <div class="row">
 	<div class="medium-4 columns">
 		<img class="thumbnail" src="http://placehold.it/400x400">
@@ -57,7 +55,53 @@ OF SUCH DAMAGE.
  Chat</a></li>{% endif %}
 		</ul>
 		
-		<script class="podigee-podcast-player" src="https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js" data-configuration="{{ request.build_absolute_uri }}/json"></script>
+		<!-- show player if the episode is actually running -->
+		{% ifequal episode.status "RUNNING" %}
+
+			<!-- list of stream urls -->
+			<ul>
+			{% for stream in episode.channel.running_streams %}
+				<li>
+					{% if stream.transport == "http" %}
+					<a href="{% host_url "playlist" slug=stream.mount on "www" %}">{{ stream.displayFormat }}</a> (<a href="{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{% trans "direct" %}</a>
+					{% elif stream.transport == "hls" %}
+					<a href="{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{{ stream.displayFormat }}</a>(
+					{% endif %}
+				</li>
+			{% empty %}
+				<li>{% trans "Streams are upcoming, please wait." %}</li>
+			{% endfor %}
+			</ul>
+
+			<!-- the player -->
+			<script>
+			window.playerConfiguration = {
+			  options: {
+			    theme: "default",
+			    sslProxy: "https://cdn.podigee.com/ssl-proxy/"
+			  },
+			  extensions: {},
+			  podcast: {},
+			  episode: {
+				  media: {
+					{% for stream in episode.channel.running_streams %}
+					  {{ stream.format }}: "{% host_url "mount" stream=stream.mount on "www" %}"
+					  {% if not loop.last %},{% endif %}
+					{% endfor %}
+				  },
+				  coverUrl: "https://cdn.podigee.com/uploads/u493/researchvr%20redesign1466094096e6a5.png?v=0&source=unknown",
+				  url: "http:{% host_url 'episode' show_name=show.slug slug=episode.slug on 'www' %}",
+				  title: "{{show.name}}",
+				  subtitle: "{{episode.title}}",
+				  description: "",
+				  chaptermarks: []
+			  }
+			}
+			</script>
+
+			<script class="podigee-podcast-player" src="https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js" data-configuration="playerConfiguration"></script>	
+		{% endifequal %}
+
 	</div>
 </div>
 

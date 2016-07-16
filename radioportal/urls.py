@@ -54,8 +54,6 @@ urlpatterns = patterns('',
     # episode of a show
     url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/$',
         episodes.EpisodeView.as_view(), name="episode"),
-    url(r'^(?P<show_name>[\w-]+)/(?P<slug>[\w-]+)/json$',
-        episodes.EpisodeViewJSON.as_view(), name="episode_json"),
 
     # calendar
     url(r'^calendar/$', episodes.Calendar.as_view(), name="calendar"),

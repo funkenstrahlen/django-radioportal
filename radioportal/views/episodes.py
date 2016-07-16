@@ -41,7 +41,6 @@ from django.http import JsonResponse
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
-from django_hosts.resolvers import reverse
 
 class RobotsTxtView(TemplateResponseMixin, View):
     
@@ -73,49 +72,6 @@ class EpisodeView(DetailView):
        context = super(EpisodeView, self).get_context_data(**kwargs)
        context["show"] = self.object.show
        return context
-
-class EpisodeViewJSON(BaseDetailView):
-    model = Episode
-
-    def render_to_response(self, context, **kwargs):
-        episode = self.object
-        playerConfiguration = {
-          "options": {
-            "theme": "default"
-          },
-          "extensions": {
-            "EpisodeInfo": {},
-            "Playlist": {
-              "disabled": "true"
-            }
-          },
-          "podcast": {
-            "feed": "%s" % episode.show.podcastfeed.feed_url
-          },
-          "episode": {
-            "media": {
-              "mp3": "https://detektor.fm/stream/mp3/musik/"
-            },
-            "coverUrl": "https://cdn.podigee.com/ppp/samples/cover.jpg",
-            "title": "%s" % episode.show.name,
-            "subtitle": "%s" % episode.title(),
-            "url": "http:%s" % reverse("show_detail", kwargs={'slug': episode.show.slug}, host='www'),
-            "embedCode": "<script class=\"podigee-podcast-player\" src=\"https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js\" data-configuration=\"https:%s\"><\/script>" % reverse("episode_json", kwargs={'slug': episode.slug, 'show_name':episode.show.slug }, host='www'),
-            "description": "%s" % episode.show.abstract
-          }
-        }
-
-        # there is only a channel linked to this episode if it is running
-        if episode.status == "RUNNING":
-          # iterate over all available streams and add them to the json
-          for stream in episode.channel.running_streams:
-            url = reverse("mount", kwargs={'stream': stream.mount}, host='www')
-            playerConfiguration["episode"]["media"]["%s" % stream.format] = "%s" % url
-
-        response = JsonResponse(playerConfiguration, safe=False, **kwargs)
-        # json needs to be accessible from external sources as the player is embeddable
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
 
 class Calendar(ListView):
     template_name = "radioportal/episodes/calendar.html"
