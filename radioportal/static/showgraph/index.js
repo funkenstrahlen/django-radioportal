@@ -90,7 +90,7 @@ function showGraph(uri, elem, selector) {
       });
 
       result = []
-      for (d in interval) {
+      for (d of interval) {
         v = d1.values.filter(function(d2) { return d2.date.getTime() == d.getTime(); });
         if (v.length > 0) {
           result.push({"date": v[0].date, "listeners": v[0].values});
