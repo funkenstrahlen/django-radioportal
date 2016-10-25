@@ -47,7 +47,7 @@ OF SUCH DAMAGE.
 <h3>{% trans "Associated Graphics" %}</h3>
 <ul>
 {% for g in form.instance.graphics.all %}
-	<li><a href="{{ g.file.url }}">{{ g.file }}</a></li>
+	<li>{% if g.file %}<a href="{{ g.file.url }}">{{ g.file }}</a>{% else %}JSON Data{% endif %}</li>
 {% endfor %}
 </ul>
 {% endif %}
