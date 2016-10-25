@@ -303,11 +303,25 @@ class BackendInterpreter(object):
     def graphic_updated(self, data):
         channel = Channel.objects.get(cluster=data["channel"])
 
-        if not channel.currentEpisode and not channel.currentEpisode.current_part:
-            error_handler("graphic_update: no current episode for %s" % channel.cluster, channel)
-            return
-
-        part = channel.currentEpisode.current_part
+        if not channel.currentEpisode or not channel.currentEpisode.current_part:
+            if "episode" in data:
+                episode_slug = data["episode"].split("-")[-1]
+                episode = Episode.objects.filter(slug=episode_slug)
+                if len(episode) == 1:
+                    episode = episode[0]
+                    if len(episode.parts.all()) == 1:
+                        part = episode.parts.all()[0]
+                    elif "begin" in data:
+                        begin = int(data["begin"])
+                        begindt = datetime.fromtimestamp(begin)
+                        for p in episode.parts.all():
+                            if abs((p.begin()-begindt).seconds) < 120:
+                                part = p
+            if not part:
+                error_handler("graphic_update: no current episode for %s" % channel.cluster, channel)
+                return
+        else:
+            part = channel.currentEpisode.current_part
 
         g, created = Graphic.objects.get_or_create(type=data["type"], episode=part)
         if "image" in data:
