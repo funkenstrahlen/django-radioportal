@@ -278,7 +278,7 @@ class BackendInterpreter(object):
             episode = channel.currentEpisode
             part = episode.current_part
             for key, value in metadata.iteritems():
-                if key == 'name' and value.lower().startswith(episode.slug):
+                if key == 'name' and value.lower().startswith(episode.slug.lower()):
                     value = value[len(episode.slug):].strip()
                 if key == 'url' and value != '':
                     value = url_normalize(value)
