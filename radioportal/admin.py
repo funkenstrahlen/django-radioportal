@@ -38,13 +38,18 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 import reversion
 
-class InlineStream(admin.TabularInline):
-    model = models.Stream
+class InlineRecodedStream(admin.TabularInline):
+    exclude = ('format', 'encoding', 'running')
+    model = models.RecodedStream
 
+class InlineSourcedStream(admin.TabularInline):
+    exclude = ('format', 'bitrate', 'container', 'codec', 'transport', 'running')
+    model = models.SourcedStream
 
 class ChannelAdmin(reversion.VersionAdmin, GuardedModelAdmin):
     inlines = [
-        InlineStream,
+        InlineSourcedStream,
+        InlineRecodedStream,
     ]
 
 

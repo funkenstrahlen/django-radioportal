@@ -491,6 +491,12 @@ class Stream(models.Model):
     transport = models.CharField(max_length=100,
         choices=TRANSPORTS, default=TRANSPORTS[0][0])
 
+    def get_format(self):
+        return "%s-%s-%s" % (self.codec, self.container, self.transport)
+
+    def set_format(self, format):
+        self.codec, self.container, self.transport = format.split("-")
+
     FORMATS = (
         ('mp3', _('MP3')),
         ('aac', _('AAC')),
@@ -545,6 +551,7 @@ class Stream(models.Model):
         f = ""
         if self.transport == "hls":
             f += self.get_transport_display()
+            f += " "
         if self.container == "ogg":
             f += self.get_container_display()
             f += "/"

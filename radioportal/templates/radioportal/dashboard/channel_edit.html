@@ -84,33 +84,51 @@ OF SUCH DAMAGE.
 {% csrf_token %}
 <table>
 {{ form.forms.0.as_table }}
-
-<tr><td colspan="2"><h3>{% trans "Sourced Streams" %}</h3></td></tr>
+</table>
+<h3>{% trans "Sourced Streams" %}</h3>
 {% for f in form.forms.1 %}
-<tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Sourced Stream" %}{% endif %}</h4></td></tr>
-{% if f.instance.id %}<tr><td colspan="2"><div style="border: 2px solid black; background-color: #ffffbe; width: 20em; margin: 0.5em auto;"><h5 style="margin: 0.5em;">{% trans "Settings for connecting to this Stream" %}</h5>
+<div style="padding: 0.5em; margin: 0.5em; border: 3px solid #fefefe;">
+<h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Sourced Stream" %}{% endif %}</h4>
+{% if f.instance.id %}
+<p>{% trans "Use the following settings for connecting to the server" %}</p>
 <table>
-<tr><th style="padding: 0;">Server</th style="padding: 0;"><td style="padding: 0;">master.streams.xenim.de</td style="padding: 0;"></tr>
-<tr><th style="padding: 0;">Port</th style="padding: 0;"><td style="padding: 0;">8001</td style="padding: 0;"></tr>
-<tr><th style="padding: 0;">User</th style="padding: 0;"><td style="padding: 0;">{{ f.instance.user }}</td style="padding: 0;"></tr>
-<tr><th style="padding: 0;">Password</th style="padding: 0;"><td style="padding: 0;">{{ f.instance.password }}</td style="padding: 0;"></tr>
-<tr><th style="padding: 0;">Mount</th style="padding: 0;"><td style="padding: 0;">/{{ f.instance.mount }}</td style="padding: 0;"></tr>
-<tr><th style="padding: 0;">Public</th style="padding: 0;"><td style="padding: 0;">1</td style="padding: 0;"></tr>
-</table>
-</div></td></tr>
-{% endif %}
+<tr><th>Server</th><td>master.streams.xenim.de</td></tr>
+<tr><th>Port</th><td>8001</td></tr>
+<tr><th>User</th><td>{{ f.instance.user }}</td></tr>
+<tr><th>{% trans "Mount for connecting" %}</th><td>/{{ f.instance.mount }}</td></tr>
+<tr><th>Public</th><td>1</td></tr>
 {{ f.as_table }}
+</table>
+{% else %}
+<table>
+{{ f.as_table }}
+</table>
+{% endif %}
+{% if f.instance.recoded.all %}
+<h5>{% trans "Transcoded Streams" %}</h5>
+<table>
+<tr>
+<th>{% trans "Mount" %}</th>
+<th>{% trans "Format" %}</th>
+<th>{% trans "Bitrate" %}</th>
+<th>{% trans "Fallback" %}</th>
+<th>{% trans "Running?" %}</th>
+</tr>
+{% for ts in f.instance.recoded.all %}
+<tr>
+<td>{{ ts.mount }}</td>
+<td>{{ ts.displayFormat }}</td>
+<td>{{ ts.bitrate }}</td>
+<td>{{ ts.fallback }}</td>
+<td>{{ ts.running }}</td>
+</tr>
+{% endfor %}
+</table>
+<p>{% trans "This are just the default settings, if you want other formats (mp3, vorbis, opus) or bitrates please contact the support" %}</p>
+{% endif %}
+</div>
 {% endfor %}
 
-{% if form.forms.2 %}
-<tr><td colspan="2"><h3>{% trans "Recoded Streams" %}</h3></td></tr>
-{% endif %}
-{% for f in form.forms.2 %}
-<tr><td colspan="2"><h4>{% if f.instance.mount %}{% trans "Stream" %} {{ f.instance.mount }}{% else %}{% trans "New Recoded Stream" %}{% endif %}</h4></td></tr>
-{{ f.as_table }}
-{% endfor %}
-
-<tr><td colspan="2">{{ form.forms.1.management_form }}{{ form.forms.2.management_form }}<input type="submit" value="{% trans "Save Channel" %}" /></td></tr>
-</table>
+{{ form.forms.1.management_form }}<input type="submit" value="{% trans "Save Channel" %}" />
 </form>
 {% endblock %}
