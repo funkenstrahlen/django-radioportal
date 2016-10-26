@@ -1,0 +1,13 @@
+Hallo,
+
+soeben wurde eine neue Anfrage für eine Sendung für das xenim streaming 
+network erstellt. Bitte prüfe den Antrag unter
+
+> {{ request_url }}
+
+auf Übereinstimmung mit den allgemeinen Regeln und akzeptiere oder ver-
+werfe den Antrag.
+
+Vielen Dank
+
+Der xenim Roboter

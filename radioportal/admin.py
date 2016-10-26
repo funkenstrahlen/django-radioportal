@@ -76,6 +76,7 @@ class ShowAdmin(reversion.VersionAdmin, GuardedModelAdmin):
     pass
 
 admin.site.register(models.Show, ShowAdmin)
+admin.site.register(models.ShowRequest)
 admin.site.register(models.Episode, EpisodeAdmin)
 admin.site.register(models.Channel, ChannelAdmin)
 admin.site.register(models.Status)

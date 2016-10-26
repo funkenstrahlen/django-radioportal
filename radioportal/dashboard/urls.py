@@ -32,6 +32,7 @@ from django.conf.urls import patterns, url, include
 from django.conf import settings
 
 from radioportal.dashboard import views, forms, notification, importer, debug
+from radioportal.dashboard.signup import views as signup
 
 import django.contrib.auth.views
 django.contrib.auth.views.is_safe_url=views.is_safe_url
@@ -67,6 +68,10 @@ urlpatterns = patterns('',
     url(r'^group/(?P<slug>[\w-]+)/$', views.GroupEditView.as_view(), name="admin-group-edit"),
 
     url(r'^show/create/$', views.ShowCreateView.as_view(), name="admin-show-create"),
+    url(r'^show/request/create/$', signup.ShowRequestCreateView.as_view(), name="admin-show-request-create"),
+    url(r'^show/request/deny/(?P<pk>[0-9]+)/$', signup.ShowRequestDenyView.as_view(), name="admin-show-request-deny"),
+    url(r'^show/request/accept/(?P<pk>[0-9]+)/$', signup.ShowRequestAcceptView.as_view(), name="admin-show-request-accept"),
+    url(r'^show/request/(?P<pk>[0-9]+)/$', signup.ShowRequestView.as_view(), name="admin-show-request"),
     url(r'^show/(?P<slug>[\w-]+)/$', views.EpisodeListView.as_view(), name="admin-episode-list"),
     url(r'^show/(?P<slug>[\w-]+)/edit/$', views.ShowEditView.as_view(), name="admin-show-edit"),
     url(r'^show/(?P<slug>[\w-]+)/delete/$', views.ShowDeleteView.as_view(), name="admin-show-delete"),

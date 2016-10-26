@@ -50,6 +50,8 @@ import os.path
 import os.path
 import uuid
 
+from radioportal import util
+
 class Show(models.Model):
     name = models.CharField(max_length=50, unique=True,
         verbose_name=_('Name of the show'),
@@ -610,7 +612,37 @@ class RecodedStream(Stream):
 
 class HLSStream(RecodedStream):
     pass
+
+
+class ShowRequest(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_("Name of the Podcast"))
+    STATUS = (
+      ('NEW', _('New')),
+      ('UNCONFIR', _('Unconfirmed')),
+      ('ACCEPTED', _('Accepted')), 
+      ('DECLINED', _('Declined'))
+    )
+    status = models.CharField(choices=STATUS, default=STATUS[0][0],  max_length=8)
+    feed = models.URLField(blank=True, verbose_name=_("Feed of the Podcast, used for automatic extraction of master data"))
+    ical = models.URLField(blank=True, verbose_name=_("HTTP-Adress of ICal File with announcements of live broadcasts"))
+    user = models.ForeignKey(User, related_name='show_requests')
+    show = models.ForeignKey(Show, related_name='request', blank=True, null=True)
+    reviewer = models.ForeignKey(User, related_name='reviews', blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    review_time = models.DateTimeField(blank=True, null=True)
+    review_note = models.CharField(default='', blank=True, max_length=400)
+
+    def __unicode__(self):
+        return u"<Request for %s by %s>" % (self.name, self.user)
+    
  
+import allauth.account.signals
+import radioportal.dashboard.signup.handlers
+
+allauth.account.signals.email_confirmed.connect(radioportal.dashboard.signup.handlers.email_confirmed_)
+post_save.connect(radioportal.dashboard.signup.handlers.handle_request, sender=ShowRequest)
+
+
 class Status(models.Model):
     name = models.CharField(max_length=100)
     status = models.PositiveSmallIntegerField()

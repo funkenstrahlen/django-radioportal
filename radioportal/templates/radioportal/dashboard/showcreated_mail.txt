@@ -1,0 +1,20 @@
+Hallo,
+
+soeben wurde eine neue Sendung für das xenim streaming network für dich 
+erstellt. Du kannst und solltest unter
+
+> {{ show_url }}
+
+alle weiteren Angaben zu deiner Sendung ergänzen bzw. ändern. Im Dashboard
+können auch die Zugangsdaten für den zentralen Icecast-Server nachgeguckt
+wierden. Weitere Informationen befinden sich im Wiki [1].
+
+Bei Fragen einfach über einen der bekannten Kanäle [2] melden.
+
+Viele Grüße
+
+Das xenim streaming team
+
+[1] {{ wiki_url }}
+[2] {{ wiki_communication_url }}
+

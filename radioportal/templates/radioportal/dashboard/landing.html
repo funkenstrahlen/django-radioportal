@@ -32,7 +32,26 @@ OF SUCH DAMAGE.
 Here you can change all settings regarding the appearance of your show and the behavior of the streams.
 You might also have a look at the wiki for additional features, documentation and contact informations.{% endblocktrans %}</p>
 
-{% if shows or perms.portal.add_show %}
+
+{% if reviews and perms.radioportal.add_showrequest %}
+<h3>{% trans "Pending Request Reviews" %}</h3>
+<ul>
+{% for r in reviews %}
+<li><a href="{% host_url "admin-show-request" r.id on "dashboard" %}">{{ r.name }} {% trans "by" %} {{ r.user }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if requests %}
+<h3>{% trans "Requests for new Shows" %}</h3>
+<ul>
+{% for r in requests %}
+<li>{{ r.name }}, {{ r.create_time }}: {{ r.get_status_display }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if shows or perms.radioportal.add_show %}
 <h3>{% trans "Shows" %}</h3>
 <p class="explanation">
 {% blocktrans %}
@@ -49,13 +68,13 @@ They also contain episodes for time a stream is online.
 {% if "delete_show" in show_perms %}(<a href="{% host_url "admin-show-delete" s.slug on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
 </li>
 {% endfor %}
-{% if perms.portal.add_show %}
+{% if perms.radioportal.add_show %}
 	<li><a href="{% host_url "admin-show-create" on "dashboard" %}">{% trans "Create new Show" %}</a></li>
 {% endif %}	
 </ul>
 {% endif %}
 
-{% if channels or perms.portal.add_channel %}
+{% if channels or perms.radioportal.add_channel %}
 <h3>{% trans "Streams" %}</h3>
 <p class="explanation">
 {% blocktrans %}
@@ -71,7 +90,7 @@ This is the place to view or change the credentials for your streams.
 		{% if "delete_channel" in channel_perms %}(<a href="{% host_url "admin-channel-delete" s.id on "dashboard" %}">{% trans "delete" %}</a>){% endif %}
 	</li>
 {% endfor %}
-{% if perms.portal.add_channel %}
+{% if perms.radioportal.add_channel %}
 	<li><a href="{% host_url "admin-channel-create" on "dashboard" %}">{% trans "Create new Channel" %}</a></li>
 {% endif %}
 </ul>
@@ -79,13 +98,19 @@ This is the place to view or change the credentials for your streams.
 <h3>{% trans "Account Settings" %}</h3>
 <ul>
     <li><a href="{% host_url "django.contrib.auth.views.password_change" on "dashboard" %}">{% trans "Change Password" %}</a></li>
+{% if not reviews or request.user.is_superuser %}
+    <li><a href="{% host_url "admin-show-request-create" on "dashboard" %}">{% trans "Request Show" %}</a></li>
+{% endif %}
+    <li><a href="{% host_url "account_email" on "dashboard" %}">{% trans "Change E-Mail" %}</a></li>
 {% if request.user.is_superuser %}
     <li><a href="{% host_url "admin-list-users" on "dashboard" %}">{% trans "List of Users" %}</a></li>
     <li><a href="{% host_url "admin-wizard" on "dashboard" %}">{% trans "Create new User, Show, Channel and Stream" %}</a></li>
 {% endif %}
 </ul>
+{% if perms.radioportal.change_recording %}
 <h3>{% trans "Recordings" %}</h3>
 <ul>
 <li><a href="{% host_url "archive-list" on "dashboard" %}">{% trans "List of Recordings" %}</a></li>
 </ul>
+{% endif %}
 {% endblock %}

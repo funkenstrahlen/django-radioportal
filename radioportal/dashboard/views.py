@@ -60,7 +60,7 @@ from radioportal import forms
 from radioportal.dashboard import forms as dforms
 from radioportal.dashboard.decorators import superuser_only
 from radioportal.messages.send import send_msg
-from radioportal.models import Show, Channel, Episode, PodcastFeed, EpisodePart, Marker, Message, SourcedStream
+from radioportal.models import Show, Channel, Episode, PodcastFeed, EpisodePart, Marker, Message, SourcedStream, ShowRequest
 
 from django.core.mail import send_mail
 from formtools.wizard.views import SessionWizardView
@@ -409,6 +409,8 @@ class LandingView(TemplateResponseMixin, View):
 
     def get(self, request, *args, **kwargs):
         ctx = {}
+        ctx['requests'] = ShowRequest.objects.filter(user=request.user,status="NEW")
+        ctx['reviews'] = ShowRequest.objects.filter(status="NEW")
         ctx['shows'] = get_objects_for_user(request.user, 'radioportal.change_show', Show).extra(
 			select={'lower_name': 'lower(name)'}).order_by('lower_name')
         ctx['channels'] = get_objects_for_user(request.user, 'radioportal.change_channel').order_by('cluster')
@@ -815,14 +817,3 @@ def is_safe_url(url, host=None):
     netloc = urllib_parse.urlparse(url)[1]
     return not netloc or netloc == host or netloc in settings.LOGIN_REDIRECT_WHITELIST
 
-# class MarkerListView(ListView):
-#     model = Marker
-# 
-#     template_name = "radioportal/dashboard/marker_list.html"
-# 
-#     def get_queryset(self):
-#         self.episodepart = get_object_or_404(EpisodePart, id=self.args[0])
-#         return Marker.objects.filter(episode=self.episodepart)
-# 
-# class MarkerCreateView(CreateView):
-#     model = Marker
