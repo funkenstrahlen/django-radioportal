@@ -32,6 +32,8 @@ Created on 14.09.2011
 @author: robert
 '''
 
+from crispy_forms_foundation.forms import FoundationModelForm
+from crispy_forms_foundation.layout import Layout, Fieldset, SplitDateTimeField, Row, Column, ButtonHolder, Submit, Div, InlineField
 
 from datetime import timedelta
 from itertools import chain
@@ -178,17 +180,17 @@ class PermissionForm(forms.Form):
                 shortcuts.assign(perm, self.user, instance)
 
 
-class EpisodeForm(forms.ModelForm):
+class EpisodeForm(FoundationModelForm):
     required_css_class = "required"
     status = forms.ChoiceField(choices=models.Episode.PUBLIC_STATUS)
     class Meta:
         model = models.Episode
         fields = ('slug', 'status')
 
-class EpisodePartForm(forms.ModelForm):
+class EpisodePartForm(FoundationModelForm):
     required_css_class = "required"
-    begin = forms.SplitDateTimeField
-    end = forms.SplitDateTimeField
+    begin = forms.SplitDateTimeField()
+    end = forms.SplitDateTimeField()
     shownotes_id = forms.ChoiceField
 
     def __init__(self, *args, **kwargs):
@@ -206,17 +208,17 @@ class EpisodePartForm(forms.ModelForm):
         model = models.EpisodePart
         exclude = ()
         widgets = {
-            'begin': adminwidgets.AdminSplitDateTime(),
-            'end': adminwidgets.AdminSplitDateTime(),
+#            'begin': adminwidgets.AdminSplitDateTime(),
+#            'end': adminwidgets.AdminSplitDateTime(),
             'episode': widgets.HiddenInput(),
         }
-    class Media:
-        js = (
-            'admin/js/core.js',
-            'admin/js/admin/RelatedObjectLookups.js',
-            'admin/js/jquery.min.js',
-            'admin/js/jquery.init.js',
-        )
+#    class Media:
+#        js = (
+#            'admin/js/core.js',
+#            'admin/js/admin/RelatedObjectLookups.js',
+#            'admin/js/jquery.min.js',
+#            'admin/js/jquery.init.js',
+#        )
 
 class CreateEpisodeForm(forms.ModelForm):
     required_css_class = "required"
@@ -404,28 +406,26 @@ def shownotes_shows():
     result.insert(0, (None, ''))
     return result
 
-class ShowForm(forms.ModelForm):
-    required_css_class = "required"
 
+class ShowForm(FoundationModelForm):
+    required_css_class = "required"
     shownotes_id = forms.ChoiceField(choices=shownotes_shows, required=False)
 
     class Meta:
         model = models.Show
         widgets = {
-            'chat': IRCWidget(choices=IRCNETWORKS),
             'icon': ImageClearableFileInput,
         }
         exclude = ('icon_url', 'icon_etag')
 
 
-class ShowReducedForm(forms.ModelForm):
+class ShowReducedForm(FoundationModelForm):
+
+#    layout = Layout( InlineField("twitter", label_class="text-right middle"), "chat", "shownotes_id", "licence", "defaultShortName", "nextEpisodeNumber","public_email", "donation_url")
     required_css_class = "required"
     class Meta:
         model = models.Show
         exclude = ('name', 'url', 'abstract', 'description', 'icon', 'icon_url', 'icon_etag')
-        widgets = {
-            'chat': IRCWidget(choices=IRCNETWORKS),
-        }
 
 class PodcastFeedForm(forms.ModelForm):
     required_css_class = "required"

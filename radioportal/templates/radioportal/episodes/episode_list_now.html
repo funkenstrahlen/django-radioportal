@@ -40,9 +40,9 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url "shows-feed" status="live" show_name=show.slug on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url "shows-feed" status="live" show_name=show.slug on "feeds" %}" class="icon-rss-squared">{% trans "atom" %}</a></li>
 {% else %}
-	<li><a href="{% host_url "all-feed" status="live" on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
+	<li><a href="{% host_url "all-feed" status="live" on "feeds" %}" class="icon-rss-squared">{% trans "atom" %}</a></li>
 {% endif %}
 
 {% endblock %}

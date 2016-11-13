@@ -43,10 +43,6 @@ from polymorphic import PolymorphicModel
 from easy_thumbnails.fields import ThumbnailerImageField
 
 import jsonfield
-import uuid
-import os.path
-
-
 import os.path
 import uuid
 
@@ -63,7 +59,7 @@ class Show(models.Model):
     twitter = models.CharField(max_length=100, blank=True, default='',
         help_text='Name of the associated Twitter account')
     chat = models.CharField(max_length=100, blank=True, default='',
-        help_text='Associated IRC network and channel. Contact administrator for unlisted networks.')
+        help_text='Location for listeners to chat with eachother. Examples: irc://irc.freenode.net/#xsn, https://slackin.community.metaebene.me/')
     description = models.CharField(max_length=200, blank=True, default='',
         verbose_name=_("Description"))
     abstract = models.TextField(blank=True, default='',
@@ -817,6 +813,7 @@ class SecondaryNotification(models.Model):
 def post_delete_secondarynotification(sender, instance, *args, **kwargs):
     if instance.path and not instance.path.secondarynotification_set.all():
         instance.path.delete()
+
 
 @receiver(post_save, sender=Show)
 def create_default_notifications(sender, instance, created, raw, *args, **kwargs):

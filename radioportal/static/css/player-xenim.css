@@ -1,0 +1,67 @@
+.mejs-container {
+  display: inline-block;
+  margin-top: 0.5em;
+}
+
+.mejs-offscreen {
+  display: none;
+}
+
+.player button {
+  margin: 0;
+}
+
+.mejs-play button, .mejs-pause button {
+  display: inline-block;
+  text-align: center;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  transition: background-color .25s ease-out,color .25s ease-out;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: 0;
+  padding: .85em 1em;
+  font-size: .9rem;
+  background-color: #2199e8;
+  color: #fefefe;
+  margin-right: 0.5em;
+}
+/*
+.mejs-play button, .mejs-pause button {
+  font-size: 2em;
+  width: 1em;
+  height: 1em;
+  border: 0.2em solid black;
+  text-align: center;
+  line-height: 1em;
+  border-radius: 1em;
+  box-sizing: content-box;
+  background-color: transparent;
+  padding: 0.2em;
+}*/
+.mejs-play button:after {
+  content: " Listen to Live Stream";
+}
+
+.mejs-pause button:after {
+  content: " Stop Live Stream";
+}
+/*
+.mejs-pause button:hover, .mejs-play button:hover {
+  box-shadow: 0 0 0.1em 0.025em rgba(0,0,150,0.75), inset 0 0 0.1em 0.025em rgba(0,0,150,0.75);
+  text-shadow: 0 0 0.3em rgba(0,0,150,0.75);
+}
+*/
+.mejs-play button:before {
+  margin: 0;
+  margin-left: 0.2em;
+  content: '\e805';
+  font-family: "fontello"
+}
+.mejs-pause button:before {
+  margin: 0;
+  margin-left: 0.025em;
+  content: '\e808';
+  font-family: "fontello"
+}

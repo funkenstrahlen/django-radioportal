@@ -1,4 +1,4 @@
-{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts crispy_forms_tags %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -35,6 +35,8 @@ OF SUCH DAMAGE.
 {% block content %}
 {{ form.media }}
 <h2>{% trans "Edit Part of Episode" %}</h2>
+{% crispy form %}
+<!--
 <form action="" method="POST">
 {% csrf_token %}
 <table>
@@ -42,6 +44,7 @@ OF SUCH DAMAGE.
 </table>
 <input type="submit" value="{% trans "Apply" %}" />
 </form>
+-->
 
 {% if form.instance.graphics.all %}
 <h3>{% trans "Associated Graphics" %}</h3>

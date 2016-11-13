@@ -37,17 +37,20 @@ OF SUCH DAMAGE.
 
 {% block shorturl_footer %}{% endblock %}
 {% block shorturl_head %}{% endblock %}
+{% block head_css %}{% endblock %}
 {% block head_js %}
-        {{ block.super }}
+	{{ block.super }}
 	{% load staticfiles %}
 	<script type="text/javascript" src="{% url 'jsi18n' %}"></script>
-	<script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
-	<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
-	<link rel="stylesheet" type="text/css" href="{% static "admin/css/widgets.css" %}"/>	
+	<!--	<script type="text/javascript" src="{% static "admin/js/core.js" %}"></script> -->
+	<!--	<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/> -->
+	<!--	<link rel="stylesheet" type="text/css" href="{% static "admin/css/widgets.css" %}"/>	-->
 	{{ form.media }}
-	<script type="text/javascript">
-	window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";
-	</script>
+	<!--	<script type="text/javascript">
+		window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";
+	</script> -->
+<!--	<link rel="stylesheet" href="{% static "foundation/css/foundation.css" %}">
+	<link rel="stylesheet" href="{% static "foundation/css/app.css" %}"> -->
 {% endblock %}
 {% block content_class %}accounts {% endblock %}
 {% block navi_account %}

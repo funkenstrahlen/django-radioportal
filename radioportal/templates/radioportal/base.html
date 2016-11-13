@@ -28,20 +28,7 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% block head_js %}
 {% load staticfiles %}
-<script type="text/javascript" src="{% static "js/jquery/jquery-1.11.3.min.js" %}"></script>
 <script type="text/javascript" src="{% static "js/modernizr/modernizr.custom.10600.js" %}"></script>
-<link rel="stylesheet" href="{% static "css/font/fontello.css" %}">
-<!--[if IE 7]><link rel="stylesheet" href="{% static "css/font/fontello-ie7.css" %}"><![endif]-->
-<link rel="stylesheet" href="{% static "css/sharebuttons.css" %}">
-<script type="text/javascript">
-  function registerPopupClick() {
-    $("a.sharelink").click(function(event) {
-      event.preventDefault();
-      window.open(this.href, "_blank", "width=500,height=500,menubar=0,toolbar=0,", false);
-    });
-  }
-  $(registerPopupClick);
-</script>
 {% endblock %}
 {% block navigation %}
 {% load i18n hosts %}
@@ -84,31 +71,11 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block breadcrumb %}<a href="{% url 'root' %}">{% trans "Start" %}</a>{% endblock %}
 {% block content_foot %}
-<div id="socialshareprivacy"></div>
-<!-- Social -->
-{% spaceless %}
-<div class="icon-only">
-    <h4>{% trans "Share on:" %}</h4>
-    <ul id="sharelist">
-        <li>
-            <a target="_blank" href="https://plus.google.com/share?url={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-gplus"></i>
-                <span>Google+</span>
-            </a>
-        </li>
-        <li>
-            <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-facebook"></i>
-                <span>Facebook</span>
-            </a>
-        </li>
-        <li>
-            <a target="_blank" href="https://twitter.com/home?status={{ current_path|urlencode }}" class="sharelink">
-                <i aria-hidden="true" class="icon-twitter"></i>
-                <span>Twitter</span>
-            </a>
-        </li>
-    </ul>
-</div>
-{% endspaceless %}
+<span style="white-space: nowrap;">
+{% trans "Share on:" %}<br />
+<span style="font-size: 1.5em;">
+<a target="_blank" href="https://plus.google.com/share?url={{ current_path|urlencode }}" class="icon-gplus-squared"></a>
+<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ current_path|urlencode }}" class="icon-facebook-squared"></a>
+<a target="_blank" href="https://twitter.com/home?status={{ current_path|urlencode }}" class="icon-twitter-squared"></a>
+</span></span>
 {% endblock %}

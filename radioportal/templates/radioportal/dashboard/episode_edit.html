@@ -1,4 +1,4 @@
-{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts crispy_forms_tags %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -33,13 +33,7 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block content %}
 <h2>{% trans "Edit episode" %}</h2>
-<form action="" method="POST">
-{% csrf_token %}
-<table>
-{{ form.as_table }}
-</table>
-<input type="submit" value="{% trans "Apply" %}" />
-</form>
+{% crispy form %}
 <h3>{% trans "Parts of this Episode" %}</h3>
 <p>{% blocktrans %}An episode might be split up into several parts when for example the streams gets 
 disconnected due to network problems. The parts can also be transferred to other episodes in case of wrong matching.

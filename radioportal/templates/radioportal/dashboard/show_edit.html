@@ -1,4 +1,4 @@
-{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts %}
+{% extends 'radioportal/dashboard/base.html' %}{% load i18n hosts crispy_forms_tags %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -47,12 +47,5 @@ properties of the show either update the podcast feed or disable the automatic u
 <a href="{% host_url "admin-show-feed" object.slug on "dashboard" %}">{% trans "here" %}</a> 
 </p><br />
 {% endif %}
-
-<form action="" method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-<table>
-{{ form.as_table }}
-<tr><td colspan="2"><input type="submit" value="{% trans "Apply" %}" /></td></tr>
-</table>
-</form>
+{% crispy form %}
 {% endblock %}

@@ -37,7 +37,7 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block head_css %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_css.html" %}
+	<link rel="stylesheet" href="{% static "css/player-xenim.css" %}" />
 <style>
 .graph {
   font: 10px sans-serif;
@@ -57,15 +57,24 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block head_js %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_js.html" %}
         <script src="{% static 'showgraph.min.js' %}"></script>
+        <script src="{% static "js/mediaelement-and-player.min.js" %}"></script>
+	<script>
+	$('audio').mediaelementplayer({
+		features: ['playpause'],
+		stretching: "fill",
+		setDimensions: false,
+		success: function (mediaElement, domObject) {
+			mediaElement.addEventListener('pause', function (e) {
+				mediaElement.load();
+			}, false);
+	        }
+	});
+	</script>
 {% endblock %}
 
 {% block shorturl_head %}{% cache 36000 episode.id %}<link rev="canonical" href="{% shorturl episode %}" />{% endcache %}{% endblock %}
-{% block shorturl_footer %}{% cache 36000 episode.id %}
-<!--  <a rev="canonical" href="{% shorturl episode %}">{% trans "Short URL" %}</a> -->
-{% shorturl episode %}
-{% endcache %}{% get_obj_perms request.user for episode.show as "episode_perm" %}{% if "change_episodes" in episode_perm %} <a class="dashboard" href="{% host_url "admin-episode-edit" episode.pk on "dashboard" %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
+{% block shorturl_footer %}{% cache 36000 episode.id %}{% trans "Short URL" %}: {% shorturl episode %}{% endcache %}{% get_obj_perms request.user for episode.show as "episode_perm" %}{% if "change_episodes" in episode_perm %} <a href="{% host_url "admin-episode-edit" episode.pk on "dashboard" %}">{% trans "edit" %}</a>{% endif %}{% endblock %}
 {% block collapsed_shows %}{% endblock %}
 {% block navi_shows %}
 {% comment %}
@@ -96,9 +105,14 @@ OF SUCH DAMAGE.
 		{% include "radioportal/episodes/episode_streams.html" %}
                 <div class="streams">
 	        {% if episode.show.chat %}{% ifequal episode.status "RUNNING" %}
-                <span class="chat" style="border: 2px solid #D9E1EE; padding: 0.5em; margin: 0.2em;">
-			<b>{% trans "Chat" %}</b>: <a href="http://webchat.freenode.net?channels={{ episode.show.chat|urlsplit:"fragment" }}"><code>{{ episode.show.chat }}</code></a>
-                </span>
+                <div class="chat" style="border: 2px solid #D9E1EE; padding: 0.5em; margin: 0.2em;">
+			<b>{% trans "Chat" %}</b>: <a href="{{ episode.show.chat }}"><code>{{ episode.show.chat }}</code></a>
+                        {% if episode.show.chat|urlsplit:"scheme" == "irc" %}
+                            <iframe src="https://kiwiirc.com/client/{{ episode.show.chat|urlsplit:"hostname" }}/{{ episode.show.chat|urlsplit:"fragment" }}" style="border:0; width:100%; height:450px;"></iframe>
+                        {% else %}
+
+                        {% endif %}
+                </div>
 	        {% endifequal %}{% endif %}
 {% if part.shownotes_id %}
                 <span class="shownotes" style="border: 2px solid #D9E1EE; padding: 0.5em; margin: 0.2em;">

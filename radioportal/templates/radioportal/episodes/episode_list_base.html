@@ -1,4 +1,4 @@
-{% extends base %}{% load cache i18n shorturl hosts thumbnail %}
+{% extends base %}{% load cache i18n shorturl hosts thumbnail staticfiles %}
 {% comment %}
 Copyright © 2012 Robert Weidlich. All Rights Reserved.
 
@@ -30,20 +30,32 @@ OF SUCH DAMAGE.
 {% block breadcrumb %}{{ block.super }} » <a href="{% url 'shows' %}">{% trans "Shows" %}</a>{% if show %} » {{ show.name }}{% endif %}{% endblock %}
 {% block head_css %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_css.html" %}
+	<link rel="stylesheet" href="{% static "css/player-xenim.css" %}" />
 {% endblock %}
 {% block head_js %}
 	{{ block.super }}
-	{% include "radioportal/episodes/episode_streams_head_js.html" %}
+	<script src="{% static "js/mediaelement-and-player.min.js" %}"></script>
+	<script>
+	$('audio').mediaelementplayer({
+		features: ['playpause'],
+		stretching: "fill",
+		setDimensions: false,
+		success: function (mediaElement, domObject) {
+			mediaElement.addEventListener('pause', function (e) {
+				mediaElement.load();
+			}, false);
+	        }
+	});
+	</script>
 {% endblock %}
 {% block head %}
 {% if show %}
 <link href="{% host_url "show-feed" show_name=show.slug on "feeds" %}" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
 {% endif %}
 {% endblock %}
+{% block feed_label %}{% trans "Subscribe" %}{% endblock %}
 {% block feed_footer %}
-
-<li><a href="{% host_url "show-feed" show_name=show.slug on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
+<li><a href="{% host_url "show-feed" show_name=show.slug on "feeds" %}" class="icon-rss-squared"><span class="show-for-medium">{% trans "atom" %}</span></a></li>
 {% endblock %}
 {% block collapsed_shows %}un{% endblock %}
 {% block navi_shows %}
@@ -108,17 +120,17 @@ OF SUCH DAMAGE.
 {% block no_episodes %}<h2>{% trans "No episodes available." %}</h2>{% endblock %}
 {% endif %}
 {% if is_paginated %}
-<div class="pagination">
-<ul>
+<div>
+<ul class="pagination text-center">
 	{% if page_obj.has_previous %}
 	{% ifnotequal page_obj.previous_page_number 1 %}
 	<li><a href="?page=1">{% trans "First" %}</a></li>
 	{% endifnotequal %}
-	<li><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+	<li class="pagination-previous"><a href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
 	{% endif %}
-	<li>{% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ paginator.num_pages }}</li>
+	<li class="">{% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ paginator.num_pages }}</li>
 	{% if page_obj.has_next %}
-	<li><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+	<li class="pagination-next"><a href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
 	{% ifnotequal page_obj.next_page_number paginator.num_pages %}
 	<li><a href="?page=last">{% trans "Last" %}</a></li>
 	{% endifnotequal %}

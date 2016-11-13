@@ -27,46 +27,48 @@ OF SUCH DAMAGE.
 {% endcomment %}
 {% load cache i18n hosts %}
 {% ifequal episode.status "RUNNING" %}
-	{% cache 900 episode_stream episode.status episode.id %}
-	<div class="streams audio">
-	{% if episode.channel %}
-        <h4>{% trans "Listen" %}: {{ episode.channel.streamCurrentSong }}</h4>
-
-     
-		<ul>
-<li class="stream webplayer">
-<span class="play">
-&#9658;
-</span>
-<span class="player">
-<audio id="player{{ episode.channel.id }}" controls="controls" preload="none" class="mejs-xsn">
-{% for stream in episode.channel.running_streams %}
-  <source src="{% host_url "mount" stream=stream.mount on "www" %}" type="{{ stream.mimetype }}" />
-{% endfor %}
-</audio>
-</span>
-</li>
-		{% for stream in episode.channel.running_streams %}
-		{% spaceless %}
-		<li class="stream direct">
-                  {% spaceless %}
-                    {% if stream.transport == "http" %}
-			<a href="{% host_url "playlist" slug=stream.mount on "www" %}">{{ stream.displayFormat }}</a>
-			(<a href="{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{% trans "direct" %}</a>,&nbsp;
-                    {% elif stream.transport == "hls" %}
-			<a href="{% host_url "mount" stream=stream.mount on "www" %}" class="mount">{{ stream.displayFormat }}</a>(
-                    {% endif %}
-			<a href="{% load shorturl %}{% shorturl stream %}">{% trans "Short URL" %}</a>)
-                  {% endspaceless %}
-		</li>
-		{% endspaceless %}
-		{% empty %}
-		<li class="stream">{% trans "Streams are upcoming, please wait." %}</li>
-		{% endfor %}
-		</ul>
-	{% else %}
-		<p>{% trans "No streams available currently" %}</p>
-	{% endif %}
-	</div>
-	{% endcache %}
+  {% cache 900 episode_stream episode.status episode.id %}
+  <div>
+    {% if episode.channel %}
+    <div class="player">
+        <audio id="player{{ episode.channel.id }}" controls="controls" preload="none">
+      {% for stream in episode.channel.running_streams %}
+          <source src="{% host_url "mount" stream=stream.mount on "www" %}" type="{{ stream.mimetype }}" />
+      {% endfor %}
+        </audio>
+	<button class="button" type="button" data-toggle="dropdown-{{ episode.channel.id }}">{% trans "External Player" %} <span class="icon-down-open"></span></button>
+        <div class="dropdown-pane" id="dropdown-{{ episode.channel.id }}" data-dropdown data-auto-focus="true" style="min-width:20em;">
+          <ul>
+      {% for stream in episode.channel.running_streams %}
+            <li>{{ stream.displayFormat }}
+              <ul>
+        {% if stream.transport == "http" %}
+                <li>
+                  <a href="{% host_url "playlist" slug=stream.mount on "www" %}">{% trans "Playlist" %}</a>
+                </li>
+                <li>
+                  <a href="{% host_url "mount" stream=stream.mount on "www" %}">{% trans "direct" %}</a>
+                </li>
+        {% elif stream.transport == "hls" %}
+                <li>
+                  <a href="{% host_url "mount" stream=stream.mount on "www" %}">{% trans "Playlist" %}</a>
+                </li>
+        {% endif %}
+                <li>
+                  <a href="{% load shorturl %}{% shorturl stream %}">{% trans "Short URL" %}</a>
+                </li>
+              </ul>
+            </li>
+      {% empty %}
+            <li>{% trans "Streams are upcoming, please wait." %}</li>
+      {% endfor %}
+          </ul>
+        </div>
+    </div>
+    <div>{{ episode.channel.streamCurrentSong }}</div>
+  {% else %}
+    <p>{% trans "No streams available currently" %}</p>
+  {% endif %}
+  </div>
+  {% endcache %}
 {% endifequal %}

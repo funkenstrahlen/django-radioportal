@@ -39,11 +39,11 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block feed_footer %}
 {% if show %}
-	<li><a href="{% host_url "shows-feed" status="upcoming" show_name=show.slug on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
-	<li><a href="{% host_url "upcoming-show-ical" show_name=show.slug on "feeds" %}" class="feed ical">{% trans "ical" %}</a></li>
+	<li><a href="{% host_url "shows-feed" status="upcoming" show_name=show.slug on "feeds" %}" class="icon-rss-squared"><span class="show-for-medium">{% trans "atom" %}</span></a></li>
+	<li><a href="{% host_url "upcoming-show-ical" show_name=show.slug on "feeds" %}" class="icon-calendar"><span class="show-for-medium">{% trans "ical" %}</span></a></li>
 {% else %}
-	<li><a href="{% host_url "all-feed" status="upcoming" on "feeds" %}" class="feed atom">{% trans "atom" %}</a></li>
-	<li><a href="{% host_url "upcoming-all-ical" on "feeds" %}" class="feed ical">{% trans "ical" %}</a></li>
+	<li><a href="{% host_url "all-feed" status="upcoming" on "feeds" %}" class="icon-rss-squared"><span class="show-for-medium">{% trans "atom" %}</span></a></li>
+	<li><a href="{% host_url "upcoming-all-ical" on "feeds" %}" class="icon-calendar"><span class="show-for-medium">{% trans "ical" %}</span></a></li>
 {% endif %}
 {% endblock %}
 
