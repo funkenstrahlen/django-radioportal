@@ -57,8 +57,7 @@ OF SUCH DAMAGE.
 {% endblock %}
 {% block head_js %}
 	{{ block.super }}
-        <script src="{% static 'showgraph.min.js' %}"></script>
-        <script src="{% static "js/mediaelement-and-player.min.js" %}"></script>
+	<script src="{% static "js/mediaelement-and-player.min.js" %}"></script>
 	<script>
 	$('audio').mediaelementplayer({
 		features: ['playpause'],
@@ -126,6 +125,7 @@ OF SUCH DAMAGE.
 		<div class="graph" id="{{ graphic.uuid }}">
 {% if graphic.data %}
 <div id="graph-{{ graphic.uuid }}"></div>
+<script src="{% static 'showgraph.min.js' %}"></script>
 <script>
 showgraph("{% url "graphic_stats" graphic.uuid %}", "#graph-{{ graphic.uuid }}", function(d) { return d.hostname; });
 </script>
