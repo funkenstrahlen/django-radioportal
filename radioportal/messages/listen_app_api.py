@@ -67,12 +67,11 @@ class ListenAppAPI(object):
 
 		try:
 			results = result["results"]
-			# there should not be multiple matches
-			if len(results) > 1:
-				raise ListenAppAPIError("Could not fetch channelId. Too many matches.", result)
-			else:
+			if len(results) == 1:
 				channel = results[0] # get the one single element of the results
 				return channel["objectId"]
+			else:
+				raise ListenAppAPIError("Could not fetch channelId.", result)
 		except KeyError as e:
 			raise ListenAppAPIError("Could not fetch channelId", result)
 
